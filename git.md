@@ -16,7 +16,11 @@
   * `git config --local [--unset] user.email <Email>`
 > 注：--unset 移除配置
 
-## 3. git rm 与 rm
+## 3. git add
+* `git add <文件名>` 将指定文件纳入到暂存区
+* `git add .` 将当前目录下以及当前目录的子目录下的所有文件都纳入暂存区
+
+## 4. git rm 与 rm
 * git rm:
   * 删除一个文件
   * 将被删除的文件纳入到暂存区（stage, index）
@@ -26,3 +30,5 @@
 * rm
   * 删除一个文件
   * **没有**将被删除的文件纳入到暂存区（stage, index），可以使用 `git add <文件名>` 将被删除或修改的文件纳入暂存区
+* **git mv 与 mv 的区别同上**
+
