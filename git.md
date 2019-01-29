@@ -16,11 +16,23 @@
   * `git config --local [--unset] user.email <Email>`
 > 注：--unset 移除配置
 
-## 3. git add
+## 3. 获取版本库
+* 将当前目录初始化为git版本库  
+  `git init`
+* 克隆远程版本库  
+  `git clone <版本库地址>`
+
+## 4. 查看日志
+* 查看提交日志  
+  `git log`
+* <span id="op_log">查看操作日志</span>  
+  `git reflog`
+
+## 5. git add
 * `git add <文件名>` 将指定文件纳入到暂存区
 * `git add .` 将当前目录下以及当前目录的子目录下的所有未追踪的文件都纳入暂存区
 
-## 4. git rm 与 rm
+## 6. git rm 与 rm
 * git rm:
   * 删除一个文件
   * 将被删除的文件纳入到暂存区（stage, index）
@@ -32,10 +44,17 @@
   * **没有**将被删除的文件纳入到暂存区（stage, index），可以使用 `git add <文件名>` 将被删除或修改的文件纳入暂存区
 * **git mv 与 mv 的区别同上**
 
-## 5. 修改上一次提交的日志内容
-* `git commit --amend -m '新的日志内容'`
+## 7. 提交（commit）
+* 多行日志  
+  `git commit`
+* 单行日志  
+  `git commit -m '提交日志'`
+* `git add .` **+** `git commit -m`  
+  `git commit --am '提交日志'`
+* 修改上一次提交的日志内容  
+  `git commit --amend -m '新的日志内容'`
 
-## 6. 分支
+## 8. 分支
 * 原理
   * 单分支：一个commit对象链，一条工作记录线。
   * HEAD是一个指针，指向当前分支。
@@ -56,3 +75,11 @@
   `git merge <分支名>` 将其他分支上的修改合并（应用）到当前分支上
 * 显示当前分支最近（最后）一次提交的日志  
   `git branch -v`
+ 
+## 9. 版本回退
+* 回退上到一个版本
+  * `git reset --hard HEAD^`
+  * `git reset --hard HEAD~1`
+* 回退或前进到任何一个版本（commit_id可以只写前4个）
+  * `git reset --hard <commit_id>`
+    > 前进到指定版本时可[查看操作日志](#op_log)来获取commit_id
