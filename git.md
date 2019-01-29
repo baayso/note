@@ -6,12 +6,23 @@
 
 ## 2. user.name 与 user.email，可以设置的地方：
 * /etc/gitconfig （针对一台电脑上所有用户，不常用，优化级最低）
-  * git config --system [--unset] user.name \<Username>
-  * git config --system [--unset] user.email \<Email>
+  * `git config --system [--unset] user.name <Username>`
+  * `git config --system [--unset] user.email <Email>`
 * ~/.gitconfig （针对某一用户下所有git仓库，常用，优化级其次）
-  * git config --global [--unset] user.name \<Username>
-  * git config --global [--unset] user.email \<Email>
+  * `git config --global [--unset] user.name <Username>`
+  * `git config --global [--unset] user.email <Email>`
 * .git/config （针对某一git仓库，常用，优先级最高）
-  * git config --local [--unset] user.name \<Username>
-  * git config --local [--unset] user.email \<Email>
+  * `git config --local [--unset] user.name <Username>`
+  * `git config --local [--unset] user.email <Email>`
 > 注：--unset 移除配置
+
+## 3. git rm 与 rm
+* git rm:
+  * 删除一个文件
+  * 将被删除的文件纳入到暂存区（stage, index）
+  * 恢复被删除的文件需要进行执行两个命令:
+    * `git reset HEAD <文件名>` 将待删除的文件从暂存区恢复到工作区
+    * `git checkout -- <文件名>` 将工作区中的修改丢弃掉
+* rm
+  * 删除一个文件
+  * **没有**将被删除的文件纳入到暂存区（stage, index），可以使用 `git add <文件名>` 将被删除或修改的文件纳入暂存区
