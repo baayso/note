@@ -116,3 +116,27 @@
   `git tag -a v1.0.2 -m 'release version'`
 * 删除标签  
   `git tag -d <tag_name>`
+* 查看标签列表  
+  `git tag`
+* 查找标签
+  * 精确查找
+    * `git tag -l 'v1.0.1'`
+  * 模糊查找
+    * `git tag -l *2`
+    * `git tag -l v1.*`
+
+## 12. diff
+* 显示文件中每一行的commit_id和作者  
+  `git blame <文件名>`
+* 暂存区与工作区的文件差别  
+  `git diff`
+* 某一个提交与工作区的差别
+  * 最新一次提交与工作区的差别  
+    `git diff HEAD`
+  * 指定的一次提交与工作区的差别  
+    `git diff <commit_id>`
+* 某一个提交与暂存区的差别  
+  `git diff --cached <commit_id>`
+* 两个提交之间的差别  
+  ``
+
