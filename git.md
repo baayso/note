@@ -98,7 +98,7 @@
   `git stash`
 * 保存工作现场并填写日志  
   `git stash save '日志'`
-* 查看工作现场列表
+* 查看工作现场列表  
   `git stash list`
 * 恢复最后一次保存的工作现场
   * `git stash pop`（恢复的同时也将stash内容删除）
@@ -107,3 +107,12 @@
   `git stash apply stash@{编号}`
 * 删除指定的工作现场  
   `git stash drop stash@{编号}`
+
+## 11. Git标签
+> 标签有两种：轻量级标签（lightweight）和带有附注标签（annotated）。
+* 创建一个轻量级标签  
+  `git tag v1.0.1`
+* 创建一个带有附注的标签  
+  `git tag -a v1.0.2 -m 'release version'`
+* 删除标签  
+  `git tag -d <tag_name>`
