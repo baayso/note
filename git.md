@@ -37,8 +37,10 @@
   * 删除一个文件
   * 将被删除的文件纳入到暂存区（stage, index）
   * 恢复被删除的文件需要进行执行两个命令:
-    * `git reset HEAD <文件名>` 将待删除的文件从暂存区恢复到工作区
-    * `git checkout -- <文件名>` 将工作区中的修改丢弃掉
+    * `git reset HEAD <文件名>` 将待删除的文件从暂存区恢复到工作区  
+      > 作用是：将之前添加到暂存区（stage, index）的内容从暂存区移除到工作区
+    * `git checkout -- <文件名>` 将工作区中的修改丢弃掉  
+      > 作用是：丢弃掉相对于暂存区中最后一次添加的文件内容所做的变更。
 * rm
   * 删除一个文件
   * **没有**将被删除的文件纳入到暂存区（stage, index），可以使用 `git add <文件名>` 将被删除或修改的文件纳入暂存区
@@ -61,8 +63,10 @@
   * 分支也是一个指针，指向最近（最后）一次提交。
   * 创建一个分支实际上只创建了一个指针，然后将这个指针指向最近（最后）一次提交。 
   * [了解更多](https://git-scm.com/book/zh/v2/Git-%E5%88%86%E6%94%AF-%E5%88%86%E6%94%AF%E7%AE%80%E4%BB%8B)
-* 创建分支  
+* 以当前分支最新一次的提交点为基准创建新分支  
   `git branch <分支名>`
+* 以指定的提交点为基准创建新分支  
+  `git branch <分支名> <commit_id>`
 * 切换分支  
   * `git checkout <分支名>`
   * `git checkout -` 切换到上一次所在的分支
@@ -75,6 +79,8 @@
   `git merge <分支名>` 将其他分支上的修改合并（应用）到当前分支上
 * 显示当前分支最近（最后）一次提交的日志  
   `git branch -v`
+* 修改分支名称  
+  `git branch -m <原分支名> <新分支名>`
  
 ## 9. 版本回退
 * 回退上到一个版本
@@ -83,3 +89,21 @@
 * 回退或前进到任何一个版本（commit_id可以只写前4个）
   * `git reset --hard <commit_id>`
     > 前进到指定版本时可[查看操作日志](#op_log)来获取commit_id
+* HEAD游离状态（'detached HEAD' state）
+  * `git checkout <commit_id>`  
+    > 此命令可以回退到指定的提交点，但是会处于HEAD游离状态（'detached HEAD' state），此时可以进行一些实验性的变更并且可以提交这些变更，可以通过执行另一个`checkout`命令丢弃掉在当前状态下所进行的任何提交，也可以使用`git checkout -b <新分支名>`命令创建一个新的分支并保留当状态下所创建的任何提交。
+
+## 10. git stash
+* 保存工作现场  
+  `git stash`
+* 保存工作现场并填写日志  
+  `git stash save '日志'`
+* 查看工作现场列表
+  `git stash list`
+* 恢复最后一次保存的工作现场
+  * `git stash pop`（恢复的同时也将stash内容删除）
+  * `git stash apply`（stash内容并不删除）
+* 恢复指定的工作现场  
+  `git stash apply stash@{编号}`
+* 删除指定的工作现场  
+  `git stash drop stash@{编号}`
