@@ -135,8 +135,9 @@
     `git diff HEAD`
   * 指定的一次提交与工作区的差别  
     `git diff <commit_id>`
-* 某一个提交与暂存区的差别  
-  `git diff --cached <commit_id>`
+* 某一个提交与暂存区的差别
+  * 最新一次提交与暂存区的差别  
+    `git diff --cached`
+  * 指定的一次提交与暂存区的差别  
+    `git diff --cached <commit_id>`
 * 两个提交之间的差别  
-  ``
-
