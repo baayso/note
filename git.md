@@ -51,10 +51,11 @@
   `git commit`
 * 单行日志  
   `git commit -m '提交日志'`
-* `git add .` **+** `git commit -m`  
+* `git add .` **+** `git commit -m`（不适用新创建的文件）  
   `git commit --am '提交日志'`
 * 修改上一次提交的日志内容  
-  `git commit --amend -m '新的日志内容'`
+  * `git commit --amend -m '新的日志内容'`
+  * `git commit --amend --reset-author`
 
 ## 8. 分支
 * 原理
@@ -141,3 +142,14 @@
   * 指定的一次提交与暂存区的差别  
     `git diff --cached <commit_id>`
 * 两个提交之间的差别  
+
+## 13. 远程操作
+* 设置远程仓库  
+  `git remote add origin <远程仓库地址>`
+* 将本地仓库的某个分支与远程仓库进行关联    
+  `git push -u origin <分支名称>` 如：`git push -u origin master`
+* 推送  
+  `git push`
+* 拉取  
+  `git pull` 是`fetch`**+**`merge`两个命令的组合
+
