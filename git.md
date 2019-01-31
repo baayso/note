@@ -82,6 +82,12 @@
   `git branch -v`
 * 修改分支名称  
   `git branch -m <原分支名> <新分支名>`
+* 基于git分支的开发模型：
+  > develop分支在开发完成后会merge到test分支，test分支在测试完成后会merge到master分支，最后将master分支push到远程仓库
+  * develop分支，频繁变化的一个分支
+  * test分支，供测试和产品等人员使用的一个分支，变化不是特别频繁
+  * master分支，生产发布分支，变化非常不频繁的一个分支
+  * bugfix(hotfix)分支，用于紧急修复生产系统中出现紧急bug的分支
  
 ## 9. 版本回退
 * 回退上到一个版本
@@ -145,9 +151,15 @@
 
 ## 13. 远程操作
 * 设置远程仓库  
-  `git remote add origin <远程仓库地址>`
+  `git remote add [origin] <远程仓库地址>`
+  > origin 为远程仓库的别名
 * 将本地仓库的某个分支与远程仓库进行关联    
   `git push -u origin <分支名称>` 如：`git push -u origin master`
+* 显示本地仓库关联的所有远程仓库（别名）  
+  `git remote show`
+* 显示指定的远程仓库详细信息  
+  `git remote show <origin>`
+  > origin 为远程仓库的别名
 * 推送  
   `git push`
 * 拉取  
