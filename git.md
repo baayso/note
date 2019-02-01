@@ -154,7 +154,7 @@
   `git remote add [origin] <远程仓库地址>`
   > origin 为远程仓库的别名
 * 将本地仓库的某个分支与远程仓库进行关联    
-  `git push -u origin <分支名称>` 如：`git push -u origin master`
+  `git push -u <远程仓库别名> <分支名称>` 如：`git push -u origin master`
 * 显示本地仓库关联的所有远程仓库（别名）  
   `git remote show`
 * 显示指定的远程仓库详细信息  
