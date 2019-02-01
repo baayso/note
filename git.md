@@ -20,7 +20,8 @@
 * 将当前目录初始化为git版本库  
   `git init`
 * 克隆远程版本库  
-  `git clone <版本库地址>`
+  * `git clone <版本库地址>`
+  * `git clone <版本库地址> <本地目录名称>`
 
 ## 4. 查看日志
 * 查看提交日志  
@@ -155,13 +156,18 @@
   > origin 为远程仓库的别名
 * 将本地仓库的某个分支与远程仓库进行关联    
   `git push -u <远程仓库别名> <分支名称>` 如：`git push -u origin master`
+  > 会在本地仓库创建一个只读的远程分支，分支名称为：`<远程仓库别名>/<远程仓库分支>`，如：`origin/master`
 * 显示本地仓库关联的所有远程仓库（别名）  
   `git remote show`
 * 显示指定的远程仓库详细信息  
   `git remote show <origin>`
   > origin 为远程仓库的别名
-* 推送  
-  `git push`
-* 拉取  
-  `git pull` 是`fetch`**+**`merge`两个命令的组合
-
+* `git push`
+  * **推送**到与本地仓库分支**同名**的远程仓库分支上
+  * 将`origin/master`分支指向最新的提交
+* `git pull`（是`git fetch`**+**`git merge`两个命令的组合）
+  * **拉取**与本地仓库分支**同名**的远程仓库分支
+  * 将`origin/master`分支指向最新的提交
+* 查看远程分支  
+  * `git branch -a`
+  * `git branch -av` 会列出所有分支（本地分支 + 远程分支）以及各分支最后一次提交的信息
