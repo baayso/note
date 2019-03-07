@@ -169,6 +169,24 @@
       ...
   }
   ```
+* `MappedByteBuffer`
+  * 抽象类，继承自`ByteBuffer`类，是`DirectByteBuffer`的父类。
+  * 是一个直接字节缓冲区，其内容是一个文件的内存映射区域。
+  * `MappedByteBuffer`通过`java.nio.channels.FileChannel#map()`方法创建。
+  * 映射的字节缓冲区及它所表示的文件映射在缓冲区本身被垃圾回收之前一直保持有效。
+  * `MappedByteBuffer`是一种允许Java程序直接从内存访问的一种特殊的文件，可以将整个文件或者文件的一部分映射到内存当中，接下来由操作系统负责相关的页面请求并且将内存的修改写入到文件当中。应用程序只需要处理内存中的数据，这样可以实现非常迅速的IO操作。用于内存映射文件的这个内存是堆外内存。
+  * `MappedByteBuffer`使用示例：
+  ```java
+    File file = new File("text.txt");
+    try (RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw")) {
+        FileChannel fileChannel = randomAccessFile.getChannel();
+
+        MappedByteBuffer mappedByteBuffer = fileChannel.map(FileChannel.MapMode.READ_WRITE, 0, file.length());
+
+        mappedByteBuffer.put(0, (byte) 'a');
+        mappedByteBuffer.put(3, (byte) 'b');
+    }
+  ```
 
 ## 4. 通过NIO读取文件涉及到3个步骤：
 1. 从`FileInputStream`对象中获取`FileChannel`对象
