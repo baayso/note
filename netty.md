@@ -106,7 +106,7 @@ import io.netty.util.concurrent.MultithreadEventExecutorGroup;
 /**
  * Abstract base class for {@link EventLoopGroup} implementations that handles their tasks with multiple threads at
  * the same time.
- * 实现了 {@link EventLoopGroup} 的抽象基类，它同时处理多个线程的任务。
+ * 实现了 {@link EventLoopGroup} 的抽象基类，该实现使用多个线程同时处理任务。
  */
 public abstract class MultithreadEventLoopGroup extends MultithreadEventExecutorGroup implements EventLoopGroup {
 
@@ -123,7 +123,7 @@ public abstract class MultithreadEventLoopGroup extends MultithreadEventExecutor
         }
     }
 
-   ...
+    ...
 
     /**
      * @see MultithreadEventExecutorGroup#MultithreadEventExecutorGroup(int, Executor, Object...)
@@ -143,11 +143,11 @@ package io.netty.util.concurrent;
 /**
  * Abstract base class for {@link EventExecutorGroup} implementations that handles their tasks with multiple threads at
  * the same time.
- * 实现了 {@link EventExecutorGroup} 的抽象基类，它同时处理多个线程的任务。
+ * 实现了 {@link EventExecutorGroup} 的抽象基类，该实现同时使用多个线程处理其任务。
  */
 public abstract class MultithreadEventExecutorGroup extends io.netty.util.concurrent.AbstractEventExecutorGroup {
 
-   ...
+    ...
 
     /**
      * Create a new instance.
@@ -231,7 +231,7 @@ public abstract class MultithreadEventExecutorGroup extends io.netty.util.concur
         readonlyChildren = Collections.unmodifiableSet(childrenSet);
     }
 
-   ...
+    ...
 }
 ```
 
