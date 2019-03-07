@@ -106,9 +106,11 @@
 
 ## 3. <span id="DirectByteBuffer">NIO堆外内存与零拷贝</span>
 * `HeapByteBuffer`
-  * 当使用`HeapByteBuffer`，其底层的字节数组使用的是Java堆来进行存储的。然而对于操作系统来说，在进行IO操作的时候，操作系统并不会直接处理`HeapByteBuffer`底层所封装的存储在Java堆上的字节数组（注：可以通过JNI的方式来让操作系统访问Java堆上的内存，但是由于GC的存在导致了一些不确定性），而是会将Java堆上的字节数组的内容原样拷贝一份到Java堆外的某一块内存当中，然后使用拷贝到堆外内存的数据跟IO设备进行交互。如此就会多一个数据拷贝的过程。
+  * `HeapByteBuffer`底层的字节数组是使用Java堆来进行存储的。然而对于操作系统来说，在进行IO操作的时候，操作系统并不会直接处理`HeapByteBuffer`底层所封装的存储在Java堆上的字节数组（注：可以通过JNI的方式来让操作系统访问Java堆上的内存，但是由于GC的存在导致了一些不确定性），而是会将Java堆上的字节数组的内容原样拷贝一份到Java堆外的某一块内存当中，然后使用拷贝到堆外内存的数据跟IO设备进行交互。如此就会多一个数据拷贝的过程。
+  * 对于没有超高性能要求的情况下，使用`HeapByteBuffer`的性价比是比较高的。因为数据拷贝的过程很快，而IO操作相对来说比较慢。
 * `DirectByteBuffer`
-  * `DirectByteBuffer`底层所封装的字节数组为null（`final byte[] hb`为`null`），也就是Java堆上没有存储数据，而是直接将数据存储在堆外内存之中。在进行IO操作时，操作系统直接使用堆外内存中的数据直接跟IO设备进行交互。对比`HeapByteBuffer`则少了一个数据拷贝的过程，标准术语我们称之为零拷贝（Zero Copy）。
+  * `DirectByteBuffer`底层所封装的字节数组为null（`final byte[] hb`为`null`），也就是Java堆上没有存储数据，而是直接将数据存储在堆外内存之中（`Buffer`类中有一个`long`类型的成员变量`address`，用于保存堆外内存的地址，如此就可以通过`address`这个成员变量来访问堆外内存。之所以将这个成员变量放在`Buffer`类中而不是放在实际使用的类中是为了加快JNI方法`GetDirectBufferAddress`的调用速度）。在进行IO操作时，操作系统直接使用堆外内存中的数据直接跟IO设备进行交互。对比`HeapByteBuffer`则少了一个数据拷贝的过程，标准术语我们称之为零拷贝（Zero Copy）。
+  * `DirectByteBuffer`类的实例依然存储在Java堆中。
   ```java
   // -- This file was mechanically generated: Do not edit! -- //
 
