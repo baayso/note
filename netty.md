@@ -175,7 +175,10 @@ public abstract class MultithreadEventExecutorGroup extends io.netty.util.concur
         }
 
         if (executor == null) {
-            // newDefaultThreadFactory()
+            // newDefaultThreadFactory() 创建默认的线程工厂，线程工厂的好处：
+            // 将要执行的逻辑放在run()方法里，同时还需要new Thread()并调用它的start()方法启动线程并执行任务。
+            // 使用这种方式时是将创建线程和需要线程执行的逻辑这两个事情合二为一了，这么做并不是一种好的方式。
+            // 更好的方式是，将线程的创建和我们编写的任务逻辑进行解耦，也就是我们只需关心任务逻辑的编写，创建线程并执行任务逻辑由线程工厂去做。
             executor = new ThreadPerTaskExecutor(newDefaultThreadFactory());
         }
 
@@ -184,6 +187,8 @@ public abstract class MultithreadEventExecutorGroup extends io.netty.util.concur
         for (int i = 0; i < nThreads; i ++) {
             boolean success = false;
             try {
+                // newChild() 方法会创建一个新的 {@link EventExecutor}，稍后可以通过 {@link #next()} 方法访问它。
+                // 这个方法将为每个服务于这个 {@link MultithreadEventExecutorGroup} 的线程所调用。
                 children[i] = newChild(executor, args);
                 success = true;
             } catch (Exception e) {
@@ -230,6 +235,12 @@ public abstract class MultithreadEventExecutorGroup extends io.netty.util.concur
         Collections.addAll(childrenSet, children);
         readonlyChildren = Collections.unmodifiableSet(childrenSet);
     }
+
+    /**
+     * 创建一个新的 {@link EventExecutor}，稍后可以通过 {@link #next()} 方法访问它。
+     * 这个方法将为每个服务于这个 {@link MultithreadEventExecutorGroup} 的线程所调用。
+     */
+    protected abstract EventExecutor newChild(Executor executor, Object... args) throws Exception;
 
     ...
 }
