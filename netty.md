@@ -179,6 +179,10 @@ public abstract class MultithreadEventExecutorGroup extends io.netty.util.concur
             // 将要执行的逻辑放在run()方法里，同时还需要new Thread()并调用它的start()方法启动线程并执行任务。
             // 使用这种方式时是将创建线程和需要线程执行的逻辑这两个事情合二为一了，这么做并不是一种好的方式。
             // 更好的方式是，将线程的创建和我们编写的任务逻辑进行解耦，也就是我们只需关心任务逻辑的编写，创建线程并执行任务逻辑由线程工厂去做。
+            //
+            // ThreadPerTaskExecutor类实现了 java.util.concurrent.Executor 接口。
+            // ThreadPerTaskExecutor类里用了命令模式和代理模式。
+            // ThreadPerTaskExecutor类里实际是使用了构造函数中传递进去的线程工厂去创建线程并执行线程的。
             executor = new ThreadPerTaskExecutor(newDefaultThreadFactory());
         }
 
