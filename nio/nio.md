@@ -21,86 +21,86 @@
   * `ByteBuffer`是一个抽象类，我们不能`new`一个`ByteBuffer`的实例，只能通过`ByteBuffer`的静态方法 `allocate(int capacity)` 和 `allocateDirect(int capacity)` 来创建。
   * `allocate(int capacity)`实际创建的是`HeapByteBuffer`实例。
     ```java
-        public static ByteBuffer allocate(int capacity) {
-            if (capacity < 0)
-                throw new IllegalArgumentException();
-            return new HeapByteBuffer(capacity, capacity);
-        }
+    public static ByteBuffer allocate(int capacity) {
+        if (capacity < 0)
+            throw new IllegalArgumentException();
+        return new HeapByteBuffer(capacity, capacity);
+    }
     ```
   * `allocateDirect(int capacity)`实际创建的是 [`DirectByteBuffer`](#DirectByteBuffer) 实例。
     ```java
-        public static ByteBuffer allocateDirect(int capacity) {
-            return new DirectByteBuffer(capacity);
-        }
+    public static ByteBuffer allocateDirect(int capacity) {
+        return new DirectByteBuffer(capacity);
+    }
     ```
 * `Buffer#clear()`
   ```java
-      /**
-       * 清除缓冲区。position设置为0，limit设置为其capacity，mark则被丢弃。
-       *
-       * <p> 在使用一系列Channel的读取或put操作来填充此缓冲区之前调用此方法。例如:
-       *
-       * <blockquote><pre>
-       * buf.clear();     // Prepare buffer for reading
-       * in.read(buf);    // Read data
-       * </pre></blockquote>
-       *
-       * <p> 这个方法实际上并没有擦除缓冲区中的数据，但是它的名称就好像可以擦除一样，因为它通常会在这种情况下使用。 </p>
-       *
-       * @return  This buffer
-       */
-      public final Buffer clear() {
-          position = 0;
-          limit = capacity;
-          mark = -1;
-          return this;
-      }
+  /**
+   * 清除缓冲区。position设置为0，limit设置为其capacity，mark则被丢弃。
+   *
+   * <p> 在使用一系列Channel的读取或put操作来填充此缓冲区之前调用此方法。例如:
+   *
+   * <blockquote><pre>
+   * buf.clear();     // Prepare buffer for reading
+   * in.read(buf);    // Read data
+   * </pre></blockquote>
+   *
+   * <p> 这个方法实际上并没有擦除缓冲区中的数据，但是它的名称就好像可以擦除一样，因为它通常会在这种情况下使用。 </p>
+   *
+   * @return  This buffer
+   */
+  public final Buffer clear() {
+      position = 0;
+      limit = capacity;
+      mark = -1;
+      return this;
+  }
   ```
 * `Buffer#flip()`：**Buffer有两种模式，写模式和读模式。在写模式下调用flip()之后，Buffer从写模式变成读模式。**
   ```java
-      /**
-       * 翻转这个缓冲区。将limit设置为当前position，然后将position设置为零。如果定义了标记，则将其丢弃。
-       *
-       * <p> 在一系列Channel的读操作或put操作之后，调用此方法为一系列通道写操作或相关get操作做准备。例如:
-       *
-       * <blockquote><pre>
-       * buf.put(magic);    // Prepend header
-       * in.read(buf);      // Read data into rest of buffer
-       * buf.flip();        // Flip buffer
-       * out.write(buf);    // Write header + data to channel
-       * </pre></blockquote>
-       *
-       * <p> 当将数据从一个地方传输到另一个地方时，经常将此方法与 {@link java.nio.ByteBuffer#compact()} 方法一起使用。 </p>
-       *
-       * @return  This buffer
-       */
-      public final Buffer flip() {
-          limit = position;
-          position = 0;
-          mark = -1;
-          return this;
-      }
+  /**
+   * 翻转这个缓冲区。将limit设置为当前position，然后将position设置为零。如果定义了标记，则将其丢弃。
+   *
+   * <p> 在一系列Channel的读操作或put操作之后，调用此方法为一系列通道写操作或相关get操作做准备。例如:
+   *
+   * <blockquote><pre>
+   * buf.put(magic);    // Prepend header
+   * in.read(buf);      // Read data into rest of buffer
+   * buf.flip();        // Flip buffer
+   * out.write(buf);    // Write header + data to channel
+   * </pre></blockquote>
+   *
+   * <p> 当将数据从一个地方传输到另一个地方时，经常将此方法与 {@link java.nio.ByteBuffer#compact()} 方法一起使用。 </p>
+   *
+   * @return  This buffer
+   */
+  public final Buffer flip() {
+      limit = position;
+      position = 0;
+      mark = -1;
+      return this;
+  }
   ```
 * `Buffer#rewind()`
   ```java
-      /**
-       * 倒带这个缓冲区。将position设置为0并丢弃mark。
-       *
-       * <p> 在一系列Channel的写操作或get操作之前调用此方法，假设已经适当设置了limit。例如:
-       *
-       * <blockquote><pre>
-       * out.write(buf);    // Write remaining data
-       * buf.rewind();      // Rewind buffer
-       * buf.get(array);    // Copy data into array
-       * </pre></blockquote>
-       *
-       * @return  This buffer
-       */
-      public final Buffer rewind() {
-          position = 0;
-          mark = -1;
-          return this;
-      }
+  /**
+   * 倒带这个缓冲区。将position设置为0并丢弃mark。
+   *
+   * <p> 在一系列Channel的写操作或get操作之前调用此方法，假设已经适当设置了limit。例如:
+   *
+   * <blockquote><pre>
+   * out.write(buf);    // Write remaining data
+   * buf.rewind();      // Rewind buffer
+   * buf.get(array);    // Copy data into array
+   * </pre></blockquote>
+   *
+   * @return  This buffer
+   */
+  public final Buffer rewind() {
+      position = 0;
+      mark = -1;
+      return this;
+  }
   ```
 * `只读Buffer`，我们可以随机在一个`普通Buffer`上调用`asReadOnlyBuffer()`方法返回一个`只读Buffer`，但是不能将一个`只读Buffer`转换为`读写Buffer`。
 
@@ -111,64 +111,65 @@
 * `DirectByteBuffer`
   * `DirectByteBuffer`底层所封装的字节数组为null（`final byte[] hb`为`null`），也就是Java堆上没有存储数据，而是直接将数据存储在堆外内存之中（`Buffer`类中有一个`long`类型的成员变量`address`，用于保存堆外内存的地址，如此就可以通过`address`这个成员变量来访问堆外内存。之所以将这个成员变量放在`Buffer`类中而不是放在实际使用的类中是为了加快JNI方法`GetDirectBufferAddress`的调用速度）。在进行IO操作时，操作系统直接使用堆外内存中的数据直接跟IO设备进行交互。对比`HeapByteBuffer`则少了一个数据拷贝的过程，标准术语我们称之为零拷贝（Zero Copy）。
   * `DirectByteBuffer`类的实例依然存储在Java堆中。
-  ```java
-  // -- This file was mechanically generated: Do not edit! -- //
+  * `DirectByteBuffer`构造函数中使用了`sun.misc.Unsafe#allocateMemory()`native方法申请堆外内存：
+    ```java
+    // -- This file was mechanically generated: Do not edit! -- //
 
-  package java.nio;
+    package java.nio;
 
-  import java.io.FileDescriptor;
-  import sun.misc.Cleaner;
-  import sun.misc.Unsafe;
-  import sun.misc.VM;
-  import sun.nio.ch.DirectBuffer;
+    import java.io.FileDescriptor;
+    import sun.misc.Cleaner;
+    import sun.misc.Unsafe;
+    import sun.misc.VM;
+    import sun.nio.ch.DirectBuffer;
 
-  class DirectByteBuffer extends MappedByteBuffer implements DirectBuffer {
+    class DirectByteBuffer extends MappedByteBuffer implements DirectBuffer {
 
-      ...
+        ...
 
-      DirectByteBuffer(int cap) {
+        DirectByteBuffer(int cap) {
 
-          super(-1, 0, cap, cap);
-          boolean pa = VM.isDirectMemoryPageAligned();
-          int ps = Bits.pageSize();
-          long size = Math.max(1L, (long)cap + (pa ? ps : 0));
-          Bits.reserveMemory(size, cap);
+            super(-1, 0, cap, cap);
+            boolean pa = VM.isDirectMemoryPageAligned();
+            int ps = Bits.pageSize();
+            long size = Math.max(1L, (long)cap + (pa ? ps : 0));
+            Bits.reserveMemory(size, cap);
 
-          long base = 0;
-          try {
-              // allocateMemory() 是一个 native 方法，查看sun.misc.Unsafe类源码可以看到如下注释及方法签名：
-              // /// wrappers for malloc, realloc, free:
-              // public native long allocateMemory(long bytes);
-              // allocateMemory() 用于申请堆外内存，底层是使用C语言的 malloc() 函数向计算机申请的内存，不在JVM的GC管控之内，
-              // 用完需要使用 free() 函数手动释放内存。
-              // 注：从Java9以后，sun.misc.Unsafe类的包路径改成了jdk.internal.misc.Unsafe
-              base = unsafe.allocateMemory(size);
-          } catch (OutOfMemoryError x) {
-              Bits.unreserveMemory(size, cap);
-              throw x;
-          }
-          unsafe.setMemory(base, size, (byte) 0);
-          if (pa && (base % ps != 0)) {
-              // address 是 Buffer类中的一个 long类型的成员变量，用于保存堆外内存的地址，注释及定义如下：
-              // Used only by direct buffers
-              // NOTE: hoisted here for speed in JNI GetDirectBufferAddress
-              // long address;
-              // Round up to page boundary
-              address = base + ps - (base & (ps - 1));
-          } else {
-              // address 是 Buffer类中的一个 long类型的成员变量，用于保存堆外内存的地址，注释及定义如下：
-              // Used only by direct buffers
-              // NOTE: hoisted here for speed in JNI GetDirectBufferAddress
-              // long address;
-              address = base;
-          }
-          cleaner = Cleaner.create(this, new Deallocator(base, size, cap));
-          att = null;
-      }
+            long base = 0;
+            try {
+                // allocateMemory() 是一个 native 方法，查看sun.misc.Unsafe类源码可以看到如下注释及方法签名：
+                // /// wrappers for malloc, realloc, free:
+                // public native long allocateMemory(long bytes);
+                // allocateMemory() 用于申请堆外内存，底层是使用C语言的 malloc() 函数向计算机申请的内存，不在JVM的GC管控之内，
+                // 用完需要使用 free() 函数手动释放内存。
+                // 注：从Java9以后，sun.misc.Unsafe类的包路径改成了jdk.internal.misc.Unsafe
+                base = unsafe.allocateMemory(size);
+            } catch (OutOfMemoryError x) {
+                Bits.unreserveMemory(size, cap);
+                throw x;
+            }
+            unsafe.setMemory(base, size, (byte) 0);
+            if (pa && (base % ps != 0)) {
+                // address 是 Buffer类中的一个 long类型的成员变量，用于保存堆外内存的地址，注释及定义如下：
+                // Used only by direct buffers
+                // NOTE: hoisted here for speed in JNI GetDirectBufferAddress
+                // long address;
+                // Round up to page boundary
+                address = base + ps - (base & (ps - 1));
+            } else {
+                // address 是 Buffer类中的一个 long类型的成员变量，用于保存堆外内存的地址，注释及定义如下：
+                // Used only by direct buffers
+                // NOTE: hoisted here for speed in JNI GetDirectBufferAddress
+                // long address;
+                address = base;
+            }
+            cleaner = Cleaner.create(this, new Deallocator(base, size, cap));
+            att = null;
+        }
 
-      ...
-  }
-  ```
+        ...
+    }
+    ```
 * `MappedByteBuffer`
   * 抽象类，继承自`ByteBuffer`类，是`DirectByteBuffer`的父类。
   * 是一个直接字节缓冲区，其内容是一个文件的内存映射区域。
@@ -176,7 +177,7 @@
   * 映射的字节缓冲区及它所表示的文件映射在缓冲区本身被垃圾回收之前一直保持有效。
   * `MappedByteBuffer`是一种允许Java程序直接从内存访问的一种特殊的文件，可以将整个文件或者文件的一部分映射到内存当中，接下来由操作系统负责相关的页面请求并且将内存的修改写入到文件当中。应用程序只需要处理内存中的数据，这样可以实现非常迅速的IO操作。用于内存映射文件的这个内存是堆外内存。
   * `MappedByteBuffer`使用示例：
-  ```java
+    ```java
     File file = new File("text.txt");
     try (RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw")) {
         FileChannel fileChannel = randomAccessFile.getChannel();
@@ -186,7 +187,7 @@
         mappedByteBuffer.put(0, (byte) 'a');
         mappedByteBuffer.put(3, (byte) 'b');
     }
-  ```
+    ```
 
 ## 4. 通过NIO读取文件涉及到3个步骤：
 1. 从`FileInputStream`对象中获取`FileChannel`对象
