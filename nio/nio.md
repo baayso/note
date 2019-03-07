@@ -17,6 +17,22 @@
   * capacity 是缓冲区所包含的元素的数量。缓冲区的capacity不能为负并且不能更改
   * limit 是第一个不应该读取或写入的元素的索引。缓冲区的limit不能为负，并且不能大于capacity
   * position 是下一个要读取或写入的元素的索引。缓冲区的position不能为负，并且不能大于limit
+* ByteBuffer
+  * ByteBuffer是一个抽象类，我们不能new一个ByteBuffer的实例，只能通过ByteBuffer的静态方法 allocate(int capacity) 和 allocateDirect(int capacity) 来创建。
+  * allocate(int capacity) 实际创建的是 HeapByteBuffer 实例。
+  ```java
+      public static ByteBuffer allocate(int capacity) {
+          if (capacity < 0)
+              throw new IllegalArgumentException();
+          return new HeapByteBuffer(capacity, capacity);
+      }
+  ```
+  * allocateDirect(int capacity) 实际创建的是 DirectByteBuffer 实例。
+  ```java
+      public static ByteBuffer allocateDirect(int capacity) {
+          return new DirectByteBuffer(capacity);
+      }
+  ```
 * clear()
 ```java
     /**
@@ -86,6 +102,7 @@
         return this;
     }
 ```
+* 只读Buffer，我们可以随机在一个普通Buffer上调用 asReadOnlyBuffer() 方法返回一个只读Buffer，但是不能将一个只读Buffer转换为读写Buffer。
 
 ## 3. 通过NIO读取文件涉及到3个步骤：
 1. 从FileInputStream对象中获取FileChannel对象
