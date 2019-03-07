@@ -190,32 +190,32 @@
     ```
 
 ## 4. 通过NIO读取文件涉及到3个步骤：
-1. 从`FileInputStream`对象中获取`FileChannel`对象
-2. 创建`Buffer`
-3. 将数据从`Channel`读取到`Buffer`中
+1) 从`FileInputStream`对象中获取`FileChannel`对象
+2) 创建`Buffer`
+3) 将数据从`Channel`读取到`Buffer`中
 ```java
-    try (FileInputStream inputStream = new FileInputStream("text.txt")) {
-        FileChannel channel = inputStream.getChannel();
+try (FileInputStream inputStream = new FileInputStream("text.txt")) {
+    FileChannel channel = inputStream.getChannel();
 
-        ByteBuffer buffer = ByteBuffer.allocate(1024);
+    ByteBuffer buffer = ByteBuffer.allocate(1024);
 
-        channel.read(buffer);
+    channel.read(buffer);
 
-        buffer.flip();
+    buffer.flip();
 
-        int i = 0;
-        while (buffer.remaining() > 0) {
-            byte b = buffer.get();
-            System.out.println("Character " + i + ": " + ((char) b));
-            i++;
-        }
+    int i = 0;
+    while (buffer.remaining() > 0) {
+        byte b = buffer.get();
+        System.out.println("Character " + i + ": " + ((char) b));
+        i++;
     }
-    catch (FileNotFoundException e) {
-        e.printStackTrace();
-    }
-    catch (IOException e) {
-        e.printStackTrace();
-    }
+}
+catch (FileNotFoundException e) {
+    e.printStackTrace();
+}
+catch (IOException e) {
+    e.printStackTrace();
+}
 ```
 
 ## 5. 
