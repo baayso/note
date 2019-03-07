@@ -106,7 +106,7 @@
 
 ## 3. <span id="DirectByteBuffer">NIO堆外内存与零拷贝</span>
 * `HeapByteBuffer`
-  * 当使用`HeapByteBuffer`，其底层的字节数组使用的是Java堆来进行存储的。然而对于操作系统来说，在进行IO操作的时候，操作系统并不会直接处理`HeapByteBuffer`底层所封装的存储在Java堆上的字节数组，而是会将Java堆上的字节数组的内容原样拷贝一份到Java堆外的某一块内存当中，然后使用拷贝到堆外内存的数据跟IO设备进行交互。如此就会多一个数据拷贝的过程。
+  * 当使用`HeapByteBuffer`，其底层的字节数组使用的是Java堆来进行存储的。然而对于操作系统来说，在进行IO操作的时候，操作系统并不会直接处理`HeapByteBuffer`底层所封装的存储在Java堆上的字节数组（注：可以通过JNI的方式来让操作系统访问Java堆上的内存，但是由于GC的存在导致了一些不确定性。），而是会将Java堆上的字节数组的内容原样拷贝一份到Java堆外的某一块内存当中，然后使用拷贝到堆外内存的数据跟IO设备进行交互。如此就会多一个数据拷贝的过程。
 * `DirectByteBuffer`
   * `DirectByteBuffer`底层所封装的字节数组为null（`final byte[] hb`为`null`），也就是Java堆上没有存储数据，而是直接将数据存储在堆外内存之中。在进行IO操作时，操作系统直接使用堆外内存中的数据直接跟IO设备进行交互。对比`HeapByteBuffer`则少了一个数据拷贝的过程，标准术语我们称之为零拷贝（Zero Copy）。
 ```java
