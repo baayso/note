@@ -189,7 +189,75 @@
     }
     ```
 
-## 4. 通过NIO读取文件涉及到3个步骤：
+## 4. NIO Buffer 的 Scattering 和 Gathering
+### 4.1 Scattering（分散，一个分散成多个）
+* 从`Channel`中读取数据时不仅可以写入到一个`Buffer`中，还可以写入到一个`Buffer数组`。
+* 例如：需要从`Channel`中读取数据并写入`Buffer`中，假设`Channel`中有20个字节，此时我们可以传递一个`ByteBuffer数组`，`ByteBuffer数组`第一个元素的`capacity`属性为`5`，第二个元素的`capacity`属性也为`5`，第三个元素的`capacity`属性也为`10`。当从`Channel`中读取数据并写入到`ByteBuffer数组`中时，会先将`ByteBuffer数组`的第一个元素写满，然后在往`ByteBuffer数组`的第二个元素中写入数据，如果第二个元素也被写满，在向`ByteBuffer数组`的第三个元素中写入数据，直到`Channel`中所有字节全部读完。也就是把来自于一个`Channel`中的数据给写入到了多个`Buffer`当中，总是会按照顺序并只有当`Buffer数组`的前一个元素被写满才会去向下一个元素中写入数据，如果`Buffer数组`的前一个元素没有被写满则不会向下一个元素中写入数据。
+
+### 4.2 Gathering（聚集，多个聚集成一个）
+* 往`Channel`中写入数据时可以传递一个`Buffer数组`。也就是将一个`Buffer数组`中的所有数据按数组元素次序写入到一个`Channel`中，只有当数组的前一个元素被读完才会去读下一个元素中的数据。
+
+### 4.3 应用场景
+* 比如在进行网络数据传输的时候使用自定义协议，自定义协议的报文格式的第一个Head是5个字节，第二个Head是10个字节，第三个是Body它长度是可变的。此时就可以使用Buffer的Scattering，在读取数据时将第一个Head的5个字节读到Buffer数组的第一个元素中，第二个Head的10个字节读到Buffer的第二个元素中，第三个是Body把它读到Buffer数组的第三个元素当中。如此就实现了数据的分类，而不用将所有的数据都读到一个Buffer中，然后在去解析这个Buffer。
+
+### 4.4 示例代码（以下为服务端代码，客户端可以使用telnet、nc）：
+```java
+public static void main(String args[]) throws Exception {
+
+    ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
+    InetSocketAddress address = new InetSocketAddress(8899);
+    serverSocketChannel.socket().bind(address);
+
+    int firstMsgLen = 3;
+    int secondMsgLen = 4;
+    int thirdMsgLen = 3;
+
+    int totalMsgLen = firstMsgLen + secondMsgLen + thirdMsgLen;
+
+    ByteBuffer buffers[] = new ByteBuffer[3];
+    buffers[0] = ByteBuffer.allocate(firstMsgLen);
+    buffers[1] = ByteBuffer.allocate(secondMsgLen);
+    buffers[2] = ByteBuffer.allocate(thirdMsgLen);
+
+    SocketChannel socketChannel = serverSocketChannel.accept();
+
+    while (true) {
+        // Scatter-read into buffers
+        int readBytes = 0;
+        while (readBytes < totalMsgLen) {
+            long r = socketChannel.read(buffers);
+            readBytes += r;
+
+            System.out.println("bytesRead: " + readBytes);
+
+            System.out.println("r " + r);
+
+            Arrays.stream(buffers)
+                    .map(buffer -> "position: " + buffer.position() + ", limit: " + buffer.limit())
+                    .forEach(System.out::println);
+        }
+
+        // Process message here
+
+        // Flip buffers
+        Arrays.asList(buffers).forEach(Buffer::flip);
+
+        // Scatter-write back out
+        long writeBytes = 0;
+        while (writeBytes < totalMsgLen) {
+            long r = socketChannel.write(buffers);
+            writeBytes += r;
+        }
+
+        // Clear buffers
+        Arrays.asList(buffers).forEach(Buffer::clear);
+
+        System.out.println(readBytes + " " + writeBytes + " " + totalMsgLen);
+    }
+}
+```
+
+## 5. 通过NIO读取文件涉及到3个步骤：
 1) 从`FileInputStream`对象中获取`FileChannel`对象
 2) 创建`Buffer`
 3) 将数据从`Channel`读取到`Buffer`中
@@ -217,6 +285,4 @@ catch (IOException e) {
     e.printStackTrace();
 }
 ```
-
-## 5. 
 
