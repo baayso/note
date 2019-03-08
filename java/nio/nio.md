@@ -300,22 +300,30 @@ public static void main(String args[]) throws Exception {
   * `map()`: 用于将`Channel`对应的部分或全部数据数据映射成`MappedByteBuffer`。
   * `read()`: 有一系列重载形式，用于从`Channel`中读取数据写入到`Buffer`中。
   * `write()`: 有一系列重载形式，用于将`Buffer`中的数据写入`Channel`。
-* 从`FileChannel`中读取数据的示例代码：
+* 示例代码：使用`FileChannel`从一个文件中读取数据并写入到另一个文件中。
   ```java
-  try (FileInputStream inputStream = new FileInputStream("text.txt")) {
-      FileChannel channel = inputStream.getChannel();
+  try (FileInputStream inputStream = new FileInputStream("input.txt");
+       FileOutputStream outputStream = new FileOutputStream("output.txt")) {
 
-      ByteBuffer buffer = ByteBuffer.allocate(1024);
+      FileChannel inChannel = inputStream.getChannel();
+      FileChannel outChannel = outputStream.getChannel();
 
-      channel.read(buffer);
+      ByteBuffer buffer = ByteBuffer.allocate(16);
 
-      buffer.flip();
+      while (true) {
+          buffer.clear();
 
-      int i = 0;
-      while (buffer.remaining() > 0) {
-          byte b = buffer.get();
-          System.out.println("Character " + i + ": " + ((char) b));
-          i++;
+          int r = inChannel.read(buffer);
+
+          System.out.println("read " + r + " bytes.");
+
+          if (r <= 0) {
+              break;
+          }
+
+          buffer.flip();
+
+          outChannel.write(buffer);
       }
   }
   catch (FileNotFoundException e) {
