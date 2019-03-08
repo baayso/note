@@ -102,6 +102,31 @@
       return this;
   }
   ```
+* `ByteBuffer`类型化的`put()`方法与`get()`方法：
+  ```java
+  public static void main(String args[]) {
+
+      ByteBuffer buffer = ByteBuffer.allocate(64);
+
+      buffer.put((byte) 1);
+      buffer.putLong(123456789L);
+      buffer.putInt(61);
+      buffer.putChar('南');
+      buffer.putDouble(3.1415926);
+      buffer.putChar('京');
+      buffer.putShort((short) 2);
+
+      buffer.flip();
+
+      System.out.println(buffer.get());
+      System.out.println(buffer.getLong());
+      System.out.println(buffer.getInt());
+      System.out.println(buffer.getChar());
+      System.out.println(buffer.getDouble());
+      System.out.println(buffer.getChar());
+      System.out.println(buffer.getShort());
+  }
+  ```
 * `只读Buffer`，我们可以随机在一个`普通Buffer`上调用`asReadOnlyBuffer()`方法返回一个`只读Buffer`，但是不能将一个`只读Buffer`转换为`读写Buffer`。
 
 ## 3. <span id="DirectByteBuffer">NIO堆外内存与零拷贝</span>
