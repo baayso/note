@@ -286,3 +286,100 @@ catch (IOException e) {
 }
 ```
 
+## 6. `Selector`
+* `Selector`是`SelectableChannel`对象的多路复用器，采用非阻塞方式进行通信的`Channel`都应该注册到`Selector`对象。可以通过调用此类的`open()`静态方法来创建`Selector`实例，该方法将使用系统默认的`Selector`来返回新的`Selector`。
+  ```java
+  public static Selector open() throws IOException {
+      return SelectorProvider.provider().openSelector();
+  }
+  ```
+* `Selector`可以同时监控多个`SelectableChannel`的IO状况，是非阻塞IO的核心。
+* 一个`Selector`实例有三个`SelectionKey`集合：
+  * 所有的`SelectionKey`集合：代表了注册在该`Selector`上的`Channel`，这个集合可以通过`keys()`方法返回。
+  * 被选择的`SelectionKey`集合：代表了所有可通过`select()`方法获取的、需要进行IO处理的`Channel`，这个集合可以通过`selectedKeys()`方法返回。
+  * 被取消的`SelectionKey`集合：代表了所有被取消注册关系的`Channel`，在下一次执行`select()`方法时，这些`Channel`对应的`SelectionKey`会被彻底删除，程序通常无须直接访问该集合。
+* `SelectionKey`中用静态常量定义了4种IO操作：
+  * `public static final int OP_READ = 1 << 0;` // 1
+  * `public static final int OP_WRITE = 1 << 2;` // 4
+  * `public static final int OP_CONNECT = 1 << 3;` // 8
+  * `public static final int OP_ACCEPT = 1 << 4;` // 16
+* 示例代码：
+  ```java
+  int ports[] = new int[3];
+  ports[0] = 6001;
+  ports[1] = 6002;
+  ports[2] = 6003;
+
+  // Create a new selector
+  Selector selector = Selector.open();
+
+  // Open a listener on each port, and register each one
+  // with the selector
+  for (int i = 0; i < ports.length; ++i) {
+      ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
+      serverSocketChannel.configureBlocking(false);
+      ServerSocket serverSocket = serverSocketChannel.socket();
+      InetSocketAddress address = new InetSocketAddress(ports[i]);
+      serverSocket.bind(address);
+
+      SelectionKey key = serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
+
+      System.out.println("Going to listen on " + ports[i]);
+  }
+
+  while (true) {
+      int num = selector.select();
+
+      Set<SelectionKey> selectedKeys = selector.selectedKeys();
+
+      System.out.println("selectedKeys: " + selectedKeys);
+
+      Iterator<SelectionKey> it = selectedKeys.iterator();
+
+      while (it.hasNext()) {
+          SelectionKey selectionKey = it.next();
+
+          if (selectionKey.isAcceptable()) {
+              // Accept the new connection
+              ServerSocketChannel serverSocketChannel = (ServerSocketChannel) selectionKey.channel();
+              SocketChannel channel = serverSocketChannel.accept();
+              channel.configureBlocking(false);
+
+              // Add the new connection to the selector
+              SelectionKey newKey = channel.register(selector, SelectionKey.OP_READ);
+              it.remove();
+
+              System.out.println("Got connection from " + channel.toString());
+          }
+          else if (selectionKey.isReadable()) {
+              // Read the data
+              SocketChannel channel = (SocketChannel) selectionKey.channel();
+
+              int writeBytes = 0;
+
+              ByteBuffer buffer = ByteBuffer.allocate(10);
+
+              while (true) {
+                  buffer.clear();
+
+                  int r = channel.read(buffer);
+
+                  if (r <= 0) {
+                      break;
+                  }
+
+                  buffer.flip();
+
+                  channel.write(buffer);
+
+                  writeBytes += r;
+              }
+
+              System.out.println("Echoed " + writeBytes + " from " + channel);
+
+              it.remove();
+          }
+      }
+  }
+  ```
+
