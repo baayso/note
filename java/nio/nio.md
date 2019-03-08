@@ -282,34 +282,49 @@ public static void main(String args[]) throws Exception {
 }
 ```
 
-## 5. 通过NIO读取文件涉及到3个步骤：
-1) 从`FileInputStream`对象中获取`FileChannel`对象
-2) 创建`Buffer`
-3) 将数据从`Channel`读取到`Buffer`中
-```java
-try (FileInputStream inputStream = new FileInputStream("text.txt")) {
-    FileChannel channel = inputStream.getChannel();
+## 5. `Channel`
+* `Channel`可以直接将指定文件的部分或全部直接映射成`Buffer`。
+* 程序不能直接访问`Channel`中的数据，包括读取、写入都不行，`Channel`只能与`Buffer`进行交互。也就是说，如果要从`Channel`中取得数据，必须先用`Buffer`从`Channel`中取出一些数据，然后让程序从`Buffer`中取出这些数据；如果要将程序中的数据写入`Channel`，一样先让程序将数据放入`Buffer`中，程序再将`Buffer`里的数据写入`Channel`中。
+* `Channel`接口的实现类：
+  * 用于读取、写入、映射和操作文件的Channel：
+    * `FileChannel`
+  * 用于支持线程之间通信的管道Channel：
+    * `Pipe.SinkChannel`
+    * `Pipe.SourceChannel`
+  * 用于支持TCP网络通信的Channel：
+    * `ServerSocketChannel`
+    * `SocketChannel`
+  * 用于支持UDP网络通信的Channel：
+    * `DatagramChannel`
+* `Channel`中最常用的**三类**方法：
+  * `map()`: 用于将`Channel`对应的部分或全部数据数据映射成`MappedByteBuffer`。
+  * `read()`: 有一系列重载形式，用于从`Channel`中读取数据写入到`Buffer`中。
+  * `write()`: 有一系列重载形式，用于将`Buffer`中的数据写入`Channel`。
+* 从`FileChannel`中读取数据的示例代码：
+  ```java
+  try (FileInputStream inputStream = new FileInputStream("text.txt")) {
+      FileChannel channel = inputStream.getChannel();
 
-    ByteBuffer buffer = ByteBuffer.allocate(1024);
+      ByteBuffer buffer = ByteBuffer.allocate(1024);
 
-    channel.read(buffer);
+      channel.read(buffer);
 
-    buffer.flip();
+      buffer.flip();
 
-    int i = 0;
-    while (buffer.remaining() > 0) {
-        byte b = buffer.get();
-        System.out.println("Character " + i + ": " + ((char) b));
-        i++;
-    }
-}
-catch (FileNotFoundException e) {
-    e.printStackTrace();
-}
-catch (IOException e) {
-    e.printStackTrace();
-}
-```
+      int i = 0;
+      while (buffer.remaining() > 0) {
+          byte b = buffer.get();
+          System.out.println("Character " + i + ": " + ((char) b));
+          i++;
+      }
+  }
+  catch (FileNotFoundException e) {
+      e.printStackTrace();
+  }
+  catch (IOException e) {
+      e.printStackTrace();
+  }
+  ```
 
 ## 6. `Selector`
 * `Selector`是`SelectableChannel`对象的多路复用器，采用非阻塞方式进行通信的`Channel`都应该注册到`Selector`对象。可以通过调用此类的`open()`静态方法来创建`Selector`实例，该方法将使用系统默认的`Selector`来返回新的`Selector`。
