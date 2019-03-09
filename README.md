@@ -20,11 +20,15 @@
 * 杂项
   * [`Runtime.getRuntime().availableProcessors();`](https://github.com/baayso/note/blob/master/java/java_other.md#1-runtimegetruntimeavailableprocessors)
 
-
-
 ## Git
 * [Git操作命令](https://github.com/baayso/note/blob/master/git.md)
   * [Git分支原理及操作命令](https://github.com/baayso/note/blob/master/git.md#8-%E5%88%86%E6%94%AF)
   * [Git版本回退](https://github.com/baayso/note/blob/master/git.md#9-%E7%89%88%E6%9C%AC%E5%9B%9E%E9%80%80)
   * [Git远程操作](https://github.com/baayso/note/blob/master/git.md#13-%E8%BF%9C%E7%A8%8B%E6%93%8D%E4%BD%9C)
   * [...](https://github.com/baayso/note/blob/master/git.md)
+
+## 推荐阅读：
+* https://github.com/Snailclimb/JavaGuide
+* https://github.com/crossoverJie/JCSprout
+
+
