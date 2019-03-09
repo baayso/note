@@ -165,8 +165,8 @@
                 // allocateMemory() 是一个 native 方法，查看sun.misc.Unsafe类源码可以看到如下注释及方法签名：
                 // /// wrappers for malloc, realloc, free:
                 // public native long allocateMemory(long bytes);
-                // allocateMemory() 用于申请堆外内存，底层是使用C语言的 malloc() 函数向计算机申请的内存，不在JVM的GC管控之内，
-                // 用完需要使用 free() 函数手动释放内存。
+                // allocateMemory() 用于申请堆外内存，底层是使用C语言的 malloc() 函数向操作系统申请的内存，不在JVM的GC管控之内，
+                // 且用完需要使用 free() 函数手动释放内存。
                 // 注：从Java9以后，sun.misc.Unsafe类的包路径改成了jdk.internal.misc.Unsafe
                 base = unsafe.allocateMemory(size);
             } catch (OutOfMemoryError x) {
