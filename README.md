@@ -14,6 +14,9 @@
 * [Netty](https://github.com/baayso/note/tree/master/java/netty)
   * [Netty源码解析](https://github.com/baayso/note/blob/master/java/netty/netty.md)
   * [为什么Netty只基于NIO而抛弃AIO](https://github.com/baayso/note/blob/master/java/netty/netty-nio-aio.md)
+* [String](https://github.com/baayso/note/blob/master/java/String.md)
+* [equals And hashCode](https://github.com/baayso/note/blob/master/java/equals_and_hashCode.md)
+* [Collection](https://github.com/baayso/note/blob/master/java/collection.md)
 * 杂项
   * [`Runtime.getRuntime().availableProcessors();`](https://github.com/baayso/note/blob/master/java/java_other.md#1-runtimegetruntimeavailableprocessors)
 
@@ -24,4 +27,4 @@
   * [Git分支原理及操作命令](https://github.com/baayso/note/blob/master/git.md#8-%E5%88%86%E6%94%AF)
   * [Git版本回退](https://github.com/baayso/note/blob/master/git.md#9-%E7%89%88%E6%9C%AC%E5%9B%9E%E9%80%80)
   * [Git远程操作](https://github.com/baayso/note/blob/master/git.md#13-%E8%BF%9C%E7%A8%8B%E6%93%8D%E4%BD%9C)
-
+  * [...](https://github.com/baayso/note/blob/master/git.md)
