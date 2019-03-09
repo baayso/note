@@ -16,7 +16,7 @@
   * [为什么Netty只基于NIO而抛弃AIO](https://github.com/baayso/note/blob/master/java/netty/netty-nio-aio.md)
 * [String](https://github.com/baayso/note/blob/master/java/String.md)
 * [equals And hashCode](https://github.com/baayso/note/blob/master/java/equals_and_hashCode.md)
-* [Collection](https://github.com/baayso/note/blob/master/java/collection.md)
+* [Collection](https://github.com/baayso/note/blob/master/java/collection/collection.md)
 * 杂项
   * [`Runtime.getRuntime().availableProcessors();`](https://github.com/baayso/note/blob/master/java/java_other.md#1-runtimegetruntimeavailableprocessors)
 
