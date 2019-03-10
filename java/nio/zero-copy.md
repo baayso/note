@@ -11,7 +11,6 @@
 * 以上内容摘自：https://www.cnblogs.com/Anker/p/3269106.html
 
 ## 1. 传统IO底层操作机制
-![传统IO底层操作机制](https://github.com/baayso/note/blob/master/java/nio/zero-copy_1.png)
 * 第一步：JVM向操作系统发起`read()`系统调用，由用户空间切换到内核空间。
 * 第二步：操作系统向硬件发出读取数据的请求。
 * 第三步：通过`DMA`(直接内存访问)方式将数据读取到内核空间的缓冲区当中。第一次数据拷贝。
@@ -21,6 +20,7 @@
 * 第七步：操作系统将内核空间缓冲区的数据写回硬件。第四次数据拷贝。
 * 第八步：硬件通知操作系统完成数据写入。
 * 第九步：`write()`系统调用完成并返回结果，由内核空间切换到用户空间。
+![传统IO底层操作机制](https://github.com/baayso/note/blob/master/java/nio/zero-copy_1.png)
 
 ## 2. 零拷贝底层操作机制
 ![零拷贝底层操作机制](https://github.com/baayso/note/blob/master/java/nio/zero-copy_2.png)
