@@ -98,11 +98,12 @@
     ```java
     public E get(int index) {
         checkElementIndex(index);
+        // 由 node() 方法查找指定下标的节点，然后返回其包含的元素
         return node(index).item;
     }
 
-    // 由`node()`方法查找指定下标的节点，然后返回其包含的元素，看下`next()`方法：
-
+    // 先判断输入的下标与中间值（size右移一位，也就是除以2）的关系，小于中间值则从头开始正向搜索，
+    // 大于中间值则从尾节点反向搜索，每一次的 get() 方法都是一个遍历。
     Node<E> node(int index) {
         // assert isElementIndex(index);
 
@@ -120,8 +121,5 @@
             return x;
         }
     }
-
-    // 先判断输入的下标与中间值（size右移一位，也就是除以2）的关系，小于中间值则从头开始正向搜索，
-    // 大于中间值则从尾节点反向搜索，每一次的 get() 方法都是一个遍历。
     ```
 
