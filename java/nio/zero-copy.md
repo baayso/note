@@ -43,6 +43,7 @@
     * 1) 内核缓冲区数据的内存地址
     * 2) 内核缓冲区数据的长度(即需要读多少数据)
 * 第五步：协议引擎根据`socket`缓冲区存储的*描述符*信息从内核空间缓冲区中读取数据(Gather)，然后写入对端。
+* 第六步：`sendfile()`系统调用完成并返回结果，***由内核空间切换到用户空间***。
 ![改进的零拷贝底层操作机制-1](https://github.com/baayso/note/blob/master/java/nio/zero-copy_6.jpg)
 ![改进的零拷贝底层操作机制-2](https://github.com/baayso/note/blob/master/java/nio/zero-copy_3.png)
 
