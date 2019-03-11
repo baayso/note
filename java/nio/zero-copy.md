@@ -50,7 +50,19 @@
 ## 4. 使用内存映射文件来解决需要修改数据的问题
 ![使用内存映射文件来解决需要修改数据的问题](https://github.com/baayso/note/blob/master/java/nio/zero-copy_4.png)
 
-## 5. Java中实现零拷贝的代码：
+## 5. Java中使用零拷贝的代码示例：
+* Java中通过`java.nio.channels.FileChannel`中的`transferTo()`方法来支持零拷贝，内部实现就是使用操作系统底层的`sendfile()`系统调用。
+  ```java
+  FileChannel fileChannel = new FileInputStream(fileName).getChannel();
+  // transferTo() 方法直接将字节从它被调用的通道上传输到另外一个可写字节通道上，数据无需流经应用程序。
+  long transferCount = fileChannel.transferTo(0, fileChannel.size(), socketChannel);
+  ```
+* `java.nio.channels.FileChannel#transferTo()`方法签名：
+  ```java
+  public abstract long transferTo(long position, long count, WritableByteChannel target) throws IOException;
+  ```
+
+## 6. Java底层实现零拷贝的代码：
 * https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/sun/nio/ch/FileChannelImpl.java#L1211
   ```java
   package sun.nio.ch;
