@@ -11,7 +11,16 @@
 
 ## 2. Vector
 * `Vector`是多线程版本的`ArrayList`。
-* `Vector`的每个方法前都加上了`synchronized`关键字，同时只会允许一个线程进入方法，以此来保护集合中的数据不被`脏读`和`脏写`。
+* `Vector`的**每个**方法前都加上了`synchronized`关键字，同时只会允许一个线程进入方法，以此来保护集合中的数据不被`脏读`和`脏写`。
+* `Vector`的`get()`方法：
+  ```java
+  public synchronized E get(int index) {
+      if (index >= elementCount)
+          throw new ArrayIndexOutOfBoundsException(index);
+
+      return elementData(index);
+  }
+  ```
 
 ## 3. LinkedList
 * `LinkedList`底层是使用双向循环链表实现。
@@ -52,9 +61,23 @@
   ![HashMap存储结构图](https://github.com/baayso/note/blob/master/java/collection/HashMap%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84%E5%9B%BE.png)
 * 元素查找：使用`hashCode`定位元素，若有哈希冲突，则遍历对比。
 
-## 8. HashTable
-* `HashTable`是多线程版本的`HashMap`。
-* `HashTable`的每个方法前都加上了`synchronized`关键字，同时只会允许一个线程进入方法，以此来保护集合中的数据不被`脏读`和`脏写`。
+## 8. Hashtable
+* `Hashtable`是多线程版本的`HashMap`。
+* `Hashtable`的**每个**方法前都加上了`synchronized`关键字，同时只会允许一个线程进入方法，以此来保护集合中的数据不被`脏读`和`脏写`。
+* `Hashtable`的`get()`方法：
+  ```java
+  public synchronized V get(Object key) {
+      Entry<?,?> tab[] = table;
+      int hash = key.hashCode();
+      int index = (hash & 0x7FFFFFFF) % tab.length;
+      for (Entry<?,?> e = tab[index] ; e != null ; e = e.next) {
+          if ((e.hash == hash) && e.key.equals(key)) {
+              return (V)e.value;
+          }
+      }
+      return null;
+  }
+  ```
 
 ## 9. ConcurrentHashMap
 * JDK1.5新增，位于`java.util.concurrent`包下。
