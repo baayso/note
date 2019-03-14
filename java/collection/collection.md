@@ -84,7 +84,10 @@
 * 
 
 ## 10. 线程安全 和 同步修改异常
-* 
+* `java.util.ConcurrentModificationException`：基本上所有的集合类都有一个叫做`快速失败（Fail-Fast）`的检验机制，当一个集合在被多个线程修改并访问时，就可能会出现`ConcurrentModificationException`异常，这是为了确保集合方法一致而设置的保护措施，它的实现原理是`modCount`修改计数器，如果在读列表时，`modCount`发生变化（也就是有其他线程修改）则会抛出`ConcurrentModificationException`异常。这与线程不是一个概念，线程同步是为了保护集合中的数据不被`脏读`和`脏写`。
+* 解决方法：
+  * 单线程时：remove元素请使用`Iterator`方式。
+  * 多线路时：对`Iterator`对象加锁，或者使用`CopyOnWriteArrayList`和`ConcurrentHasMap`。
 
 ## 11. 使用优雅的方式进行集合运算
 * 并集，也叫合集
@@ -146,3 +149,6 @@
     }
     ```
 
+## 参考文献：
+* 《编写高质量代码：改善Java程序的151个建议》/秦小波著. 机械工业出版社，2011.11
+* 北京圣思园Java培训教学视频
