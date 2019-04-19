@@ -16,3 +16,67 @@
 3) `Event Handler（事件处理器）`：由多个回调方法构成，这些回调方法构成了与应用相关的对于某个事件的反馈机制。Netty相比于Java NIO来说，在事件处理器这个角色上进行了升级，为开发者提供了大量的回调方法，供我们在特定事件产生时实现相应的回调方法进行业务逻辑的处理。
 4) `Concrete Event Handler（具体事件处理器）`：`事件处理器`的实现。它本身实现了`事件处理器`所提供的各个回调方法，从而实现了特定于业务的逻辑。它本质上就是我们所编写的一个个的处理器实现。
 5) `Initiation Dispatcher（初始分发器）`：实际上就是`Reactor角色`。其本身定义了一些规范，这些规范用于控制事件的调度方式，同时又提供了应用进行事件处理器的注册、删除等设施。是整个事件处理器的核心，`Initiation Dispatcher`会通过`同步事件分离器`来等待事件的发生。一旦事件发生，`Initiation Dispatcher`首先会**分离出每一个事件**（分离事件：遍历SelectionKey集合，取出集合中的每一个SelectionKey。一个SelectionKey就是一个事件。），然后调用`事件处理器`，最后调用相关的回调方法来处理这些事件。
+
+## 4. Netty中`Event Handler（事件处理器）`的回调方法
+```java
+package io.netty.channel;
+
+/**
+ * {@link ChannelHandler} which adds callbacks for state changes. This allows the user
+ * to hook in to state changes easily.
+ */
+public interface ChannelInboundHandler extends ChannelHandler {
+
+    /**
+     * The {@link Channel} of the {@link ChannelHandlerContext} was registered with its {@link EventLoop}
+     */
+    void channelRegistered(ChannelHandlerContext ctx) throws Exception;
+
+    /**
+     * The {@link Channel} of the {@link ChannelHandlerContext} was unregistered from its {@link EventLoop}
+     */
+    void channelUnregistered(ChannelHandlerContext ctx) throws Exception;
+
+    /**
+     * The {@link Channel} of the {@link ChannelHandlerContext} is now active
+     */
+    void channelActive(ChannelHandlerContext ctx) throws Exception;
+
+    /**
+     * The {@link Channel} of the {@link ChannelHandlerContext} was registered is now inactive and reached its
+     * end of lifetime.
+     */
+    void channelInactive(ChannelHandlerContext ctx) throws Exception;
+
+    /**
+     * Invoked when the current {@link Channel} has read a message from the peer.
+     */
+    void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception;
+
+    /**
+     * Invoked when the last message read by the current read operation has been consumed by
+     * {@link #channelRead(ChannelHandlerContext, Object)}.  If {@link ChannelOption#AUTO_READ} is off,
+     * no further attempt to read an inbound data from the current {@link Channel} will be made until
+     * {@link ChannelHandlerContext#read()} is called.
+     */
+    void channelReadComplete(ChannelHandlerContext ctx) throws Exception;
+
+    /**
+     * Gets called if an user event was triggered.
+     */
+    void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception;
+
+    /**
+     * Gets called once the writable state of a {@link Channel} changed. You can check the state with
+     * {@link Channel#isWritable()}.
+     */
+    void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception;
+
+    /**
+     * Gets called if a {@link Throwable} was thrown.
+     */
+    @Override
+    @SuppressWarnings("deprecation")
+    void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception;
+}
+```
