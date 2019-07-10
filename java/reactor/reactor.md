@@ -35,27 +35,32 @@ public interface ChannelInboundHandler extends ChannelHandler {
 
     /**
      * The {@link Channel} of the {@link ChannelHandlerContext} was registered with its {@link EventLoop}
+     * 通道注册
      */
     void channelRegistered(ChannelHandlerContext ctx) throws Exception;
 
     /**
      * The {@link Channel} of the {@link ChannelHandlerContext} was unregistered from its {@link EventLoop}
+     * 通道取消注册
      */
     void channelUnregistered(ChannelHandlerContext ctx) throws Exception;
 
     /**
      * The {@link Channel} of the {@link ChannelHandlerContext} is now active
+     * 通道激活
      */
     void channelActive(ChannelHandlerContext ctx) throws Exception;
 
     /**
      * The {@link Channel} of the {@link ChannelHandlerContext} was registered is now inactive and reached its
      * end of lifetime.
+     * 通道取消激活
      */
     void channelInactive(ChannelHandlerContext ctx) throws Exception;
 
     /**
      * Invoked when the current {@link Channel} has read a message from the peer.
+     * 通道读数据
      */
     void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception;
 
@@ -64,22 +69,26 @@ public interface ChannelInboundHandler extends ChannelHandler {
      * {@link #channelRead(ChannelHandlerContext, Object)}.  If {@link ChannelOption#AUTO_READ} is off,
      * no further attempt to read an inbound data from the current {@link Channel} will be made until
      * {@link ChannelHandlerContext#read()} is called.
+     * 通道读数据完成
      */
     void channelReadComplete(ChannelHandlerContext ctx) throws Exception;
 
     /**
      * Gets called if an user event was triggered.
+     * 用户事件触发
      */
     void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception;
 
     /**
      * Gets called once the writable state of a {@link Channel} changed. You can check the state with
      * {@link Channel#isWritable()}.
+     * 通道可写能力改变
      */
     void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception;
 
     /**
      * Gets called if a {@link Throwable} was thrown.
+     * 异常捕获
      */
     @Override
     @SuppressWarnings("deprecation")
