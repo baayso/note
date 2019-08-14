@@ -69,6 +69,28 @@
   * R: 函数的结果类型。
 * ```R apply(T t, U u);```
   > 将这个函数应用到给定的参数上。
+* ```BiFunction<T, U, R>```接口的```default```方法：
+  ```java
+  // BiFunction接口中没有compose默认方法的原因是：
+  // 1. BiFunction接口中compose默认方法的参数应该是BiFunction类型（before函数）；
+  // 2. 首先应用于before函数，得到一个返回值；
+  // 3. 然后将before函数的返回值做为当前函数的参数，但是当前函数是需要两个参数的（BiFunction接口表示接收两个参数的的函数），
+  //    而before函数的返回值只会是一个，不可能是两个，因为这是Java语法所规定的。
+
+  /**
+   * 返回一个组合函数，该函数首先将当前函数应用于其输入，然后将当前函数的结果做为after函数的参数。
+   * 如果对任一函数的求值抛出异常，则将其转发给组合函数的调用者。
+   *
+   * @param <V> after函数的输出类型和组合函数的输出类型
+   * @param after 在应用当前函数之后所要应用的函数
+   * @return 一个组合函数，首先应用当前函数，然后应用after函数
+   * @throws NullPointerException if after is null
+   */
+   default <V> BiFunction<T, U, V> andThen(Function<? super R, ? extends V> after) {
+       Objects.requireNonNull(after);
+       return (T t, U u) -> after.apply(apply(t, u));
+   }
+  ```
 
 ### 1.4 ```java.util.function.Consumer<T>``` 接口
 * ```void accept(T t);```
