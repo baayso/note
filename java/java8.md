@@ -34,6 +34,6 @@
 ### 1.5 ```java.util.function.Predicate<T>``` 接口
 * ```boolean test(T t);```
  
- ### 1.5 ```java.util.function.Supplier<T>``` 接口
+### 1.6 ```java.util.function.Supplier<T>``` 接口
 * ```T get();```
  
