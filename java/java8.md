@@ -92,11 +92,7 @@
    }
   ```
 
-### 1.4 ```java.util.function.Consumer<T>``` 接口
-* 这个函数式接口表示接受单个输入参数但不返回结果的操作。与大多数其他函数式接口不同，Consumer需要通过```side-effects（函数“附”作用）```进行操作。
-* ```void accept(T t);```
-
-### 1.5 ```java.util.function.Predicate<T>``` 接口
+### 1.4 ```java.util.function.Predicate<T>``` 接口
 * 这个函数式接口表示一个参数的predicate（boolean-valued function）。
 * ```boolean test(T t);```
   > 根据给定的参数计算this predicate。
@@ -120,7 +116,7 @@
   }
   ```
  
-### 1.6 ```java.util.function.Supplier<T>``` 接口
+### 1.5 ```java.util.function.Supplier<T>``` 接口
 * Supplier使用场景：没有输入参数的工厂。
 * ```Supplier<T>``` 接口源码：
   ```java
@@ -149,3 +145,6 @@
   }
   ```
 
+### 1.6 ```java.util.function.Consumer<T>``` 接口
+* 这个函数式接口表示接受单个输入参数但不返回结果的操作。与大多数其他函数式接口不同，Consumer需要通过```side-effects（函数“附”作用）```进行操作。
+* ```void accept(T t);```
