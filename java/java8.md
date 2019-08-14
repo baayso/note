@@ -93,11 +93,59 @@
   ```
 
 ### 1.4 ```java.util.function.Consumer<T>``` 接口
+* 这个函数式接口表示接受单个输入参数但不返回结果的操作。与大多数其他函数式接口不同，Consumer需要通过```side-effects（函数“附”作用）```进行操作。
 * ```void accept(T t);```
 
 ### 1.5 ```java.util.function.Predicate<T>``` 接口
+* 这个函数式接口表示一个参数的predicate（boolean-valued function）。
 * ```boolean test(T t);```
+  > 根据给定的参数计算this predicate。
+* ```Predicate<T>```接口的```default```方法：
+  ```java
+  // 与 &&
+  default Predicate<T> and(Predicate<? super T> other) {
+      Objects.requireNonNull(other);
+      return (t) -> test(t) && other.test(t);
+  }
+
+  // 非（取反） !
+  default Predicate<T> negate() {
+      return (t) -> !test(t);
+  }
+
+  // 或 ||
+  default Predicate<T> or(Predicate<? super T> other) {
+      Objects.requireNonNull(other);
+      return (t) -> test(t) || other.test(t);
+  }
+  ```
  
 ### 1.6 ```java.util.function.Supplier<T>``` 接口
-* ```T get();```
- 
+* Supplier使用场景：没有输入参数的工厂。
+* ```Supplier<T>``` 接口源码：
+  ```java
+  package java.util.function;
+
+  /**
+   * 代表结果的供应者。
+   *
+   * <p>每次调用Supplier时都不要求返回新的或不同的结果。
+   *
+   * <p>这是一个函数式接口。其函数式方法是 {@link #get()}.
+   *
+   * @param <T> the type of results supplied by this supplier
+   *
+   * @since 1.8
+   */
+  @FunctionalInterface
+  public interface Supplier<T> {
+
+      /**
+       * Gets a result.
+       *
+       * @return a result
+       */
+      T get();
+  }
+  ```
+
