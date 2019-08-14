@@ -147,4 +147,13 @@
 
 ### 1.6 ```java.util.function.Consumer<T>``` 接口
 * 这个函数式接口表示接受单个输入参数但不返回结果的操作。与大多数其他函数式接口不同，Consumer需要通过```side-effects（函数“附”作用）```进行操作。
-* ```void accept(T t);```
+* 这是一个函数式接口。其函数式方法是：```void accept(T t);```
+* ```java.lang.Iterable<T>```接口中的```forEach()```方法源码：
+  ```java
+  default void forEach(Consumer<? super T> action) {
+      Objects.requireNonNull(action);
+      for (T t : this) {
+          action.accept(t);
+      }
+    }
+  ```
