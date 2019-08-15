@@ -157,3 +157,28 @@
       }
     }
   ```
+
+## 2. java.util.Optional<T> final类
+* 是一个容器对象，可能包含也可能不包含非null值。如果值存在则isPresent()方法会返回true，调用get()方法会返回该对象。
+* 可以保存类型T的值，或者仅仅保存null。Optional类提供很多有用的方法，这样我们就不用显式进行空值检测。
+* 可以很好的解决NPE(NullPointerException, 空指针异常)。
+* Optional类通常只做为方法的返回值，不要定义接收Optional类型参数的方法和Optional类型的成员变量。因为Optional类并没有实现Serializable接口。
+* 推荐用法：
+  ```java
+  Optional<String> optional = Optional.ofNullable(...);
+  optional.isPresent(str -> System.out.println(str));
+  ```
+  ```java
+  class User {
+      private String name;
+      private List<Role> roles;
+
+      // 省略 getter 和 setter
+  }
+
+  User user = ...;
+
+  Optional<User> optional = Optional.ofNullable(user);
+  Lsit<Roles> roles = optional.map(u -> u.getRoles()).orElse(Collections.emptyList());
+  ```
+
