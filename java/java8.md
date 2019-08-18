@@ -181,4 +181,9 @@
   Optional<User> optional = Optional.ofNullable(user);
   Lsit<Roles> roles = optional.map(u -> u.getRoles()).orElse(Collections.emptyList());
   ```
-
+## 3. 方法引用
+* 共分为4类：
+  1) 类名::静态方法名
+  2) 实例名::实例方法名
+  3) 类名::实例方法名，第一个Lambda参数做为调用**实例方法**的对象，第二个及后面的Lambda参数做为**实例方法**的参数。
+  4) 类名::new（构造方法引用）
