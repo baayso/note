@@ -180,7 +180,7 @@ import ...
  *
  * <h4>Strings</h4>
  *
- * 提供各种{@link #toString(Charset)}方法将{@link ByteBuf}转换为{@link String}。
+ * 提供了各种{@link #toString(Charset)}方法将{@link ByteBuf}转换为{@link String}。
  * 请注意，{@link #toString()}并不是转换方法。
  *
  * <h4>I/O Streams</h4>
