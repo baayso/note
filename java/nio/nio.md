@@ -56,7 +56,7 @@
       return this;
   }
   ```
-* `Buffer#flip()`：**Buffer有两种模式，写模式和读模式。在写模式下调用flip()之后，Buffer从写模式变成读模式。**
+* `Buffer#flip()`：**Buffer有两种模式，写模式和读模式。在写模式下调用flip()方法之后，Buffer从写模式变成读模式。**
   ```java
   /**
    * 翻转这个缓冲区。将limit设置为当前position，然后将position设置为零。如果定义了标记，则将其丢弃。
@@ -301,18 +301,21 @@ public static void main(String args[]) throws Exception {
   * `read()`: 有一系列重载形式，用于从`Channel`中读取数据写入到`Buffer`中。
   * `write()`: 有一系列重载形式，用于将`Buffer`中的数据写入`Channel`。
 * 示例代码：使用`FileChannel`从一个文件中读取数据并写入到另一个文件中。
-  ```java
+  ```java  
   try (FileInputStream inputStream = new FileInputStream("input.txt");
        FileOutputStream outputStream = new FileOutputStream("output.txt")) {
 
+      // 1. 从FileInputStream对象获取到FileChannel对象
       FileChannel inChannel = inputStream.getChannel();
       FileChannel outChannel = outputStream.getChannel();
 
+      // 2. 创建Buffer对象
       ByteBuffer buffer = ByteBuffer.allocate(16);
 
       while (true) {
           buffer.clear();
 
+          // 3. 读取Channel中的数据写入到Buffer对象中
           int r = inChannel.read(buffer);
 
           System.out.println("read " + r + " bytes.");
@@ -321,6 +324,7 @@ public static void main(String args[]) throws Exception {
               break;
           }
 
+          // 在写模式下调用flip()方法之后，Buffer从写模式变成读模式
           buffer.flip();
 
           outChannel.write(buffer);
