@@ -106,11 +106,9 @@ import ...
  *
  * <h4>清除缓冲区索引</h4>
  *
- * You can set both {@link #readerIndex() readerIndex} and
- * {@link #writerIndex() writerIndex} to {@code 0} by calling {@link #clear()}.
- * It does not clear the buffer content (e.g. filling with {@code 0}) but just
- * clears the two pointers.  Please also note that the semantic of this
- * operation is different from {@link ByteBuffer#clear()}.
+ * 你可以通过调用{@link #clear()}将{@link #readerIndex() readerIndex}和{@link #writerIndex() writerIndex}都设置为{@code 0}。
+ * 请注意它不会清除buffer的内容（例如填充{@code 0}），它只会清除两个指针的值。
+ * 还请注意，此操作的语义与{@link ByteBuffer#clear()}不同。
  *
  * <pre>
  *  BEFORE clear()
@@ -131,25 +129,20 @@ import ...
  *      0 = readerIndex = writerIndex            <=            capacity
  * </pre>
  *
- * <h3>Search operations</h3>
+ * <h3>搜索操作</h3>
  *
- * For simple single-byte searches, use {@link #indexOf(int, int, byte)} and {@link #bytesBefore(int, int, byte)}.
- * {@link #bytesBefore(byte)} is especially useful when you deal with a {@code NUL}-terminated string.
- * For complicated searches, use {@link #forEachByte(int, int, ByteProcessor)} with a {@link ByteProcessor}
- * implementation.
+ * 对于简单的单字节搜索，请使用{@link #indexOf(int, int, byte)}和{@link #bytesBefore(int, int, byte)}。
+ * {@link #bytesBefore(byte)}在处理以NUL结尾的字符串时特别有用。
+ * 对于复杂的搜索，请使用带有{@link ByteProcessor}实现的{@link #forEachByte(int, int, ByteProcessor)}。
  *
  * <h3>Mark and reset</h3>
  *
- * There are two marker indexes in every buffer. One is for storing
- * {@link #readerIndex() readerIndex} and the other is for storing
- * {@link #writerIndex() writerIndex}.  You can always reposition one of the
- * two indexes by calling a reset method.  It works in a similar fashion to
- * the mark and reset methods in {@link InputStream} except that there's no
- * {@code readlimit}.
+ * 每个buffer都有两个标记索引。一个是用于存储{@link #readerIndex() readerIndex}，另一个是用于存储{@link #writerIndex() writerIndex}。
+ * 你总是可以通过调用reset方法重新定位两个索引中的一个。它的工作方式与{@link InputStream}中的mark和reset方法类似，只是没有{@code readlimit}。
  *
- * <h3>Derived buffers</h3>
+ * <h3>衍生buffers</h3>
  *
- * You can create a view of an existing buffer by calling one of the following methods:
+ * 你可以通过调用以下某一个方法来创建现有buffer的视图：
  * <ul>
  *   <li>{@link #duplicate()}</li>
  *   <li>{@link #slice()}</li>
@@ -160,12 +153,10 @@ import ...
  *   <li>{@link #retainedSlice(int, int)}</li>
  *   <li>{@link #readRetainedSlice(int)}</li>
  * </ul>
- * A derived buffer will have an independent {@link #readerIndex() readerIndex},
- * {@link #writerIndex() writerIndex} and marker indexes, while it shares
- * other internal data representation, just like a NIO buffer does.
+ * 衍生buffer将会拥有自己独立的{@link #readerIndex() readerIndex}，{@link #writerIndex() writerIndex}和marker索引，
+ * 但是它会共享底层数据，就像NIO buffer一样。
  * <p>
- * In case a completely fresh copy of an existing buffer is required, please
- * call {@link #copy()} method instead.
+ * 如果需要现有buffer的一个全新副本，请改为调用{@link #copy()}方法。
  *
  * <h4>Non-retained and retained derived buffers</h4>
  *
@@ -175,30 +166,26 @@ import ...
  * {@link #retainedSlice()}, {@link #retainedSlice(int, int)} and {@link #readRetainedSlice(int)} which may return
  * a buffer implementation that produces less garbage.
  *
- * <h3>Conversion to existing JDK types</h3>
+ * <h3>转换为现有的JDK类型</h3>
  *
  * <h4>Byte array</h4>
  *
- * If a {@link ByteBuf} is backed by a byte array (i.e. {@code byte[]}),
- * you can access it directly via the {@link #array()} method.  To determine
- * if a buffer is backed by a byte array, {@link #hasArray()} should be used.
+ * 如果ByteBuf的底层是字节数组（即 {@code byte[]}），则可以通过 {@link #array()}方法直接访问它。
+ * 要确定buffer的底层是否为字节数组，应使用{@link #hasArray()}。
  *
  * <h4>NIO Buffers</h4>
  *
- * If a {@link ByteBuf} can be converted into an NIO {@link ByteBuffer} which shares its
- * content (i.e. view buffer), you can get it via the {@link #nioBuffer()} method.  To determine
- * if a buffer can be converted into an NIO buffer, use {@link #nioBufferCount()}.
+ * 如果需要将{@link ByteBuf}转换为共享底层数据的 NIO {@link ByteBuffer}（即：视图buffer），则可以通过{@link #nioBuffer()}方法实现。 
+ * 要确定buffer是否可以转换为NIO buffer，可以使用{@link #nioBufferCount()}。
  *
  * <h4>Strings</h4>
  *
- * Various {@link #toString(Charset)} methods convert a {@link ByteBuf}
- * into a {@link String}.  Please note that {@link #toString()} is not a
- * conversion method.
+ * 提供各种{@link #toString(Charset)}方法将{@link ByteBuf}转换为{@link String}。
+ * 请注意，{@link #toString()}并不是转换方法。
  *
  * <h4>I/O Streams</h4>
  *
- * Please refer to {@link ByteBufInputStream} and
- * {@link ByteBufOutputStream}.
+ * Please refer to {@link ByteBufInputStream} and {@link ByteBufOutputStream}.
  */
 @SuppressWarnings("ClassMayBeInterface")
 public abstract class ByteBuf implements ReferenceCounted, Comparable<ByteBuf> {
