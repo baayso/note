@@ -130,6 +130,8 @@
 * `只读Buffer`，我们可以随机在一个`普通Buffer`上调用`asReadOnlyBuffer()`方法返回一个`只读Buffer`，但是不能将一个`只读Buffer`转换为`读写Buffer`。
 
 ## 3. <span id="DirectByteBuffer">NIO堆外内存与零拷贝</span>
+> 推荐阅读：Java NIO中，关于DirectBuffer，HeapBuffer的疑问？ - RednaxelaFX的回答 - 知乎
+https://www.zhihu.com/question/57374068/answer/152691891
 * `HeapByteBuffer`
   * `HeapByteBuffer`底层的字节数组是使用Java堆来进行存储的。然而对于操作系统来说，在进行IO操作的时候，操作系统并不会直接处理`HeapByteBuffer`底层所封装的存储在Java堆上的字节数组（注：可以通过JNI的方式来让操作系统访问Java堆上的内存，但是由于GC的存在导致了一些不确定性），而是会将Java堆上的字节数组的内容原样拷贝一份到Java堆外的某一块内存当中，然后使用拷贝到堆外内存的数据跟IO设备进行交互。如此就会多一个数据拷贝的过程。
   * 对于没有超高性能要求的情况下，使用`HeapByteBuffer`的性价比是比较高的。因为数据拷贝的过程很快，而IO操作相对来说比较慢。
