@@ -14,6 +14,7 @@
 * [Netty](https://github.com/baayso/note/tree/master/java/netty)
   * [Netty源码解析](https://github.com/baayso/note/blob/master/java/netty/netty.md)
   * [为什么Netty只基于NIO而抛弃AIO](https://github.com/baayso/note/blob/master/java/netty/netty-nio-aio.md)
+  * [ByteBuf](https://github.com/baayso/note/blob/master/java/netty/ByteBuf.md)
 * [String](https://github.com/baayso/note/blob/master/java/String.md)
 * [equals And hashCode](https://github.com/baayso/note/blob/master/java/equals_and_hashCode.md)
 * [Collection](https://github.com/baayso/note/blob/master/java/collection/collection.md)
