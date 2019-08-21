@@ -23,7 +23,7 @@ import ...
  * <pre>
  * {@link ByteBuf} buffer = ...;
  * for (int i = 0; i &lt; buffer.capacity(); i ++) {
- *     byte b = buffer.getByte(i);
+ *     byte b = buffer.getByte(i); // getByte(i)是一个绝对方法，调用完后不会改变 readerIndex 或者 writerIndex
  *     System.out.println((char) b);
  * }
  * </pre>
@@ -56,7 +56,7 @@ import ...
  * // 迭代buffer的可读字节
  * {@link ByteBuf} buffer = ...;
  * while (buffer.isReadable()) {
- *     System.out.println(buffer.readByte());
+ *     System.out.println(buffer.readByte()); // readByte()是一个相对方法，调用完后会改变 readerIndex 或者 writerIndex
  * }
  * </pre>
  *
