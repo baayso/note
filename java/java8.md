@@ -194,9 +194,9 @@
   * 惰性求值
   * 及早求值
 * Stream由3部分构成：
-  1) 源：数组、集合、generator function
-  2) 零个或多个中间操作（惰性求值）：map()、filter()、skip()、limit()，当没有终止操作时，所有中间操作不会执行
-  3) 终止操作（及早求值）：reduce()、forEach()、sum()、min()、max()、summaryStatistics()，只有当有终止操作时，所有的中间操作才会一并的执行
+  1) 源：数组、集合、generator function（Stream.of(...)、IntStream.iterate(...)、Stream.generate(...)）
+  2) 零个或多个中间操作（惰性求值）：map()、filter()、distinct()、skip()、limit()，当没有终止操作时，所有中间操作不会执行
+  3) 终止操作（及早求值）：reduce()、forEach()、sum()、min()、max()、summaryStatistics()、findFirst()、collect()，只有当有终止操作时，所有的中间操作才会一并的执行
 
 
 
