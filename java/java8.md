@@ -190,13 +190,17 @@
 
 ## 4. Stream（流）
 > 流不存储值，通过管道的方式获取值，对流的操作会生成一个结果，不过并不会修改底层的数据源。
+* Stream与集合的区别：
+  * 集合关注的是数据与数据的存储
+  * 流关注的是对数据的计算
+  * 流与迭代器（```java.util.Iterator<E>```）类似的一点是：流不可以重复使用或消费
 * Stream操作的分类：
   * 惰性求值
   * 及早求值
 * Stream由3部分构成：
-  1) 源：数组、集合、generator function（Stream.of(...)、IntStream.iterate(...)、Stream.generate(...)）
-  2) 零个或多个中间操作（惰性求值）：map()、filter()、distinct()、skip()、limit()，当没有终止操作时，所有中间操作不会执行
-  3) 终止操作（及早求值）：reduce()、forEach()、sum()、min()、max()、summaryStatistics()、findFirst()、collect()，只有当有终止操作时，所有的中间操作才会一并的执行
+  1) 数据源：数组、集合、generator function（Stream.of(...)、IntStream.iterate(...)、Stream.generate(...)）
+  2) 零个或多个中间操作（惰性求值、会返回新的Stream对象）：map()、filter()、distinct()、skip()、limit()，当没有终止操作时，所有中间操作不会执行
+  3) 终止操作（及早求值、不返回Stream对象）：reduce()、forEach()、sum()、min()、max()、summaryStatistics()、findFirst()、collect()，只有当有终止操作时，所有的中间操作才会一并的执行
 
 
 
