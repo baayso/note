@@ -347,6 +347,34 @@ public static void main(String args[]) throws Exception {
       return SelectorProvider.provider().openSelector();
   }
   ```
+* 频繁调用```SelectorProvider.provider()```来创建大量连接时会有性能问题：
+  ```java
+  /**
+   * Use the {@link SelectorProvider} to open {@link java.nio.channels.SocketChannel} and so remove condition in
+   * {@link SelectorProvider#provider()} which is called by each SocketChannel.open() otherwise.
+   * <p>
+   * See <a href="https://github.com/netty/netty/issues/2308">#2308</a>.
+   */
+  private static final SelectorProvider DEFAULT_SELECTOR_PROVIDER = SelectorProvider.provider();
+
+  final Selector            selector;
+  final ServerSocketChannel serverSocketChannel;
+
+  Reactor(int port) throws IOException {
+      this(DEFAULT_SELECTOR_PROVIDER, port);
+  }
+
+  Reactor(SelectorProvider provider, int port) throws IOException {
+  
+      this.selector = provider.openSelector();  // Selector.open()
+      this.serverSocketChannel = provider.openServerSocketChannel(); // ServerSocketChannel.open()
+
+      this.serverSocketChannel.socket().bind(new InetSocketAddress(port));
+      this.serverSocketChannel.configureBlocking(false);
+
+      ...
+  }
+  ```
 * `Selector`可以同时监控多个`SelectableChannel`的IO状况，是非阻塞IO的核心。
 * 一个`Selector`实例有三个`SelectionKey`集合：
   * 所有的`SelectionKey`集合：代表了注册在该`Selector`上的`Channel`，这个集合可以通过`keys()`方法返回。
@@ -359,79 +387,82 @@ public static void main(String args[]) throws Exception {
   * `public static final int OP_ACCEPT = 1 << 4;` // 16
 * 示例代码：
   ```java
-  int ports[] = new int[3];
-  ports[0] = 6001;
-  ports[1] = 6002;
-  ports[2] = 6003;
+  private static final SelectorProvider DEFAULT_SELECTOR_PROVIDER = SelectorProvider.provider();
 
-  // Create a new selector
-  Selector selector = Selector.open();
+  public static void main(String args[]) throws IOException {
+      int ports[] = new int[3];
+      ports[0] = 6001;
+      ports[1] = 6002;
+      ports[2] = 6003;
 
-  // Open a listener on each port, and register each one
-  // with the selector
-  for (int i = 0; i < ports.length; ++i) {
-      ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
-      serverSocketChannel.configureBlocking(false);
-      ServerSocket serverSocket = serverSocketChannel.socket();
-      InetSocketAddress address = new InetSocketAddress(ports[i]);
-      serverSocket.bind(address);
+      // Create a new selector
+      Selector selector = DEFAULT_SELECTOR_PROVIDER.openSelector();
 
-      SelectionKey key = serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
+      // Open a listener on each port, and register each one with the selector
+      for (int i = 0; i < ports.length; ++i) {
+          ServerSocketChannel serverSocketChannel = DEFAULT_SELECTOR_PROVIDER.openServerSocketChannel();
+          serverSocketChannel.configureBlocking(false);
+          ServerSocket serverSocket = serverSocketChannel.socket();
+          InetSocketAddress address = new InetSocketAddress(ports[i]);
+          serverSocket.bind(address);
 
-      System.out.println("Going to listen on " + ports[i]);
-  }
+          SelectionKey key = serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
 
-  while (true) {
-      int num = selector.select();
+          System.out.println("Going to listen on " + ports[i]);
+      }
 
-      Set<SelectionKey> selectedKeys = selector.selectedKeys();
+      while (true) {
+          int num = selector.select();
 
-      System.out.println("selectedKeys: " + selectedKeys);
+          Set<SelectionKey> selectedKeys = selector.selectedKeys();
 
-      Iterator<SelectionKey> it = selectedKeys.iterator();
+          System.out.println("selectedKeys: " + selectedKeys);
 
-      while (it.hasNext()) {
-          SelectionKey selectionKey = it.next();
+          Iterator<SelectionKey> it = selectedKeys.iterator();
 
-          if (selectionKey.isAcceptable()) {
-              // Accept the new connection
-              ServerSocketChannel serverSocketChannel = (ServerSocketChannel) selectionKey.channel();
-              SocketChannel channel = serverSocketChannel.accept();
-              channel.configureBlocking(false);
+          while (it.hasNext()) {
+              SelectionKey selectionKey = it.next();
 
-              // Add the new connection to the selector
-              SelectionKey newKey = channel.register(selector, SelectionKey.OP_READ);
-              it.remove();
+              if (selectionKey.isAcceptable()) {
+                  // Accept the new connection
+                  ServerSocketChannel serverSocketChannel = (ServerSocketChannel) selectionKey.channel();
+                  SocketChannel channel = serverSocketChannel.accept();
+                  channel.configureBlocking(false);
 
-              System.out.println("Got connection from " + channel.toString());
-          }
-          else if (selectionKey.isReadable()) {
-              // Read the data
-              SocketChannel channel = (SocketChannel) selectionKey.channel();
+                  // Add the new connection to the selector
+                  SelectionKey newKey = channel.register(selector, SelectionKey.OP_READ);
+                  it.remove();
 
-              int writeBytes = 0;
+                  System.out.println("Got connection from " + channel.toString());
+              }
+              else if (selectionKey.isReadable()) {
+                  // Read the data
+                  SocketChannel channel = (SocketChannel) selectionKey.channel();
 
-              ByteBuffer buffer = ByteBuffer.allocate(10);
+                  int writeBytes = 0;
 
-              while (true) {
-                  buffer.clear();
+                  ByteBuffer buffer = ByteBuffer.allocate(10);
 
-                  int r = channel.read(buffer);
+                  while (true) {
+                      buffer.clear();
 
-                  if (r <= 0) {
-                      break;
+                      int r = channel.read(buffer);
+
+                      if (r <= 0) {
+                          break;
+                      }
+
+                      buffer.flip();
+
+                      channel.write(buffer);
+
+                      writeBytes += r;
                   }
 
-                  buffer.flip();
+                  System.out.println("Echoed " + writeBytes + " from " + channel);
 
-                  channel.write(buffer);
-
-                  writeBytes += r;
+                  it.remove();
               }
-
-              System.out.println("Echoed " + writeBytes + " from " + channel);
-
-              it.remove();
           }
       }
   }
