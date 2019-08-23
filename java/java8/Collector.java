@@ -34,26 +34,22 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
- * A <a href="package-summary.html#Reduction">mutable reduction operation</a> that
- * accumulates input elements into a mutable result container, optionally transforming
- * the accumulated result into a final representation after all input elements
- * have been processed.  Reduction operations can be performed either sequentially
- * or in parallel.
+ * 一个<a href="package-summary.html#Reduction">可变的汇聚操作(mutable reduction operation)</a>，
+ * 它将输入元素累积到一个可变的结果容器中；在处理完所有输入元素后，将累积的结果转换为一个最终表示（这是一个可选操作）。
+ * 汇聚操作（Reduction operations）可以串行执行，也可以并行执行。
+ * 
+ * <p>可变的汇聚操作的示例包括：
+ * 将元素累积到一个{@code Collection}中；使用{@code StringBuilder}连接字符串；
+ * 计算关于元素的sum、min、max或average等汇总信息；
+ * 计算“数据透视表(pivot table)”汇总信息，如“卖方最大交易金额”等。
+ * {@link Collectors}类提供了许多常见的可变汇聚的实现，{@link Collectors}类是一个工厂。
  *
- * <p>Examples of mutable reduction operations include:
- * accumulating elements into a {@code Collection}; concatenating
- * strings using a {@code StringBuilder}; computing summary information about
- * elements such as sum, min, max, or average; computing "pivot table" summaries
- * such as "maximum valued transaction by seller", etc.  The class {@link Collectors}
- * provides implementations of many common mutable reductions.
- *
- * <p>A {@code Collector} is specified by four functions that work together to
- * accumulate entries into a mutable result container, and optionally perform
- * a final transform on the result.  They are: <ul>
- *     <li>creation of a new result container ({@link #supplier()})</li>
- *     <li>incorporating a new data element into a result container ({@link #accumulator()})</li>
- *     <li>combining two result containers into one ({@link #combiner()})</li>
- *     <li>performing an optional final transform on the container ({@link #finisher()})</li>
+ * 一个{@code Collector}由四个函数指定，这四个函数一起协同工作将条目累积到可变的结果容器中，并可选地对结果执行最终转换。
+ * 它们是：<ul>
+ *     <li>创建一个新的结果容器({@link #supplier()})</li>
+ *     <li>将新的数据元素合并到结果结果容器中({@link #accumulator()})</li>
+ *     <li>将两个结果容器合并成一个({@link #combiner()})</li>
+ *     <li>对容器执行可选的最终转换({@link #finisher()})</li>
  * </ul>
  *
  * <p>Collectors also have a set of characteristics, such as
@@ -196,39 +192,36 @@ import java.util.function.Supplier;
  */
 public interface Collector<T, A, R> {
     /**
-     * A function that creates and returns a new mutable result container.
+     * 一个函数，它会创建并返回一个新的可变结果容器。
      *
-     * @return a function which returns a new, mutable result container
+     * @return 返回一个新的可变结果容器的“函数”
      */
     Supplier<A> supplier();
 
     /**
-     * A function that folds a value into a mutable result container.
+     * 一个函数，将一个值折叠到可变结果容器数。
      *
-     * @return a function which folds a value into a mutable result container
+     * @return 将值折叠成可变结果容器的函数
      */
     BiConsumer<A, T> accumulator();
 
     /**
-     * A function that accepts two partial results and merges them.  The
-     * combiner function may fold state from one argument into the other and
-     * return that, or may return a new result container.
+     * 一个函数，接受两个部分结果并将其合并。
+     * 组合器函数可以将状态从一个参数折叠到另一个参数并返回该参数，
+     * 或者返回一个新的结果容器。
      *
-     * @return a function which combines two partial results into a combined
-     * result
+     * @return 将两个部分结果组合成一个组合结果的函数
      */
     BinaryOperator<A> combiner();
 
     /**
-     * Perform the final transformation from the intermediate accumulation type
-     * {@code A} to the final result type {@code R}.
+     * 执行从中间累积类型{@code A}转换成最终结果类型{@code R}。
      *
-     * <p>If the characteristic {@code IDENTITY_TRANSFORM} is
-     * set, this function may be presumed to be an identity transform with an
-     * unchecked cast from {@code A} to {@code R}.
+     * <p>如果设置了特征{@code IDENTITY_TRANSFORM}，
+     * 则可以假定该函数是一个identity transform，
+     * 从{@code A}到{@code R}的转换是未检查的。
      *
-     * @return a function which transforms the intermediate result to the final
-     * result
+     * @return 将中间结果转换为最终结果的函数
      */
     Function<A, R> finisher();
 
