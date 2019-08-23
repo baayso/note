@@ -22,6 +22,7 @@
   * [Channel](https://github.com/baayso/note/blob/master/java/nio/nio.md#5-channel)
   * [Selector](https://github.com/baayso/note/blob/master/java/nio/nio.md#6-selector)
 * [Netty](https://github.com/baayso/note/tree/master/java/netty)
+  * [Reactor模型](https://github.com/baayso/note/blob/master/java/reactor/reactor.md)
   * [Netty源码解析](https://github.com/baayso/note/blob/master/java/netty/netty.md)
   * [为什么Netty只基于NIO而抛弃AIO](https://github.com/baayso/note/blob/master/java/netty/netty-nio-aio.md)
   * [ByteBuf](https://github.com/baayso/note/blob/master/java/netty/ByteBuf.md)
