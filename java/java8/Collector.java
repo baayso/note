@@ -119,8 +119,7 @@ import java.util.function.Supplier;
  * （此行为也由预定义的收集器{@link Collectors#toCollection(Supplier)}实现。
  *
  * @apiNote
- * Performing a reduction operation with a {@code Collector} should produce a
- * result equivalent to:
+ * 使用{@code Collector}执行汇聚操作(reduction operation)的结果等价于：
  * <pre>{@code
  *     R container = collector.supplier().get();
  *     for (T t : data)
@@ -128,25 +127,22 @@ import java.util.function.Supplier;
  *     return collector.finisher().apply(container);
  * }</pre>
  *
- * <p>However, the library is free to partition the input, perform the reduction
- * on the partitions, and then use the combiner function to combine the partial
- * results to achieve a parallel reduction.  (Depending on the specific reduction
- * operation, this may perform better or worse, depending on the relative cost
- * of the accumulator and combiner functions.)
+ * <p>然而，库可以自由地对输入进行分区，对每个分区执行reduction，
+ * 然后使用combiner函数将部分结果合并起来，实现并行reduction。
+ * （这取决于具体的reduction operation，取决于accumulator和combiner功能的相对成本，
+ * 它的性能可能更好，也可能更差。）
  *
- * <p>Collectors are designed to be <em>composed</em>; many of the methods
- * in {@link Collectors} are functions that take a collector and produce
- * a new collector.  For example, given the following collector that computes
- * the sum of the salaries of a stream of employees:
+ * <p>收集器被设计成是可以<em>组合(composed)</em>的；
+ * {@link Collectors}中的许多方法都是接受收集器并生成新收集器的函数。
+ * 例如，给定如下的收集器，它计算一个员工流的工资总和：
  *
  * <pre>{@code
  *     Collector<Employee, ?, Integer> summingSalaries
  *         = Collectors.summingInt(Employee::getSalary))
  * }</pre>
  *
- * If we wanted to create a collector to tabulate the sum of salaries by
- * department, we could reuse the "sum of salaries" logic using
- * {@link Collectors#groupingBy(Function, Collector)}:
+ * 如果我们想要创建一个收集器来按部门列出工资总额，
+ * 我们可以使用{@link Collectors#groupingBy(Function, Collector)}重用上面“工资总和”的逻辑：
  *
  * <pre>{@code
  *     Collector<Employee, ?, Map<Department, Integer>> summingSalariesByDept
@@ -157,7 +153,7 @@ import java.util.function.Supplier;
  * @see Collectors
  *
  * @param <T> 汇聚操作(reduction operation)的输入元素的类型（流中的每一个元素的类型）
- * @param <A> 汇聚操作(reduction operation)的可变累积类型(通常作为实现细节隐藏)
+ * @param <A> 汇聚操作(reduction operation)的可变累积类型(通常作为实现细节被隐藏)
  *            （每一次操作的结果容器类型）
  * @param <R> 汇聚操作(reduction operation)的结果类型
  * @since 1.8
