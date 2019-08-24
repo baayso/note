@@ -81,16 +81,13 @@ import java.util.function.Supplier;
  *     R r2 = finisher.apply(combiner.apply(a2, a3));  // result with splitting
  * } </pre>
  *
- * <p>For collectors that do not have the {@code UNORDERED} characteristic,
- * two accumulated results {@code a1} and {@code a2} are equivalent if
- * {@code finisher.apply(a1).equals(finisher.apply(a2))}.  For unordered
- * collectors, equivalence is relaxed to allow for non-equality related to
- * differences in order.  (For example, an unordered collector that accumulated
- * elements to a {@code List} would consider two lists equivalent if they
- * contained the same elements, ignoring order.)
+ * <p>对于没有{@code UNORDERED}特性的收集器(collectors)，
+ * 如果{@code finisher.apply(a1).equals(finisher.apply(a2))}，
+ * 则两个累积结果{@code a1}和{@code a2}是等效的。 
+ * 对于无序收集器(unordered collectors)，可以放宽等价性，以允许与顺序差异的不相等。
+ * （例如，一个无序收集器将元素累积到一个列表中，如果两个列表包含相同的元素，那么它将认为它们是等价的，而忽略了顺序。）
  *
- * <p>Libraries that implement reduction based on {@code Collector}, such as
- * {@link Stream#collect(Collector)}, must adhere to the following constraints:
+ * <p>基于{@code Collector}实现的reduction的库，比如{@link Stream#collect(Collector)}，必须遵守以下约定:
  * <ul>
  *     <li>The first argument passed to the accumulator function, both
  *     arguments passed to the combiner function, and the argument passed to the
