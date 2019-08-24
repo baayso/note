@@ -52,32 +52,22 @@ import java.util.function.Supplier;
  *     <li>对容器执行可选的最终转换({@link #finisher()})</li>
  * </ul>
  *
- * <p>Collectors also have a set of characteristics, such as
- * {@link Characteristics#CONCURRENT}, that provide hints that can be used by a
- * reduction implementation to provide better performance.
+ * <p>Collectors还具有一组特性，例如{@link Characteristics#CONCURRENT}，
+ * 它提供了一些提示，可以由汇聚实现使用这些提示来提供更好的性能。
  *
- * <p>A sequential implementation of a reduction using a collector would
- * create a single result container using the supplier function, and invoke the
- * accumulator function once for each input element.  A parallel implementation
- * would partition the input, create a result container for each partition,
- * accumulate the contents of each partition into a subresult for that partition,
- * and then use the combiner function to merge the subresults into a combined
- * result.
+ * <p>使用Collector进行汇聚的串行实现将使用supplier函数创建单个结果容器，并为每个输入元素调用accumulator函数一次。
+ * 并行实现将对输入进行分区，并为每个分区创建一个结果容器，
+ * 将每个分区的内容累积到该分区的子结果中，然后使用combiner函数将子结果合并到一个组合结果中。
  *
- * <p>To ensure that sequential and parallel executions produce equivalent
- * results, the collector functions must satisfy an <em>identity</em> and an
- * <a href="package-summary.html#Associativity">associativity</a> constraints.
+ * <p>为了确保串行执行和并行执行产生相同的结果，collector函数必须满足<em>同一性(identity)</em>和
+ * <a href="package-summary.html#Associativity">结合性(associativity)</a>两个约束。
  *
- * <p>The identity constraint says that for any partially accumulated result,
- * combining it with an empty result container must produce an equivalent
- * result.  That is, for a partially accumulated result {@code a} that is the
- * result of any series of accumulator and combiner invocations, {@code a} must
- * be equivalent to {@code combiner.apply(a, supplier.get())}.
+ * <p>同一性(identity)约束表示对于任何部分累积的结果，将其与空的结果容器合并必须产生等价结果。
+ * 也就是说，对于任何系列accumulator和combiner调用所产生的部分累积结果{@code a}，
+ * {@code a}必须等价于{@code combiner.apply(a, supplier.get())}。
  *
- * <p>The associativity constraint says that splitting the computation must
- * produce an equivalent result.  That is, for any input elements {@code t1}
- * and {@code t2}, the results {@code r1} and {@code r2} in the computation
- * below must be equivalent:
+ * <p>结合性(associativity)约束表示拆分(splitting)计算必须产生等价结果。
+ * 也就是说，对于任意输入元素{@code t1}和{@code t2}，下面的计算结果{@code r1}和{@code r2}必须是等价的：
  * <pre>{@code
  *     A a1 = supplier.get();
  *     accumulator.accept(a1, t1);
@@ -301,8 +291,7 @@ public interface Collector<T, A, R> {
     }
 
     /**
-     * Characteristics indicating properties of a {@code Collector}, which can
-     * be used to optimize reduction implementations.
+     * 表示{@code Collector}属性的特征，可用于优化汇聚实现。
      */
     enum Characteristics {
         /**
