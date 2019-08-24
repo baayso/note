@@ -87,42 +87,28 @@ import java.util.function.Supplier;
  * 对于无序收集器(unordered collectors)，可以放宽等价性，以允许与顺序差异的不相等。
  * （例如，一个无序收集器将元素累积到一个列表中，如果两个列表包含相同的元素，那么它将认为它们是等价的，而忽略了顺序。）
  *
- * <p>基于{@code Collector}实现的reduction的库，比如{@link Stream#collect(Collector)}，必须遵守以下约定:
+ * <p>基于{@code Collector}实现的reduction的库，比如{@link Stream#collect(Collector)}，必须遵守以下约束:
  * <ul>
- *     <li>The first argument passed to the accumulator function, both
- *     arguments passed to the combiner function, and the argument passed to the
- *     finisher function must be the result of a previous invocation of the
- *     result supplier, accumulator, or combiner functions.</li>
- *     <li>The implementation should not do anything with the result of any of
- *     the result supplier, accumulator, or combiner functions other than to
- *     pass them again to the accumulator, combiner, or finisher functions,
- *     or return them to the caller of the reduction operation.</li>
- *     <li>If a result is passed to the combiner or finisher
- *     function, and the same object is not returned from that function, it is
- *     never used again.</li>
- *     <li>Once a result is passed to the combiner or finisher function, it
- *     is never passed to the accumulator function again.</li>
- *     <li>For non-concurrent collectors, any result returned from the result
- *     supplier, accumulator, or combiner functions must be serially
- *     thread-confined.  This enables collection to occur in parallel without
- *     the {@code Collector} needing to implement any additional synchronization.
- *     The reduction implementation must manage that the input is properly
- *     partitioned, that partitions are processed in isolation, and combining
- *     happens only after accumulation is complete.</li>
- *     <li>For concurrent collectors, an implementation is free to (but not
- *     required to) implement reduction concurrently.  A concurrent reduction
- *     is one where the accumulator function is called concurrently from
- *     multiple threads, using the same concurrently-modifiable result container,
- *     rather than keeping the result isolated during accumulation.
- *     A concurrent reduction should only be applied if the collector has the
- *     {@link Characteristics#UNORDERED} characteristics or if the
- *     originating data is unordered.</li>
+ *     <li><传递给accumulator函数的第一个参数、传递给combiner函数的两个参数以及传递给finisher函数的参数
+ *     必须是上一次调用result supplier、accumulator或combiner函数的结果。/li>
+ *     <li>实现不应该对任何result supplie、accumulator或combiner函数的结果执行任何操作，
+ *     除非再次将它们传递给accumulator、combiner或finisher函数，
+ *     或者将它们返回给汇聚操作(reduction operation)的调用者。</li>
+ *     <li>如果将结果传递给combiner或finisher函数，而该函数却没有返回相同的对象，
+ *     则永远不会再次使用该对象。</li>
+ *     <li>一旦将一个结果传递给combiner或finisher函数，它就再也不会被传递给accumulator函数。</li>
+ *     <li>对于非并发收集器(non-concurrent collectors)，
+ *     从result supplier、accumulator或combiner函数返回的任何结果都必须是串行线程受限的。
+ *     这使得收集可以并行进行，而{@code Collector}不需要实现任何额外的同步。
+ *     reduction实现必须确保输入被正确分区，分区是独立处理的，并且只有在累积(accumulation)完成之后才进行合并。</li>
+ *     <li>对于并发收集器(concurrent collectors)，实现可以自由地(但不是必须)并发地实现reduction。
+ *     并发reduction是指使用相同的可并发修改的结果容器从多个线程并发地调用accumulator函数，而不是在累积期间将结果进行隔离。
+ *     只有当collector具有{@link Characteristics#UNORDERED}特性或者原始数据是无序的时，才应该应用并发reduction。</li>
  * </ul>
  *
- * <p>In addition to the predefined implementations in {@link Collectors}, the
- * static factory methods {@link #of(Supplier, BiConsumer, BinaryOperator, Characteristics...)}
- * can be used to construct collectors.  For example, you could create a collector
- * that accumulates widgets into a {@code TreeSet} with:
+ * <p>除了在{@link Collectors}中预定义的实现外，
+ * 还可以使用静态工厂方法{@link #of(Supplier, BiConsumer, BinaryOperator, Characteristics...)}构造collectors。
+ * 例如，你可以创建一个collector，使用以下命令将widgets累积到{@code TreeSet}中：
  *
  * <pre>{@code
  *     Collector<Widget, ?, TreeSet<Widget>> intoSet =
@@ -130,8 +116,7 @@ import java.util.function.Supplier;
  *                      (left, right) -> { left.addAll(right); return left; });
  * }</pre>
  *
- * (This behavior is also implemented by the predefined collector
- * {@link Collectors#toCollection(Supplier)}).
+ * （此行为也由预定义的收集器{@link Collectors#toCollection(Supplier)}实现。
  *
  * @apiNote
  * Performing a reduction operation with a {@code Collector} should produce a
@@ -171,10 +156,10 @@ import java.util.function.Supplier;
  * @see Stream#collect(Collector)
  * @see Collectors
  *
- * @param <T> the type of input elements to the reduction operation
- * @param <A> the mutable accumulation type of the reduction operation (often
- *            hidden as an implementation detail)
- * @param <R> the result type of the reduction operation
+ * @param <T> 汇聚操作(reduction operation)的输入元素的类型（流中的每一个元素的类型）
+ * @param <A> 汇聚操作(reduction operation)的可变累积类型(通常作为实现细节隐藏)
+ *            （每一次操作的结果容器类型）
+ * @param <R> 汇聚操作(reduction operation)的结果类型
  * @since 1.8
  */
 public interface Collector<T, A, R> {
