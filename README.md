@@ -42,5 +42,8 @@
 ## 推荐阅读：
 * https://github.com/Snailclimb/JavaGuide
 * https://github.com/crossoverJie/JCSprout
-
+* https://github.com/doocs/advanced-java
+* https://github.com/dylanaraps/pure-bash-bible
+* https://github.com/justjavac/free-programming-books-zh_CN
+* https://github.com/codefollower/OpenJDK-Research
 
