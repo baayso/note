@@ -273,28 +273,23 @@ public interface Collector<T, A, R> {
      */
     enum Characteristics {
         /**
-         * Indicates that this collector is <em>concurrent</em>, meaning that
-         * the result container can support the accumulator function being
-         * called concurrently with the same result container from multiple
-         * threads.
+         * 标识此收集器是<em>并发的</em>，
+         * 这意味着结果容器可以支持与来自多个hread的相同结果容器并发调用累加器函数(accumulator function)。
          *
-         * <p>If a {@code CONCURRENT} collector is not also {@code UNORDERED},
-         * then it should only be evaluated concurrently if applied to an
-         * unordered data source.
+         * <p>如果 {@code CONCURRENT} 收集器不是 {@code UNORDERED}，
+         * 那么只有应用于无序数据源时才应该并发地计算它。
          */
         CONCURRENT,
 
         /**
-         * Indicates that the collection operation does not commit to preserving
-         * the encounter order of input elements.  (This might be true if the
-         * result container has no intrinsic order, such as a {@link Set}.)
+         * 标识收集操作不承诺保存输入元素的相遇顺序。
+         * (如果结果容器没有内部顺序，例如{@link Set}，则可能是这样。)
          */
         UNORDERED,
 
         /**
-         * Indicates that the finisher function is the identity function and
-         * can be elided.  If set, it must be the case that an unchecked cast
-         * from A to R will succeed.
+         * 标识完成器函数(finisher function)是identity function并且可以省略。
+         * 如果设置了，则从A到R的未检查强制转换必须成功。
          */
         IDENTITY_FINISH
     }
