@@ -274,7 +274,8 @@ public interface Collector<T, A, R> {
     enum Characteristics {
         /**
          * 标识此收集器是<em>并发的</em>，
-         * 这意味着结果容器可以支持与来自多个hread的相同结果容器并发调用累加器函数(accumulator function)。
+         * 这意味着结果容器可以支持从多个线程同时使用相同的结果容器调用累加器函数(accumulator function)。
+         * (即：多个线程会同时的操作同一个结果容器。)
          *
          * <p>如果 {@code CONCURRENT} 收集器不是 {@code UNORDERED}，
          * 那么只有应用于无序数据源时才应该并发地计算它。
