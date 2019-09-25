@@ -77,3 +77,23 @@ Netty则对ChannelFuture进行了增强，通过ChannelFutureListener以回调�
   1. ChannelHandlerContext与ChannelHandler之间的关联绑定关系是永远都不会发生改变的，因此对其进行缓存是没有任何问题的。
   2. 对于Channel的同名方法来说，ChannelHandlerContext的方法将会产生更短的事件流，所以我们应该在可能的情况下利用这个特性来提升应用性能。
 
+## 6. [Netty ByteBuf](https://github.com/baayso/note/blob/master/java/netty/ByteBuf.md)所提供的3种缓冲区类型：
+> 最佳实践：对于后端业务消息的编解码推荐使用HeapByteBuf；对于I/O通信线程在读写缓冲区时，推荐使用DirectByteBuf。
+* Heap Buffer (堆缓冲区)
+  * 最常用的缓冲区，ByteBuf将数据存储到JVM的堆空间中，并将实际的数据存放到byte array中来实现。
+  * 优点：由于数据是存储在JVM堆中，因此可以快速的创建与快速的释放，并且它提供了直接访问内部字节数组的方法。
+  * 缺点：每次读写数据时，都需要先将数据复制到直接缓冲区中再时行网络传输。
+
+* Direct Buffer (直接缓冲区)
+  * 在JVM堆之外直接分配的内存空间，直接缓冲区并不会占用JVM堆的内存空间，因为它是由操作在本地内存进行分配的。
+  * 优点：在使用Socket进行数据传输时，性能非常好，因为数据直接位于操作系统的本地内存中，所以不需要从JVM将数据复制到直接缓冲区中。
+  * 缺点：因为Direct Buffer是直接在操作系统内存中的，所以内存空间的分配与释放要比JVM堆空间更加复杂且速度会慢一些。但是Netty通过提供内存池来解决这个问题。直接缓冲区并不支持通过字节数组的方式来访问数据。
+
+* Composite Buffer (复合缓冲区)
+  * 一个虚拟缓冲区，它将多个缓冲区展示为一个合并的缓冲区。建议使用```ByteBufAllocator.compositeBuffer()```或``` Unpooled.wrappedBuffer(ByteBuf...)```，而不是显式地调用构造函数。
+
+## 7. Netty的[ByteBuf](https://github.com/baayso/note/blob/master/java/netty/ByteBuf.md)相较于JDK的[ByteBuffer](https://github.com/baayso/note/blob/master/java/nio/nio.md#2-nio-buffer)的不同之处
+* Netty的ByteBuf采用了读写索引分离的策略(readerIndex 和 writerIndex)，一个初始化(里面尚未有任何数据)的ByteBuf的readerIndex与writerIndex值都为0。
+* 当readerIndex和writerIndex处于同一个位置时，如果继续读取，将会抛出IndexOutOfBoundsException。
+* 对于ByteBuf的任何读写操作都会分别单独维护读索引和写索引。其maxCapacity字段的最大空间默认的限制是Integer.MAX_VALUE。
+
