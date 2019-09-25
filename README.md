@@ -25,7 +25,7 @@
   * [Reactor模型](https://github.com/baayso/note/blob/master/java/reactor/reactor.md)
   * [Netty源码解析](https://github.com/baayso/note/blob/master/java/netty/netty.md)
   * [为什么Netty只基于NIO而抛弃AIO](https://github.com/baayso/note/blob/master/java/netty/netty-nio-aio.md)
-  * [ByteBuf](https://github.com/baayso/note/tree/master/java/netty#6-netty-bytebuf%E6%89%80%E6%8F%90%E4%BE%9B%E7%9A%843%E7%A7%8D%E7%BC%93%E5%86%B2%E5%8C%BA%E7%B1%BB%E5%9E%8B)
+  * [ByteBuf](https://github.com/baayso/note/blob/master/java/netty/README.md#6-netty-bytebuf%E6%89%80%E6%8F%90%E4%BE%9B%E7%9A%843%E7%A7%8D%E7%BC%93%E5%86%B2%E5%8C%BA%E7%B1%BB%E5%9E%8B)
 * [String](https://github.com/baayso/note/blob/master/java/String.md)
 * [equals And hashCode](https://github.com/baayso/note/blob/master/java/equals_and_hashCode.md)
 * [Collection](https://github.com/baayso/note/blob/master/java/collection/collection.md)
