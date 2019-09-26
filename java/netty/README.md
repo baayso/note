@@ -96,4 +96,9 @@ Netty则对ChannelFuture进行了增强，通过ChannelFutureListener以回调�
 * Netty的ByteBuf采用了读写索引分离的策略(readerIndex 和 writerIndex)，一个初始化(里面尚未有任何数据)的ByteBuf的readerIndex与writerIndex值都为0。
 * 当readerIndex和writerIndex处于同一个位置时，如果继续读取，将会抛出IndexOutOfBoundsException。
 * 对于ByteBuf的任何读写操作都会分别单独维护读索引和写索引。其maxCapacity字段的最大空间默认的限制是Integer.MAX_VALUE。
-
+* JDK的ByteBuffer的缺点：
+  * ```final byte[] hb;```这行代码是JDK的ByteBuffer对象中用于存储数据的声明，其字节数组被声明为final的，也就是长度是固定不变的。一旦分配好后不能动态扩容与收缩。当待存储的数据字节很大时就很有可能抛出IndexOutOfBoundsException。如果要预防这个异常，那就需要在存储之前完全确定好待存储的字节大小 。如果ByteBuffer的空间不足，只有一种解决方案：创建一个全新的ByteBuffer对象，然后再将之前的ByteBuffer中的数据复制过去，但这一切都需要由开发者自己手动编码完成。
+  * ByteBuffer只使用一个position指针来标识位置信息，在进行读写切换时需要调用flip()方法或者是rewind()方法使用起来很不方便。
+* Netty的ByteBuf的优点：
+  * 存储字节的数组是动态的，其长度最大值默认是Integer.MAX_VALUE。这里的动态性是体现在write()方法中，write()方法在执行时会判断buffer的容量，如果不足则自动扩容。
+  * ByteBuf的读写索引是完全分开的，使用起来很方便。
