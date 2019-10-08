@@ -26,15 +26,11 @@ import io.netty.util.internal.StringUtil;
 import java.util.List;
 
 /**
- * A specialized variation of {@link ByteToMessageDecoder} which enables implementation
- * of a non-blocking decoder in the blocking I/O paradigm.
+ * {@link ByteToMessageDecoder}的一种特殊变体，它可以在阻塞I/O范式中实现非阻塞解码器。
  * <p>
- * The biggest difference between {@link ReplayingDecoder} and
- * {@link ByteToMessageDecoder} is that {@link ReplayingDecoder} allows you to
- * implement the {@code decode()} and {@code decodeLast()} methods just like
- * all required bytes were received already, rather than checking the
- * availability of the required bytes.  For example, the following
- * {@link ByteToMessageDecoder} implementation:
+ * {@link ReplayingDecoder}和{@link ByteToMessageDecoder}之间的最大区别在于，
+ * {@link ReplayingDecoder}可以让你就像已经接收到所有必需字节一样实现{@code decode()}和{@code decodeLast()}方法，
+ * 而无需检查所需字节是否可用。例如，以下{@link ByteToMessageDecoder}实现：
  * <pre>
  * public class IntegerHeaderFrameDecoder extends {@link ByteToMessageDecoder} {
  *
@@ -58,7 +54,7 @@ import java.util.List;
  *   }
  * }
  * </pre>
- * is simplified like the following with {@link ReplayingDecoder}:
+ * 使用{@link ReplayingDecoder}可以进行如下简化:
  * <pre>
  * public class IntegerHeaderFrameDecoder
  *      extends {@link ReplayingDecoder}&lt;{@link Void}&gt; {
@@ -71,38 +67,30 @@ import java.util.List;
  * }
  * </pre>
  *
- * <h3>How does this work?</h3>
+ * <h3>这是怎么实现的呢？</h3>
  * <p>
- * {@link ReplayingDecoder} passes a specialized {@link ByteBuf}
- * implementation which throws an {@link Error} of certain type when there's not
- * enough data in the buffer.  In the {@code IntegerHeaderFrameDecoder} above,
- * you just assumed that there will be 4 or more bytes in the buffer when
- * you call {@code buf.readInt()}.  If there's really 4 bytes in the buffer,
- * it will return the integer header as you expected.  Otherwise, the
- * {@link Error} will be raised and the control will be returned to
- * {@link ReplayingDecoder}.  If {@link ReplayingDecoder} catches the
- * {@link Error}, then it will rewind the {@code readerIndex} of the buffer
- * back to the 'initial' position (i.e. the beginning of the buffer) and call
- * the {@code decode(..)} method again when more data is received into the
- * buffer.
+ * {@link ReplayingDecoder}传递一个特殊的{@link ByteBuf}实现，
+ * 当缓冲区中没有足够的数据时，该实现会抛出某种类型的{@link Error}。
+ * 在上面的{@code IntegerHeaderFrameDecoder}中，
+ * 你只是假设在调用{@code buf.readInt()}时缓冲区中会有4个或更多字节。
+ * 如果缓冲区中确实有4个字节，它将像你期望的那样返回整数header(报头)。
+ * 否则，将抛出{@link Error}并将控制返回给{@link ReplayingDecoder}。
+ * 如果{@link ReplayingDecoder}捕捉到{@link Error}，
+ * 那么它会将缓冲区的{@code readerIndex}重置为“初始”位置(即缓冲区的开始)，
+ * 并在缓冲区接收到更多数据时再次调用{@code decode(..)}方法。
  * <p>
- * Please note that {@link ReplayingDecoder} always throws the same cached
- * {@link Error} instance to avoid the overhead of creating a new {@link Error}
- * and filling its stack trace for every throw.
+ * 请注意，{@link ReplayingDecoder}总是抛出相同的被缓存的{@link Error}实例，
+ * 以避免创建新{@link Error}，并在每次抛出时填充其堆栈跟踪的开销。
  *
- * <h3>Limitations</h3>
+ * <h3>局限性</h3>
  * <p>
- * At the cost of the simplicity, {@link ReplayingDecoder} enforces you a few
- * limitations:
+ * 为了简单起见，{@link ReplayingDecoder}强制你遵守一些限制：
  * <ul>
- * <li>Some buffer operations are prohibited.</li>
- * <li>Performance can be worse if the network is slow and the message
- *     format is complicated unlike the example above.  In this case, your
- *     decoder might have to decode the same part of the message over and over
- *     again.</li>
- * <li>You must keep in mind that {@code decode(..)} method can be called many
- *     times to decode a single message.  For example, the following code will
- *     not work:
+ * <li>禁止某些缓冲区操作。</li>
+ * <li>与上面的示例不同，如果网络速度较慢且消息格式复杂，则性能可能会更差。
+ *     在这种情况下，您的解码器可能不得不一次又一次地解码相同的消息部分。</li>
+ * <li>你必须记住{@code decode(..)}方法可能被多次调用来解码单个消息。
+ *     例如，以下代码将不能正常使用:
  * <pre> public class MyDecoder extends {@link ReplayingDecoder}&lt;{@link Void}&gt; {
  *
  *   private final Queue&lt;Integer&gt; values = new LinkedList&lt;Integer&gt;();
@@ -110,19 +98,17 @@ import java.util.List;
  *   {@code @Override}
  *   public void decode(.., {@link ByteBuf} buf, List&lt;Object&gt; out) throws Exception {
  *
- *     // A message contains 2 integers.
+ *     // 一条消息包含两个整数。
  *     values.offer(buf.readInt());
  *     values.offer(buf.readInt());
  *
- *     // This assertion will fail intermittently since values.offer()
- *     // can be called more than two times!
+ *     // 这个断言将间歇性地失败，因为上面的values.offer()可能会被调用两次以上！
  *     assert values.size() == 2;
  *     out.add(values.poll() + values.poll());
  *   }
  * }</pre>
- *      The correct implementation looks like the following, and you can also
- *      utilize the 'checkpoint' feature which is explained in detail in the
- *      next section.
+ *      正确的实现如下所示，你还可以利用“检查点”特性，
+ *      下一部分将对其进行详细说明。
  * <pre> public class MyDecoder extends {@link ReplayingDecoder}&lt;{@link Void}&gt; {
  *
  *   private final Queue&lt;Integer&gt; values = new LinkedList&lt;Integer&gt;();
@@ -130,15 +116,14 @@ import java.util.List;
  *   {@code @Override}
  *   public void decode(.., {@link ByteBuf} buf, List&lt;Object&gt; out) throws Exception {
  *
- *     // Revert the state of the variable that might have been changed
- *     // since the last partial decode.
+ *     // 还原自上次部分解码以来可能已更改的变量的状态。
  *     values.clear();
  *
- *     // A message contains 2 integers.
+ *     // 一条消息包含两个整数。
  *     values.offer(buf.readInt());
  *     values.offer(buf.readInt());
  *
- *     // Now we know this assertion will never fail.
+ *     // 现在这个断言永远不会失败。
  *     assert values.size() == 2;
  *     out.add(values.poll() + values.poll());
  *   }
@@ -146,7 +131,7 @@ import java.util.List;
  *     </li>
  * </ul>
  *
- * <h3>Improving the performance</h3>
+ * <h3>提高性能</h3>
  * <p>
  * Fortunately, the performance of a complex decoder implementation can be
  * improved significantly with the {@code checkpoint()} method.  The
