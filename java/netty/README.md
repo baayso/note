@@ -102,3 +102,33 @@ Netty则对ChannelFuture进行了增强，通过ChannelFutureListener以回调�
 * Netty的ByteBuf的优点：
   * 存储字节的数组是动态的，其长度最大值默认是Integer.MAX_VALUE。这里的动态性是体现在write()方法中，write()方法在执行时会判断buffer的容量，如果不足则自动扩容。
   * ByteBuf的读写索引是完全分开的，使用起来很方便。
+
+## 8. Netty 处理器(Handler)
+* Netty Handler分为两类：Inbound Handler(入站处理器) 与 Outbound Handler(出站处理器)。
+* 入站处理器的顶层类是```ChannelInboundHandler```，出站处理器的顶层类是```ChannelOutboundHandler```。
+* 编解码器：
+  * 数据处理时常用的各种编解码器本质上都是处理器(Handler)。
+  * 无论我们向网络中写入的数据是什么类型(int、char、String、二进制等)，数据在网络中传递时，其都是以字节流的形式呈现的。
+  * 编码器通常以XxxEncoder命名；解码器通常以XxxDecoder命名，但并不是所有的编解码器都遵循这个命名规则。
+  * 编解码统一称为codec。
+  * 编码：本质上是一种出站处理器；因此，编码是一种```ChannelOutboundHandler```。
+  * 解码：本质上是一种入站处理器；因此，解码是一种```ChannelInboundHandler```。
+    * 在解码器进行数据解码时，一定要记得判断```ByteBuf```中的数据是否足够，否则将会产生一些问题。
+  * 无论是编码器还是解码器，其所接收的消息类型必须要和待处理的参数类型一致，否则该编码器或解码器并不会被执行。
+    ```java
+    /**
+     * Returns {@code true} if the given message should be handled. If {@code false} it will be passed to the next
+     * {@link ChannelOutboundHandler} in the {@link ChannelPipeline}.
+     */
+    public boolean acceptOutboundMessage(Object msg) throws Exception {
+        return matcher.match(msg);
+    }
+    ```
+  * ```io.netty.handler.codec.ByteToMessageDecoder```抽象类
+  * ```io.netty.handler.codec.ByteToMessageCodec<I>```抽象类
+  * [```io.netty.handler.codec.ReplayingDecoder<S> extends ByteToMessageDecoder```](https://github.com/baayso/note/blob/master/java/netty/ReplayingDecoder.java)抽象类
+  * ```io.netty.handler.codec.MessageToByteEncoder<I>```抽象类
+  * ```io.netty.handler.codec.MessageToMessageEncoder<I>```抽象类
+  * ```io.netty.handler.codec.MessageToMessageDecoder<I>```抽象类
+  * ```io.netty.handler.codec.MessageToMessageCodec<INBOUND_IN, OUTBOUND_IN> extends ChannelDuplexHandler```抽象类
+
