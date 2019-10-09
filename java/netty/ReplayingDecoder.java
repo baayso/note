@@ -69,7 +69,7 @@ import java.util.List;
  *
  * <h3>这是怎么实现的呢？</h3>
  * <p>
- * {@link ReplayingDecoder}传递一个特殊的{@link ByteBuf}实现，
+ * {@link ReplayingDecoder}传递了一个特殊的{@link ByteBuf}实现，
  * 当缓冲区中没有足够的数据时，该实现会抛出某种类型的{@link Error}。
  * 在上面的{@code IntegerHeaderFrameDecoder}中，
  * 你只是假设在调用{@code buf.readInt()}时缓冲区中会有4个或更多字节。
@@ -133,13 +133,12 @@ import java.util.List;
  *
  * <h3>提高性能</h3>
  * <p>
- * Fortunately, the performance of a complex decoder implementation can be
- * improved significantly with the {@code checkpoint()} method.  The
- * {@code checkpoint()} method updates the 'initial' position of the buffer so
- * that {@link ReplayingDecoder} rewinds the {@code readerIndex} of the buffer
- * to the last position where you called the {@code checkpoint()} method.
+ * 幸运的是，使用{@code checkpoint()}方法可以显著提高复杂解码器实现的性能。
+ * {@code checkpoint()}方法更新缓冲区的“初始”位置，
+ * 以便{@link ReplayingDecoder}将缓冲区的{@code readerIndex}
+ * 重置到调用{@code checkpoint()}方法时的最后位置。
  *
- * <h4>Calling {@code checkpoint(T)} with an {@link Enum}</h4>
+ * <h4>使用{@link Enum}调用{@code checkpoint(T)}</h4>
  * <p>
  * Although you can just use {@code checkpoint()} method and manage the state
  * of the decoder by yourself, the easiest way to manage the state of the
@@ -147,6 +146,10 @@ import java.util.List;
  * of the decoder and to call {@code checkpoint(T)} method whenever the state
  * changes.  You can have as many states as you want depending on the
  * complexity of the message you want to decode:
+ * 虽然你可以只使用{@code checkpoint()}方法并自己管理解码器的状态，
+ * 但是管理解码器状态的最简单方法是创建一个表示解码器当前状态的{@link Enum}类型，
+ * 并在状态改变时调用{@code checkpoint(T)}方法。
+ * 根据要解码的消息的复杂性，可以根据需要设置任意多个状态：
  *
  * <pre>
  * public enum MyDecoderState {
@@ -183,9 +186,9 @@ import java.util.List;
  * }
  * </pre>
  *
- * <h4>Calling {@code checkpoint()} with no parameter</h4>
+ * <h4>调用没有参数的 {@code checkpoint()}</h4>
  * <p>
- * An alternative way to manage the decoder state is to manage it by yourself.
+ * 管理解码器状态的另一种方式是你自己去管理。
  * <pre>
  * public class IntegerHeaderFrameDecoder
  *      extends {@link ReplayingDecoder}&lt;<strong>{@link Void}</strong>&gt; {
@@ -212,7 +215,7 @@ import java.util.List;
  * }
  * </pre>
  *
- * <h3>Replacing a decoder with another decoder in a pipeline</h3>
+ * <h3>用pipeline(管道)中的一个解码器替换另一个解码器</h3>
  * <p>
  * If you are going to write a protocol multiplexer, you will probably want to
  * replace a {@link ReplayingDecoder} (protocol detector) with another
@@ -221,6 +224,12 @@ import java.util.List;
  * It is not possible to achieve this simply by calling
  * {@link ChannelPipeline#replace(ChannelHandler, String, ChannelHandler)}, but
  * some additional steps are required:
+ * 如果要编写一个协议多路复用器，
+ * 则可能需要用另一个{@link ReplayingDecoder}，
+ * {@link ByteToMessageDecoder}或{@link MessageToMessageDecoder}(实际协议解码器)
+ * 替换{@link ReplayingDecoder}(协议检测器)。 
+ * 不能只通过调用{@link ChannelPipeline#replace(ChannelHandler, String, ChannelHandler)}来实现此目的，
+ * 还需要一些额外的步骤：
  * <pre>
  * public class FirstDecoder extends {@link ReplayingDecoder}&lt;{@link Void}&gt; {
  *
@@ -247,8 +256,7 @@ import java.util.List;
  *     }
  * </pre>
  * @param <S>
- *        the state type which is usually an {@link Enum}; use {@link Void} if state management is
- *        unused
+ *        状态类型，通常是{@link Enum}；如果不使用状态管理，则使用{@link Void}
  */
 public abstract class ReplayingDecoder<S> extends ByteToMessageDecoder {
 
