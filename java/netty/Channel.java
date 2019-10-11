@@ -28,51 +28,47 @@ import java.net.SocketAddress;
 
 
 /**
- * A nexus to a network socket or a component which is capable of I/O
- * operations such as read, write, connect, and bind.
+ * 一个网络socket的一个连接，或能够进行I/O操作(如读、写、连接和绑定)的组件的连接。
  * <p>
- * A channel provides a user:
+ * 一个Channel可以为用户提供：
  * <ul>
- * <li>the current state of the channel (e.g. is it open? is it connected?),</li>
- * <li>the {@linkplain ChannelConfig configuration parameters} of the channel (e.g. receive buffer size),</li>
- * <li>the I/O operations that the channel supports (e.g. read, write, connect, and bind), and</li>
- * <li>the {@link ChannelPipeline} which handles all I/O events and requests
- *     associated with the channel.</li>
+ * <li>Channel的当前状态（例如，是否打开？是否已连接？），</li>
+ * <li>Channel的{@linkplain ChannelConfig configuration parameters}（例如：接收缓冲区大小），</li>
+ * <li>Channel支持的I/O操作（例如：读，写，连接和绑定），以及</li>
+ * <li>处理所有与Channel相关的I/O事件和请求的
+ *     {@link ChannelPipeline}。</li>
  * </ul>
  *
- * <h3>All I/O operations are asynchronous.</h3>
+ * <h3>所有I/O操作都是异步的。</h3>
  * <p>
- * All I/O operations in Netty are asynchronous.  It means any I/O calls will
- * return immediately with no guarantee that the requested I/O operation has
- * been completed at the end of the call.  Instead, you will be returned with
- * a {@link ChannelFuture} instance which will notify you when the requested I/O
- * operation has succeeded, failed, or canceled.
+ * Netty中的所有I/O操作都是异步的。这意味着任何I/O调用都将立即返回，
+ * 而不能保证所请求的I/O操作在调用结束时已经完成。
+ * 相反，将返回一个{@link ChannelFuture}实例，
+ * 该实例将在请求的I/O操作成功、失败或取消时通知你。
  *
- * <h3>Channels are hierarchical</h3>
+ * <h3>Channel是可继承(hierarchical)的</h3>
  * <p>
- * A {@link Channel} can have a {@linkplain #parent() parent} depending on
- * how it was created.  For instance, a {@link SocketChannel}, that was accepted
- * by {@link ServerSocketChannel}, will return the {@link ServerSocketChannel}
- * as its parent on {@link #parent()}.
+ * 一个{@link Channel}可以有一个{@linkplain #parent() parent}，这取决于它是如何创建的。
+ * 例如，{@link ServerSocketChannel}接受的{@link SocketChannel}
+ * 将在{@link #parent()}方法上返回{@link ServerSocketChannel}作为其parent。
  * <p>
- * The semantics of the hierarchical structure depends on the transport
- * implementation where the {@link Channel} belongs to.  For example, you could
- * write a new {@link Channel} implementation that creates the sub-channels that
- * share one socket connection, as <a href="http://beepcore.org/">BEEP</a> and
- * <a href="http://en.wikipedia.org/wiki/Secure_Shell">SSH</a> do.
+ * 这种层次化的结构语义取决于{@link Channel}所属的传输层的实现。
+ * 例如，你可以编写一个新的{@link Channel}实现，
+ * 以创建共享一个socket连接的sub-channels，就像
+ * <a href="http://beepcore.org/">BEEP</a>和
+ * <a href="http://en.wikipedia.org/wiki/Secure_Shell">SSH</a>一样。
  *
- * <h3>Downcast to access transport-specific operations</h3>
+ * <h3>向下转换以访问特定于传输的操作(Downcast to access transport-specific operations)</h3>
  * <p>
- * Some transports exposes additional operations that is specific to the
- * transport.  Down-cast the {@link Channel} to sub-type to invoke such
- * operations.  For example, with the old I/O datagram transport, multicast
- * join / leave operations are provided by {@link DatagramChannel}.
+ * 某些传输公开了特定于该传输的其他操作。
+ * 将{@link Channel}向下转换为子类型以调用此类操作。
+ * 例如，对于老式的I/O数据报传输，{@link DatagramChannel}提供了多播 加入/离开操作。
  *
- * <h3>Release resources</h3>
+ * <h3>释放资源</h3>
  * <p>
- * It is important to call {@link #close()} or {@link #close(ChannelPromise)} to release all
- * resources once you are done with the {@link Channel}. This ensures all resources are
- * released in a proper way, i.e. filehandles.
+ * 使用完{@link Channel}后调用{@link #close()}或{@link #close(ChannelPromise)}来
+ * 释放通道中的所有资源是非常重要的。
+ * 这确保所有资源都以正确的方式释放，比如释放文件句柄。
  */
 public interface Channel extends AttributeMap, ChannelOutboundInvoker, Comparable<Channel> {
 
@@ -82,7 +78,8 @@ public interface Channel extends AttributeMap, ChannelOutboundInvoker, Comparabl
     ChannelId id();
 
     /**
-     * Return the {@link EventLoop} this {@link Channel} was registered to.
+     * 返回当前{@link Channel}注册到的{@link EventLoop}。
+     * 每一个{@link Channel}只会注册到特定的一个{@link EventLoop}。
      */
     EventLoop eventLoop();
 
@@ -178,7 +175,7 @@ public interface Channel extends AttributeMap, ChannelOutboundInvoker, Comparabl
     Unsafe unsafe();
 
     /**
-     * Return the assigned {@link ChannelPipeline}.
+     * 返回分配给当前{@link Channel}的{@link ChannelPipeline}
      */
     ChannelPipeline pipeline();
 
