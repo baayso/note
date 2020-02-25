@@ -81,15 +81,196 @@
 
 ## 9. 线程安全 和 同步修改异常
 * `java.util.ConcurrentModificationException`：基本上所有的集合类都有一个叫做`快速失败（Fail-Fast）`的检验机制，当一个集合在被多个线程修改并访问时，就可能会出现`ConcurrentModificationException`异常，这是为了确保集合方法一致而设置的保护措施，它的实现原理是`modCount`修改计数器，如果在读列表时，`modCount`发生变化（也就是有其他线程修改）则会抛出`ConcurrentModificationException`异常。这与线程不是一个概念，线程同步是为了保护集合中的数据不被`脏读`和`脏写`。
-* 解决方法：
-  * 单线程时：remove元素请使用`Iterator`方式。
-  * 多线程时：对`Iterator`对象加锁，或者使用`CopyOnWriteArrayList`、`CopyOnWriteArraySet`以及`ConcurrentHasMap`。
 
-## 10. ConcurrentHashMap
-* JDK1.5新增，位于`java.util.concurrent`包下。
-* 
+## 10. 解决同步修改异常
+* 单线程时：remove元素请使用`Iterator`方式。
+* 多线程时：
+  * 对`Iterator`对象加锁
+  * 使用`Vector`
+  * 将线程不安全的集合类包装成线程安全的（注意：进行遍历时要手动进行同步处理，可以指定锁定的对象）
+    > **`java.util.Collections.synchronizedXxx(...);`**  
+    > **`java.util.Collections.synchronizedSortedSet(...);`**  
+    > **`java.util.Collections.synchronizedSortedMap(...);`**
+    * **`List<Integer> list = Collections.synchronizedList(new ArrayList<>());`**
+      ```java
+      /**
+       * Returns a synchronized (thread-safe) list backed by the specified
+       * list.  In order to guarantee serial access, it is critical that
+       * <strong>all</strong> access to the backing list is accomplished
+       * through the returned list.<p>
+       *
+       * It is imperative that the user manually synchronize on the returned
+       * list when iterating over it:
+       * <pre>
+       *  List list = Collections.synchronizedList(new ArrayList());
+       *      ...
+       *  synchronized (list) {
+       *      Iterator i = list.iterator(); // Must be in synchronized block
+       *      while (i.hasNext())
+       *          foo(i.next());
+       *  }
+       * </pre>
+       * Failure to follow this advice may result in non-deterministic behavior.
+       *
+       * <p>The returned list will be serializable if the specified list is
+       * serializable.
+       *
+       * @param  <T> the class of the objects in the list
+       * @param  list the list to be "wrapped" in a synchronized list.
+       * @return a synchronized view of the specified list.
+       */
+      public static <T> List<T> synchronizedList(List<T> list) {
+          return (list instanceof RandomAccess ?
+                  new SynchronizedRandomAccessList<>(list) :
+                  new SynchronizedList<>(list));
+      }
 
-## 11. 使用优雅的方式进行集合运算
+      static class SynchronizedCollection<E> implements Collection<E>, Serializable {
+
+          final Collection<E> c;  // Backing Collection
+          final Object mutex;     // Object on which to synchronize
+
+          SynchronizedCollection(Collection<E> c) {
+              this.c = Objects.requireNonNull(c);
+              mutex = this;
+          }
+
+          SynchronizedCollection(Collection<E> c, Object mutex) {
+              this.c = Objects.requireNonNull(c);
+              this.mutex = Objects.requireNonNull(mutex);
+          }
+      }
+      
+      static class SynchronizedList<E> extends SynchronizedCollection<E> implements List<E> {
+          final List<E> list;
+
+          public E get(int index) {
+              synchronized (mutex) {return list.get(index);}
+          }
+          public E set(int index, E element) {
+              synchronized (mutex) {return list.set(index, element);}
+          }
+          public void add(int index, E element) {
+              synchronized (mutex) {list.add(index, element);}
+          }
+          public E remove(int index) {
+              synchronized (mutex) {return list.remove(index);}
+          }
+
+          public ListIterator<E> listIterator() {
+              return list.listIterator(); // Must be manually synched by user
+          }
+
+          public ListIterator<E> listIterator(int index) {
+              return list.listIterator(index); // Must be manually synched by user
+          }
+      }
+
+      static class SynchronizedRandomAccessList<E> extends SynchronizedList<E> implements RandomAccess {
+          ...
+      }
+      ```
+    * **`Set<Integer> set = Collections.synchronizedSet(new HashSet<>());`**
+      ```java
+      static class SynchronizedSet<E>
+            extends SynchronizedCollection<E>
+            implements Set<E> {
+          private static final long serialVersionUID = 487447009682186044L;
+
+          SynchronizedSet(Set<E> s) {
+              super(s);
+          }
+          SynchronizedSet(Set<E> s, Object mutex) {
+              super(s, mutex);
+          }
+
+          public boolean equals(Object o) {
+              if (this == o)
+                  return true;
+              synchronized (mutex) {return c.equals(o);}
+          }
+          public int hashCode() {
+              synchronized (mutex) {return c.hashCode();}
+          }
+      }
+      ```
+    * **`Map<String, String> map  = Collections.synchronizedMap(new HashMap<>());`**
+      ```java
+      private static class SynchronizedMap<K,V> implements Map<K,V>, Serializable {
+
+          private final Map<K,V> m;     // Backing Map
+          final Object      mutex;        // Object on which to synchronize
+
+          SynchronizedMap(Map<K,V> m) {
+              this.m = Objects.requireNonNull(m);
+              mutex = this;
+          }
+
+          SynchronizedMap(Map<K,V> m, Object mutex) {
+              this.m = m;
+              this.mutex = mutex;
+          }
+
+          ...
+
+          public V get(Object key) {
+              synchronized (mutex) {return m.get(key);}
+          }
+
+          public V put(K key, V value) {
+              synchronized (mutex) {return m.put(key, value);}
+          }
+          public V remove(Object key) {
+              synchronized (mutex) {return m.remove(key);}
+          }
+          public void putAll(Map<? extends K, ? extends V> map) {
+              synchronized (mutex) {m.putAll(map);}
+          }
+          public void clear() {
+              synchronized (mutex) {m.clear();}
+          }
+
+          private transient Set<K> keySet;
+          private transient Set<Map.Entry<K,V>> entrySet;
+          private transient Collection<V> values;
+
+          public Set<K> keySet() {
+              synchronized (mutex) {
+                  if (keySet==null)
+                      keySet = new SynchronizedSet<>(m.keySet(), mutex);
+                  return keySet;
+              }
+          }
+
+          public Set<Map.Entry<K,V>> entrySet() {
+              synchronized (mutex) {
+                  if (entrySet==null)
+                      entrySet = new SynchronizedSet<>(m.entrySet(), mutex);
+                  return entrySet;
+              }
+          }
+
+          public Collection<V> values() {
+              synchronized (mutex) {
+                  if (values==null)
+                      values = new SynchronizedCollection<>(m.values(), mutex);
+                  return values;
+              }
+          }
+      }
+      ```
+  * **使用JDK 1.5新增的`CopyOnWriteArrayList`、`CopyOnWriteArraySet`以及`ConcurrentHasMap`，他们位于`java.util.concurrent`包下。**
+
+## 11. CopyOnWriteArrayList
+* `public class CopyOnWriteArrayList<E> implements List<E>, RandomAccess, Cloneable, java.io.Serializable {}`
+
+## 12. CopyOnWriteArrayList
+* `public class CopyOnWriteArraySet<E> extends AbstractSet<E> implements java.io.Serializable {}`
+
+## 13. ConcurrentHashMap
+* `public class ConcurrentHashMap<K,V> extends AbstractMap<K,V> implements ConcurrentMap<K,V>, Serializable {}`
+
+## 14. 使用优雅的方式进行集合运算
 * 并集，也叫合集
   ```java
   listOne.addAll(listTwo);
@@ -114,7 +295,7 @@
   Collections.shuffle(list);
   ```
 
-## 12. <span id="RandomAccess">列表遍历方式</span>
+## 15. <span id="RandomAccess">列表遍历方式</span>
 * 随机存储
   * `RandomAccess`接口：随机存储接口，和`Cloneable`、`Serializable`一样都是`标志性接口`，不需要任何实现，只是用来表明其实现类具有某种特质。
   * `ArrayList`实现了`RandomAccess`接口，这就标志着`ArrayList`是一个可以随机存取的列表。也就是说其数据元素之间没有关联，即两个位置相邻的元素之间没有相互依赖和索引关系。
