@@ -47,4 +47,6 @@
 * https://github.com/dylanaraps/pure-bash-bible
 * https://github.com/justjavac/free-programming-books-zh_CN
 * https://github.com/codefollower/OpenJDK-Research
-
+* https://github.com/LingCoder/OnJava8
+* https://github.com/sjsdfg/effective-java-3rd-chinese
+* https://github.com/ddean2009/Spring-Framework-Documentation
