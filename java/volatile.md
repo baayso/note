@@ -131,3 +131,46 @@
   > 使用`synchronized`或者`volatile`关键字解决，他们都可以使某个线程修改变量后立即对其他线程可见。
 * 对于指令重排序导致的可见性问题和有序性问题：
   > 使用`volatile`关键字解决，`volatile`关键字的另外一个作用就是**禁止指令重排序**
+
+### volatile的使用
+1. **懒汉单例**
+   * DCL（Double Check Lock，双端检锁）机制：因为指令重排序的原因会存在线程安全问题，可以使用volatile禁止指令重排序以保证线程安全。
+   * 某一个线程执行到第一次检测，读取到的instance不为null时，instance的引用对象**可能没有完成初始化**。
+     ```java
+     instance = new Singleton(); // 可以分为以下3步骤完成（伪代码）
+
+     1: memory = allocate(); // 给对象分配内存空间
+     2: init(memory); // 初始化对象
+     3: instance = memory; // 设置instance指向刚分配的内存，此时instance != null
+     ```
+   * 上面伪代码中的第2行和第3行**不存在数据依赖关系**，且无论指令重排序前还是指令重排序后程序的执行结果在单线程中没有改变，因此这种指令重排序优化是允许的。
+     ```java
+     1: memory = allocate(); // 给对象分配内存空间
+     2: instance = memory; // 设置instance指向刚分配的内存，此时instance != null，但是对象还没有初始化完成
+     3: init(memory); // 初始化对象
+     ```
+   * 指令重排序只会保证串行语义执行的一致性（单线程），并不关心多线程间的语义一致性。所以当某一线程访问instance不为null时，由于instance实例未必已初始化完成，也就造成了线程安全问题。
+     ```java
+     public class Singleton {
+
+         // private static Singleton instance;
+         private static volatile Singleton instance;
+
+         private Singleton() {
+         }
+
+         public static Singleton getInstance() {
+             if (instance == null) {
+                 synchronized (Singleton.class) {
+                     if (instance == null) {
+                         instance = new Singleton();
+                     }
+                 }
+             }
+
+             return instance;
+         }
+     }
+     ```
+2. **自旋锁**
+   * 尚未编写
