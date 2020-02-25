@@ -21,7 +21,7 @@
    ```java
    public class ClassOne {
 
-       volatile int num = 0;
+       private volatile int num = 0;
 
        public void addNum() {
            this.num++;
@@ -30,8 +30,6 @@
    }
 
    public class ClassOne {
-     volatile int num;
-
      public ClassOne();
        Code:
           0: aload_0
@@ -55,17 +53,15 @@
    ```java
    public class ClassTwo {
 
-       AtomicInteger num = new AtomicInteger();
+       private AtomicInteger num = new AtomicInteger();
 
        public void addNum() {
-           num.getAndDecrement();
+           this.num.getAndIncrement();
        }
 
    }
 
    public class ClassTwo {
-     java.util.concurrent.atomic.AtomicInteger num;
-
      public ClassTwo();
        Code:
           0: aload_0
@@ -81,7 +77,7 @@
        Code:
           0: aload_0
           1: getfield      #4                  // Field num:Ljava/util/concurrent/atomic/AtomicInteger;
-          4: invokevirtual #5                  // Method java/util/concurrent/atomic/AtomicInteger.getAndDecrement:()I
+          4: invokevirtual #5                  // Method java/util/concurrent/atomic/AtomicInteger.getAndIncrement:()I
           7: pop
           8: return
    }
