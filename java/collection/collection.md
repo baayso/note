@@ -295,10 +295,98 @@
   * **使用JDK 1.5新增的`CopyOnWriteArrayList`、`CopyOnWriteArraySet`以及`ConcurrentHasMap`，他们位于`java.util.concurrent`包下。**
 
 ## 11. CopyOnWriteArrayList
-* `public class CopyOnWriteArrayList<E> implements List<E>, RandomAccess, Cloneable, java.io.Serializable {}`
+*  Copy-On-Write（写入时复制，简称COW）：往容器添加新元素的时候，不直接往当前的Object[]数组中添加，而是先将当前容器的Object[]数组进行Copy，复制出一个新的Object[]数组，然后往新的Object[]数组里添加元素，添加完元素之后，再将原数组的引用指向新的数组。这样做的好处是可以对容器进行并发的读而不需要加锁，因为当前容器的Object[]数组不会添加任何元素。CopyOnWrite容器也是一种**读写分离**思想的实现，读和写针对的是不同的数组。
+    ```java
+    public class CopyOnWriteArrayList<E> implements List<E>, RandomAccess, Cloneable, java.io.Serializable {
 
-## 12. CopyOnWriteArrayList
-* `public class CopyOnWriteArraySet<E> extends AbstractSet<E> implements java.io.Serializable {}`
+        /** The lock protecting all mutators */
+        final transient ReentrantLock lock = new ReentrantLock();
+
+        /** The array, accessed only via getArray/setArray. */
+        private transient volatile Object[] array;
+
+        /**  Gets the array.  Non-private so as to also be accessible from CopyOnWriteArraySet class. */
+        final Object[] getArray() {
+            return array;
+        }
+
+        /** Sets the array. */
+        final void setArray(Object[] a) {
+            array = a;
+        }
+
+        /**  Creates an empty list. */
+        public CopyOnWriteArrayList() {
+            setArray(new Object[0]);
+        }
+
+        ...
+
+        private E get(Object[] a, int index) {
+            return (E) a[index];
+        }
+
+        public E get(int index) {
+            return get(getArray(), index);
+        }
+
+        /**
+         * Appends the specified element to the end of this list.
+         *
+         * @param e element to be appended to this list
+         * @return {@code true} (as specified by {@link Collection#add})
+         */
+        public boolean add(E e) {
+            final ReentrantLock lock = this.lock;
+            lock.lock();
+            try {
+                Object[] elements = getArray();
+                int len = elements.length;
+                Object[] newElements = Arrays.copyOf(elements, len + 1); // 将原数组的数据全部复制到新的数组
+                newElements[len] = e; // 将add的元素添加到新数组
+                setArray(newElements); // 将新的数组赋给原来的引用
+                return true;
+            } finally {
+                lock.unlock();
+            }
+        }
+
+        /**
+         * Appends the element, if not present.
+         *
+         * @param e element to be added to this list, if absent
+         * @return {@code true} if the element was added
+         */
+        public boolean addIfAbsent(E e) {
+            Object[] snapshot = getArray();
+            return indexOf(e, snapshot, 0, snapshot.length) >= 0 ? false :
+                addIfAbsent(e, snapshot);
+        }
+
+        ...
+    }
+    ```
+
+## 12. CopyOnWriteArraySet
+* 底层使用`CopyOnWriteArrayList`：
+  ```java
+  public class CopyOnWriteArraySet<E> extends AbstractSet<E> implements java.io.Serializable {
+
+      private final CopyOnWriteArrayList<E> al;
+
+      public CopyOnWriteArraySet() {
+          al = new CopyOnWriteArrayList<E>();
+      }
+
+      ...
+
+      public boolean add(E e) {
+          return al.addIfAbsent(e);
+      }
+
+      ...
+  }
+  ```
 
 ## 13. ConcurrentHashMap
 * `public class ConcurrentHashMap<K,V> extends AbstractMap<K,V> implements ConcurrentMap<K,V>, Serializable {}`
