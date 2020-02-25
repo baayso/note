@@ -37,6 +37,39 @@
 
 ## 4. HashSet
 * `HashSet`底层是使用`HashMap`实现的。当使用`add()`方法将对象添加到`Set`当中时，实际上是将该对象作为底层所维护的`Map`对象的`key`，而`value`则都是同一个`Object`对象（该对象我们用不上）。
+  ```java
+  public class HashSet<E> extends AbstractSet<E> implements Set<E>, Cloneable, java.io.Serializable {
+
+      private transient HashMap<E,Object> map;
+
+      // Dummy value to associate with an Object in the backing Map
+      private static final Object PRESENT = new Object();
+
+      /**
+       * Constructs a new, empty set; the backing <tt>HashMap</tt> instance has
+       * default initial capacity (16) and load factor (0.75).
+       */
+      public HashSet() {
+          map = new HashMap<>();
+      }
+
+      ...
+
+      public boolean add(E e) {
+          return map.put(e, PRESENT) == null;
+      }
+
+      public boolean remove(Object o) {
+          return map.remove(o) == PRESENT;
+      }
+
+      public void clear() {
+          map.clear();
+      }
+
+      ...
+  }
+  ```
 
 ## 5. TreeSet
 * 可以自动排序的`Set`，默认排序为升序。它实现了`SortedSet`接口。
@@ -86,7 +119,7 @@
 * 单线程时：remove元素请使用`Iterator`方式。
 * 多线程时：
   * 对`Iterator`对象加锁
-  * 使用`Vector`
+  * 使用`Vector` 和 `Hashtable`
   * 将线程不安全的集合类包装成线程安全的（注意：进行遍历时要手动进行同步处理，可以指定锁定的对象）
     > **`java.util.Collections.synchronizedXxx(...);`**  
     > **`java.util.Collections.synchronizedSortedSet(...);`**  
