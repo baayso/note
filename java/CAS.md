@@ -117,3 +117,84 @@
 * 只能保证一个共享变量的原子操作
   * 当对一个共享变量执行操作时，我们可以使用循环CAS的方式来保证原子性，但是对于多个共享变量操作时，循环CAS就无法保证操作的原子性，这个时候需要使用锁来保证原子性。
 * ABA问题
+  * CAS算法实现一个重要前提需要取出内存中某时刻的数据并在当下时刻比较并替换，那么在这个时间差类会导致数据的变化。
+  * 比如说一个线程T1从内存位置V中取出A，这时候另一个线程T2也从内存中取出A，并且线程T2进行了一些操作将值修改成了B，然后线程T2又将V位置的数据修改成A，这时候线T1进行CAS操作发现内存中的值仍然是A，然后线程T1操作成功。**尽管线程T1的CAS操作成功，但是不代表这个过程就是没有问题的**。
+    ```java
+    public class ABADemo {
+
+        private static AtomicReference<String> ar = new AtomicReference<>("A");
+
+        public static void main(String[] args) {
+            new Thread(() -> {
+                ar.compareAndSet("A", "B");
+                ar.compareAndSet("B", "A");
+            }, "T1").start();
+
+            new Thread(() -> {
+                // 暂停100毫秒T2线程，保证上面的T1线程完成了一次ABA操作
+                try { TimeUnit.MILLISECONDS.sleep(100); } catch (InterruptedException e) { e.printStackTrace(); }
+
+                System.out.println(ar.compareAndSet("A", "ABA"));;
+
+                System.out.println(ar.get());
+            }, "T2").start();
+        }
+
+    }
+    ```
+    ```
+    运行结果：
+    true
+    ABA
+    ```
+
+### 解决CAS的ABA问题：
+* 使用[```java.util.concurrent.atomic.AtomicStampedReference<V>```](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/atomic/AtomicStampedReference.java)：带修改版本号的原子引用类
+  ```java
+  public class ABADemo {
+
+      private static AtomicStampedReference<String> asr = new AtomicStampedReference<>("A", 1);
+
+      public static void main(String[] args) {
+          new Thread(() -> {
+              int stamp = asr.getStamp();
+              System.out.println(Thread.currentThread().getName() + "\t第1次版本号：" + stamp);
+
+              // 暂停100毫秒T1线程
+              try { TimeUnit.MILLISECONDS.sleep(100); } catch (InterruptedException e) { e.printStackTrace(); }
+
+              asr.compareAndSet("A", "B", asr.getStamp(), asr.getStamp() + 1);
+              System.out.println(Thread.currentThread().getName() + "\t第2次版本号：" + asr.getStamp());
+
+              asr.compareAndSet("B", "A", asr.getStamp(), asr.getStamp() + 1);
+              System.out.println(Thread.currentThread().getName() + "\t第3次版本号：" + asr.getStamp());
+
+          }, "T1").start();
+
+          new Thread(() -> {
+              int stamp = asr.getStamp();
+              System.out.println(Thread.currentThread().getName() + "\t第1次版本号：" + stamp);
+
+              // 暂停1秒T2线程，保证上面的T1线程完成了一次ABA操作
+              try { TimeUnit.MILLISECONDS.sleep(1000); } catch (InterruptedException e) { e.printStackTrace(); }
+
+              boolean ret = asr.compareAndSet("A", "ABA", stamp, stamp + 1);
+
+              System.out.println(Thread.currentThread().getName() + "\t修改是否成功：" + ret + "\t当前最新版本号：" + asr.getStamp());
+              System.out.println(Thread.currentThread().getName() + "\t当前最新值：" + asr.getReference());
+
+          }, "T2").start();
+      }
+
+  }
+  ```
+  ```
+  运行结果：
+  T1	第1次版本号：1
+  T2	第1次版本号：1
+  T1	第2次版本号：2
+  T1	第3次版本号：3
+  T2	修改是否成功：false	当前最新版本号：3
+  T2	当前最新值：A
+  ```
+  
