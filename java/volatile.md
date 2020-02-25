@@ -228,7 +228,7 @@
            int v;
            do {
                v = getIntVolatile(o, offset); // 获取主内存中的值，获取后可能当前线程被挂起，其他线程会修改主内存中的值。
-           } while (!compareAndSwapInt(o, offset, v, v + delta)); // 为了检查上一步获取并保存在变量v中的值依然是最新的，所以compareAndSwapInt()方法会比较变量v的值是否与主内存中的值相同。如果相同表示变量v的值依然是最新的，则更新值（v + delta）并返回true，循环结束。如果不相同，继续循环从主内存中取值然后再比较，直至相同并更新完成。
+           } while (!compareAndSwapInt(o, offset, v, v + delta)); // 为了检查上一步获取并保存在变量v中的值依然是最新的，所以compareAndSwapInt()方法会先比较工作内存中变量v的值是否与主内存中的值相同。如果相同表示变量v的值依然是最新的，则更新值（v + delta）并返回true，循环结束。如果不相同，继续循环从主内存中取值然后再比较，直至相同并更新完成。
            return v;
        }
        ```
@@ -262,4 +262,14 @@
        public final native boolean compareAndSwapInt(Object o, long offset,
                                                      int expected,
                                                      int x);
+       ```
+     * ```Unsafe#compareAndSwapInt(...)```native方法的[底层源码](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/hotspot/src/share/vm/prims/unsafe.cpp#L1213)：
+       ```cpp
+       UNSAFE_ENTRY(jboolean, Unsafe_CompareAndSwapInt(JNIEnv *env, jobject unsafe, jobject obj, jlong offset, jint e, jint x))
+         UnsafeWrapper("Unsafe_CompareAndSwapInt");
+         oop p = JNIHandles::resolve(obj);
+         jint* addr = (jint *) index_oop_from_field_offset_long(p, offset);
+         // x 是即将更新的值，e是原内存的值
+         return (jint)(Atomic::cmpxchg(x, addr, e)) == e;
+       UNSAFE_END
        ```
