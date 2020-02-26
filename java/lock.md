@@ -49,5 +49,107 @@
   ```
 
 ### 可重入锁/递归锁
+* 可重入锁，又名递归锁，指的是同一线程外层函数获得锁后，内层递归函数仍然能获取该锁的代码。在同一个线程中外层方法获取锁后，在进入内层方法时会自动获取同一把锁。
+* 也就是说，线程可以进入任何一个它已经拥有的锁所同步着的代码块。
+* 示例代码一：
+  ```java
+  class Phone {
+
+      public synchronized void sendSMS() {
+          System.out.println(Thread.currentThread().getName() + "\tinvoked sendSMS()");
+
+          this.sendEmail();
+      }
+
+      public synchronized void sendEmail() {
+          System.out.println(Thread.currentThread().getName() + "\t### invoked sendEmail()");
+      }
+
+  }
+
+  public class LockDemo {
+
+      public static void main(String[] args) {
+
+          Phone phone = new Phone();
+
+          new Thread(() -> phone.sendSMS(), "T1").start();
+
+          new Thread(() -> phone.sendSMS(), "T2").start();
+
+      }
+
+  }
+  ```
+  ```
+  输出结果：
+  T1	invoked sendSMS()
+  T1	### invoked sendEmail()
+  T2	invoked sendSMS()
+  T2	### invoked sendEmail()
+  ```
+* 示例代码二：
+  ```java
+  class Resource implements Runnable {
+
+      private Lock lock = new ReentrantLock();
+
+      @Override
+      public void run() {
+          this.get();
+      }
+
+      public void get() {
+
+          this.lock.lock();
+          // this.lock.lock(); // 可多次获取锁，但必须与unlock()方法配对
+
+          try {
+              System.out.println(Thread.currentThread().getName() + "\tinvoked get()");
+
+              this.set();
+          }
+          finally {
+              this.lock.unlock();
+              // this.lock.unlock();
+          }
+      }
+
+      public void set() {
+
+          this.lock.lock();
+          // this.lock.lock(); // 可多次获取锁，但必须与unlock()方法配对
+
+          try {
+              System.out.println(Thread.currentThread().getName() + "\t### invoked set()");
+          }
+          finally {
+              this.lock.unlock();
+              // this.lock.unlock();
+          }
+      }
+
+  }
+
+  public class LockDemo {
+
+      public static void main(String[] args) {
+
+          Resource resource = new Resource();
+
+          new Thread(resource, "T1").start();
+          new Thread(resource, "T2").start();
+
+      }
+
+  }
+  ```
+  ```
+  输出结果：
+  T1	invoked get()
+  T1	### invoked set()
+  T2	invoked get()
+  T2	### invoked set()
+  ```
 
 ### 自旋锁
