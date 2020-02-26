@@ -50,3 +50,6 @@
 * https://github.com/LingCoder/OnJava8
 * https://github.com/sjsdfg/effective-java-3rd-chinese
 * https://github.com/ddean2009/Spring-Framework-Documentation
+* [精美图文带你掌握 JVM 内存布局](https://juejin.im/post/5e0708baf265da33c34e495b)
+* [点赞模块设计](https://juejin.im/post/5bdc257e6fb9a049ba410098)
+* [分布式事务解决方案汇总](https://github.com/baayso/distributed-transaction-solution)
