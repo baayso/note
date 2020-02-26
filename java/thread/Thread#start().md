@@ -1,4 +1,4 @@
-# Thread
+# `new Thread().start()`
 
 ## 1. 在Java中，调用`start()`方法启动线程
 ```java
