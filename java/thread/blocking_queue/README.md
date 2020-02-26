@@ -16,5 +16,14 @@
 ### `BlockingQueue`的核心方法
 
 ### 阻塞队列的种类及架构
+![阻塞队列类图](https://github.com/baayso/note/blob/master/java/thread/blocking_queue/BlockingQueue.png)
+* **`ArrayBlockingQueue<E>`：由数组结构组成的有界阻塞队列。**
+* **`LinkedBlockingQueue<E>`：由链表结构组成的有界（但默认值是：`Integer.MAX_VALUE`）阻塞队列。**
+* `PriorityBlockingQueue<E>`：支持优先级排序的无界阻塞队列。
+* `DelayQueue<E extends Delayed>`：使用优先级队列实现的延迟无界阻塞队列。
+* **`SynchronousQueue<E>`：不存储元素的阻塞队列，即单个元素的阻塞队列。**
+  * `SynchronousQueue<E>`没有容量，与其他`BlockingQueue`不同，`SynchronousQueue<E>`是一个不存储元素的`BlockingQueue`。每一个`put`操作必须要等待一个`take`操作，否则不能继续添加元素，反之依然。
+* `LinkedTransferQueue<E>`：由链表结构组成的无界阻塞队列。
+* `LinkedBlockingDeque<E>`：由链表结构组成的双向阻塞队列。
 
 ### 阻塞队列的用途
