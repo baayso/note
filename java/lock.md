@@ -225,9 +225,107 @@
 * 读锁的共享锁可以保证并发读是非常高效的，读写，写读，写写的过程是互斥的。
 * 示例代码：
   ```java
+  /**
+   * 多个线程同时读一份资源没有任何问题，为了满足并发量，多个读取共享资源的操作可以同时进行。
+   * <br>
+   * 但是如果有一个线程需要对共享资源进行写操作，那么就不应该再有其他线程可以对该资源进行读或者写。
+   * <br>
+   * 读-读可以同时进行<br>
+   * 读-写不可以同时进行<br>
+   * 写-写不可以同时进行<br>
+   * <br>
+   * 写操作：原子 + 独占，整个过程必须是一个整体，不允许被分割。
+   */
+  class Cache<K, V> {
 
+      private volatile Map<K, V>     map  = new HashMap<>();
+      private          ReadWriteLock lock = new ReentrantReadWriteLock();
+
+      public void put(K key, V value) {
+          Lock lock = this.lock.writeLock();
+
+          lock.lock();
+
+          try {
+              System.out.println(Thread.currentThread().getName() + "\t正在写入：" + key);
+
+              try { TimeUnit.MILLISECONDS.sleep(200); } catch (InterruptedException e) { e.printStackTrace(); }
+
+              this.map.put(key, value);
+
+              System.out.println(Thread.currentThread().getName() + "\t正在完成。");
+          }
+          finally {
+              lock.unlock();
+          }
+      }
+
+      public V get(K key) {
+          Lock lock = this.lock.readLock();
+
+          lock.lock();
+
+          try {
+              System.out.println(Thread.currentThread().getName() + "\t正在读取...");
+
+              try { TimeUnit.MILLISECONDS.sleep(200); } catch (InterruptedException e) { e.printStackTrace(); }
+
+              V value = this.map.get(key);
+
+              System.out.println(Thread.currentThread().getName() + "\t读取完成：" + value);
+
+              return value;
+          }
+          finally {
+              lock.unlock();
+          }
+      }
+
+      public void clear() {
+          // ...
+      }
+  }
+
+  public class ReadWriteLockDemo {
+
+      public static void main(String[] args) {
+
+          Cache<String, String> cache = new Cache<>();
+
+          for (int i = 1; i <= 5; i++) {
+              final String strI = String.valueOf(i);
+
+              new Thread(() -> cache.put(strI, strI), "T" + strI).start();
+          }
+
+          for (int i = 1; i <= 5; i++) {
+              final String strI = String.valueOf(i);
+
+              new Thread(() -> cache.get(strI), "T" + strI).start();
+          }
+      }
+  }
   ```
   ```
   输出结果：
-
+  T1	正在写入：1
+  T1	正在完成。
+  T3	正在写入：3
+  T3	正在完成。
+  T2	正在写入：2
+  T2	正在完成。
+  T4	正在写入：4
+  T4	正在完成。
+  T5	正在写入：5
+  T5	正在完成。
+  T1	正在读取...
+  T2	正在读取...
+  T4	正在读取...
+  T5	正在读取...
+  T3	正在读取...
+  T3	读取完成：3
+  T5	读取完成：5
+  T1	读取完成：1
+  T2	读取完成：2
+  T4	读取完成：4
   ```
