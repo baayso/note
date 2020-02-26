@@ -92,10 +92,55 @@
 * `Semaphore`（信号量）主要用于两个目的：一个是用于多个共享资源的互斥使用，另一个是用于并发线程数的控制。
 * 示例代码：
   ```java
+  /** 抢车位 */
+  public class SemaphoreDemo {
 
+      public static void main(String[] args) {
+
+          Semaphore semaphore = new Semaphore(3); //模拟3个停车位
+
+          for (int i = 1; i <= 7; i++) { // 模拟7辆汽车需要停车
+
+              new Thread(() -> {
+
+                  try {
+                      semaphore.acquire();
+
+                      System.out.println(Thread.currentThread().getName() + "\t抢到车位");
+
+                      // 模拟停车5秒
+                      try { TimeUnit.SECONDS.sleep(5); } catch (InterruptedException e) { e.printStackTrace(); }
+
+                      System.out.println(Thread.currentThread().getName() + "\t停车5秒后离开车位");
+                  }
+                  catch (InterruptedException e) {
+                      e.printStackTrace();
+                  }
+                  finally {
+                      semaphore.release();
+                  }
+
+              }, "T" + i).start();
+          }
+      }
+
+  }
   ```
   ```
   输出结果：
-
+  T1	抢到车位
+  T6	抢到车位
+  T3	抢到车位
+  T1	停车5秒后离开车位
+  T6	停车5秒后离开车位
+  T7	抢到车位
+  T5	抢到车位
+  T3	停车5秒后离开车位
+  T2	抢到车位
+  T5	停车5秒后离开车位
+  T2	停车5秒后离开车位
+  T4	抢到车位
+  T7	停车5秒后离开车位
+  T4	停车5秒后离开车位
   ```
   
