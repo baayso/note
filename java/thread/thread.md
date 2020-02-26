@@ -45,11 +45,47 @@
 * `CyclicBarrier`的字面意思是可循环（Cyclic）使用的屏障（Barrier）。它要做的事情是：让一组线程到达一个屏障（也可以叫做同步点）时被阻塞，直到最后一个线程到达屏障时，屏障才会解除，所有被屏障拦截的线程才会继续执行，使用`CyclicBarrier#await()`方法让线程进入屏障。
 * 示例代码：
   ```java
+  public class CyclicBarrierDemo {
 
+      public static void main(String[] args) {
+
+          // CyclicBarrier(int parties, Runnable barrierAction)
+          CyclicBarrier cyclicBarrier = new CyclicBarrier(7, () -> System.out.println("####### 收集到所有卡片"));
+
+          for (int i = 1; i <= 7; i++) {
+
+              final String strI = String.valueOf(i);
+
+              new Thread(() -> {
+
+                  System.out.println(Thread.currentThread().getName() + "\t收集到第 " + strI + " 张卡片");
+
+                  try {
+                      cyclicBarrier.await();
+                  }
+                  catch (InterruptedException e) {
+                      e.printStackTrace();
+                  }
+                  catch (BrokenBarrierException e) {
+                      e.printStackTrace();
+                  }
+
+              }, "T" + strI).start();
+          }
+      }
+
+  }
   ```
   ```
   输出结果：
-
+  T1	收集到第 1 张卡片
+  T3	收集到第 3 张卡片
+  T4	收集到第 4 张卡片
+  T2	收集到第 2 张卡片
+  T5	收集到第 5 张卡片
+  T7	收集到第 7 张卡片
+  T6	收集到第 6 张卡片
+  ####### 收集到所有卡片
   ```
 
 ### `Semaphore`
