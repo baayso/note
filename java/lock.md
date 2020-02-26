@@ -152,4 +152,65 @@
   T2	### invoked set()
   ```
 
-### 自旋锁
+### 自旋锁（SpinLock）
+* 是指尝试获取锁的线程不会立即阻塞，而是**采用循环的方式去尝试获取锁**，这样做的好处是减少线程上下文切换的消耗，缺点是循环对CPU的消耗会很大。
+* [```Unsafe#getAndAddInt(...)```](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/sun/misc/Unsafe.java#L1031)方法里使用```CAS + 自旋锁```实现，请[参见](https://github.com/baayso/note/blob/master/java/CAS.md#cas%E7%9A%84%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86)
+* **自己实现一个自旋锁：**
+  > 通过CAS操作完成自旋锁，线程A先进来调用lock()方法自己持有锁5秒钟，线程B随后进来后发现当前已经有其他线程获取锁，所以只能通过自旋等待，直到线程A释放锁后线程B才能获取锁。
+  ```java
+  class SpinLock {
+
+      private AtomicReference<Thread> ar = new AtomicReference<>();
+
+      public void lock() {
+          Thread thread = Thread.currentThread();
+          System.out.println(thread.getName() + "\tinvoked lock()...");
+
+          while (!this.ar.compareAndSet(null, thread)) {
+              // log
+          }
+      }
+
+      public void unlock() {
+          Thread thread = Thread.currentThread();
+          this.ar.compareAndSet(thread, null);
+          System.out.println(thread.getName() + "\tinvoked unlock()");
+      }
+
+  }
+
+  public class SpinLockDemo {
+
+      public static void main(String[] args) {
+
+          SpinLock spinLock = new SpinLock();
+
+          new Thread(() -> {
+              spinLock.lock();
+
+              try { TimeUnit.MILLISECONDS.sleep(5000); } catch (InterruptedException e) { e.printStackTrace(); }
+
+              spinLock.unlock();
+          }, "A").start();
+
+          try { TimeUnit.MILLISECONDS.sleep(1000); } catch (InterruptedException e) { e.printStackTrace(); }
+
+          new Thread(() -> {
+              spinLock.lock();
+
+              try { TimeUnit.MILLISECONDS.sleep(1000); } catch (InterruptedException e) { e.printStackTrace(); }
+
+              spinLock.unlock();
+          }, "B").start();
+
+      }
+
+  }
+  ```
+  ```
+  输出结果：
+  A	invoked lock()...
+  B	invoked lock()...
+  A	invoked unlock()
+  B	invoked unlock()
+  ```
