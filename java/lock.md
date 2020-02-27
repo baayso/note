@@ -14,8 +14,8 @@
   // java.util.concurrent.locks.ReentrantLock 通过构造函数指定该锁是否为公平锁，默认是非公平锁。
   
   // 非公平锁
-  Lock nonFairLock = new ReentrantLock();
-  Lock nonFairLock = new ReentrantLock(false);
+  Lock unfairLock = new ReentrantLock();
+  Lock unfairLock = new ReentrantLock(false);
 
   // 公平锁
   Lock fairLock = new ReentrantLock(true);
