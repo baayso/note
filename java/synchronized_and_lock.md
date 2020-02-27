@@ -69,8 +69,8 @@
 * `ReentrantLock`两者都可以，默认为非公平锁。
   ```java
   // 非公平锁
-  Lock nonFairLock = new ReentrantLock();
-  Lock nonFairLock = new ReentrantLock(false);
+  Lock unfairLock = new ReentrantLock();
+  Lock unfairLock = new ReentrantLock(false);
 
   // 公平锁
   Lock fairLock = new ReentrantLock(true);
