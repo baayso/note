@@ -68,12 +68,12 @@
 * `synchronized`是非公平锁。
 * `ReentrantLock`两者都可以，默认为公平锁。
   ```java
-  // 公平锁
-  Lock nonFairLock = new ReentrantLock();
-  Lock fairLock = new ReentrantLock(true);
-
   // 非公平锁
+  Lock nonFairLock = new ReentrantLock();
   Lock nonFairLock = new ReentrantLock(false);
+
+  // 公平锁
+  Lock fairLock = new ReentrantLock(true);
   ```
 
 ### 锁绑定多个条件`Condition`
