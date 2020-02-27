@@ -91,4 +91,99 @@
 * `LinkedTransferQueue<E>`：由链表结构组成的无界阻塞队列。
 * `LinkedBlockingDeque<E>`：由链表结构组成的双向阻塞队列。
 
-### 阻塞队列的用途
+### 阻塞队列的使用场景
+* 生产者消费者模式
+  * 传统版实现生产者消费者模式
+    ```java
+    class Resource {
+        private int       number    = 0;
+        private Lock      lock      = new ReentrantLock();
+        private Condition condition = this.lock.newCondition();
+
+        public void increment() {
+            this.lock.lock();
+            try {
+                while (this.number != 0) {
+                    this.condition.await(); // 等待，暂不能进行生产
+                }
+
+                this.number++; // 生产
+                System.out.println(Thread.currentThread().getName() + "\tnumber: " + this.number);
+
+                this.condition.signalAll(); // 通知唤醒
+            }
+            catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            finally {
+                this.lock.unlock();
+            }
+        }
+
+        public void decrement() {
+            this.lock.lock();
+            try {
+                while (this.number == 0) {
+                    this.condition.await(); // 等待，暂不能进行消费
+                }
+
+                this.number--; // 消费
+                System.out.println(Thread.currentThread().getName() + "\tnumber: " + this.number);
+
+                this.condition.signalAll(); // 通知唤醒
+            }
+            catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            finally {
+                this.lock.unlock();
+            }
+        }
+    }
+
+    public class ProducerAndConsumerTraditionDemo {
+
+        public static void main(String[] args) {
+
+            Resource resource = new Resource();
+
+            new Thread(() -> {
+                for (int i = 1; i <= 5; i++) {
+                    resource.increment();
+                }
+            }, "T1").start();
+
+            new Thread(() -> {
+                for (int i = 1; i <= 5; i++) {
+                    resource.decrement();
+                }
+            }, "T2").start();
+        }
+
+    }
+    ```
+    ```
+    输出结果：
+    T1	number: 1
+    T2	number: 0
+    T1	number: 1
+    T2	number: 0
+    T1	number: 1
+    T2	number: 0
+    T1	number: 1
+    T2	number: 0
+    T1	number: 1
+    T2	number: 0
+    ```
+  * **阻塞队列版实现生产者消费者模式**
+    ```java
+
+    ```
+    ```
+    输出结果：
+
+    ```
+* 线程池
+
+* 消息中间件
+
