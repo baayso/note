@@ -14,6 +14,18 @@
 * 在JDK 1.5的`java.util.concurrent`包发布以前，多线程环境下，程序员都必须自己控制阻塞和唤醒线程这些细节，还需要兼顾效率和线程安全，这带来了不小的复杂度。
 
 ### `BlockingQueue`的核心方法
+方法类型 | 抛出异常 | 特殊值 | 阻塞 | 超时
+-|-|-|-|-
+插入 | `add(e)` | `offer(e)` | `put(e)` | `offer(e, time, unit)` |
+移除 | `remove()` | `poll()` | `take()` | `poll(time, unit)` |
+检查 | `element()` | `peek()` | 不可用 | 不可用 |
+
+类型 | 说明
+-|-
+抛出异常 | 当阻塞队列已满时，再往队列里`add`元素会抛出`IllegalStateException: Queue full`异常。<br> 当阻塞队列为空时，再从队列里`remove`元素会抛出`NoSuchElementException`异常。 |
+特殊值 | 插入方法，成功时返回`true`，失败时返回`false`。<br> 移除方法，成功时返回被移除队列的元素，若队列已经为空则返回`null`。 |
+一直阻塞 | 当阻塞队列已满时，生产者线程继续往队列里`put`元素，队列会一直阻塞生产线程直到可以`put`数据或者响应中断退出。<br> 当阻塞队列为空时，消费者线程试图从队列里`take`元素，队列会一直阻塞消费者线程直到队列中有元素。 |
+超时退出 | 当阻塞队列已满时，队列会阻塞生产者线程一定时间，超过限时后生产者线程则会退出。 |
 
 ### 阻塞队列的种类及架构
 ![阻塞队列类图](https://github.com/baayso/note/blob/master/java/thread/blocking_queue/BlockingQueue.png)
@@ -22,7 +34,7 @@
 * `PriorityBlockingQueue<E>`：支持优先级排序的无界阻塞队列。
 * `DelayQueue<E extends Delayed>`：使用优先级队列实现的延迟无界阻塞队列。
 * **`SynchronousQueue<E>`：不存储元素的阻塞队列，即单个元素的阻塞队列。**
-  * `SynchronousQueue<E>`没有容量，与其他`BlockingQueue`不同，`SynchronousQueue<E>`是一个不存储元素的`BlockingQueue`。每一个`put`操作必须要等待一个`take`操作，否则不能继续添加元素，反之依然。
+  * `SynchronousQueue<E>`没有容量，与其他阻塞队列不同，`SynchronousQueue<E>`是一个不存储元素的阻塞队列。每一个`put`操作必须要等待一个`take`操作，否则不能继续添加元素，反之依然。
 * `LinkedTransferQueue<E>`：由链表结构组成的无界阻塞队列。
 * `LinkedBlockingDeque<E>`：由链表结构组成的双向阻塞队列。
 
