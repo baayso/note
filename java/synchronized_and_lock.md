@@ -39,7 +39,7 @@
            7: goto          15
           10: astore_2
           11: aload_1
-          12: monitorexit   // 异常退出时保证也能释放锁
+          12: monitorexit   // 保证异常退出时也能释放锁
           13: aload_2
           14: athrow
           15: new           #3                  // class java/util/concurrent/locks/ReentrantLock
