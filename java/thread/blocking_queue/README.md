@@ -103,6 +103,7 @@
         public void increment() {
             this.lock.lock();
             try {
+                // 使用while进行判断，防止虚假唤醒
                 while (this.number != 0) {
                     this.condition.await(); // 等待，暂不能进行生产
                 }
@@ -123,6 +124,7 @@
         public void decrement() {
             this.lock.lock();
             try {
+                // 使用while进行判断，防止虚假唤醒
                 while (this.number == 0) {
                     this.condition.await(); // 等待，暂不能进行消费
                 }
