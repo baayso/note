@@ -179,11 +179,135 @@
     ```
   * **阻塞队列版实现生产者消费者模式**
     ```java
+    class Resource {
 
+        private volatile boolean               enable    = true; // 默认开启生产及消费
+        private          AtomicInteger         atomicInt = new AtomicInteger();
+        private          BlockingQueue<String> queue;
+
+        public Resource(BlockingQueue<String> queue) {
+            this.queue = queue;
+            System.out.println(this.queue.getClass().getName());
+        }
+
+        public void producer() throws InterruptedException {
+            String data;
+            boolean ret;
+
+            String threadName = Thread.currentThread().getName();
+
+            while (this.enable) {
+                data = String.valueOf(this.atomicInt.incrementAndGet());
+
+                ret = this.queue.offer(data, 3L, TimeUnit.SECONDS);
+
+                if (ret) {
+                    System.out.println(threadName + "\t数据：" + data + "插入队列成功");
+                }
+                else {
+                    System.out.println(threadName + "\t数据：" + data + "插入队列失败");
+                }
+
+                TimeUnit.MILLISECONDS.sleep(500);
+            }
+
+            System.out.println(threadName + "\t停止生产");
+        }
+
+        public void consumer() throws InterruptedException {
+            String result;
+
+            String threadName = Thread.currentThread().getName();
+
+            while (this.enable) {
+                result = this.queue.poll(3L, TimeUnit.SECONDS);
+
+                if (result == null || "".equalsIgnoreCase(result)) {
+                    this.enable = false;
+                    System.out.println(threadName + "\t超过3秒钟没有取到数据，停止消费\n\n");
+                    return;
+                }
+
+                System.out.println(threadName + "\t 消费队列数据：" + result + "成功");
+            }
+        }
+
+        public void stop() {
+            this.enable = false;
+        }
+    }
+
+    public class ProducerAndConsumerBlockingQueueDemo {
+
+        public static void main(String[] args) {
+
+            Resource resource = new Resource(new ArrayBlockingQueue<>(10));
+
+            new Thread(() -> {
+                System.out.println(Thread.currentThread().getName() + "\t生产线程启动");
+                try {
+                    resource.producer();
+                }
+                catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }, "Producer").start();
+
+            new Thread(() -> {
+                System.out.println(Thread.currentThread().getName() + "\t消费线程启动");
+                System.out.println();
+                try {
+                    resource.consumer();
+                }
+                catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }, "Consumer").start();
+
+            try { TimeUnit.SECONDS.sleep(6); } catch (InterruptedException e) { e.printStackTrace(); }
+
+            System.out.println();
+
+            System.out.println("6秒钟时间到，停止main线程");
+
+            resource.stop();
+        }
+
+    }
     ```
     ```
     输出结果：
+    Producer	生产线程启动
+    Consumer	消费线程启动
 
+    Producer	数据：1插入队列成功
+    Consumer	 消费队列数据：1成功
+    Producer	数据：2插入队列成功
+    Consumer	 消费队列数据：2成功
+    Producer	数据：3插入队列成功
+    Consumer	 消费队列数据：3成功
+    Producer	数据：4插入队列成功
+    Consumer	 消费队列数据：4成功
+    Producer	数据：5插入队列成功
+    Consumer	 消费队列数据：5成功
+    Producer	数据：6插入队列成功
+    Consumer	 消费队列数据：6成功
+    Consumer	 消费队列数据：7成功
+    Producer	数据：7插入队列成功
+    Producer	数据：8插入队列成功
+    Consumer	 消费队列数据：8成功
+    Producer	数据：9插入队列成功
+    Consumer	 消费队列数据：9成功
+    Producer	数据：10插入队列成功
+    Consumer	 消费队列数据：10成功
+    Producer	数据：11插入队列成功
+    Consumer	 消费队列数据：11成功
+    Producer	数据：12插入队列成功
+    Consumer	 消费队列数据：12成功
+
+    6秒钟时间到，停止main线程
+    Producer	停止生产
+    Consumer	超过3秒钟没有取到数据，停止消费
     ```
 * 线程池
 
