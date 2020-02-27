@@ -78,7 +78,146 @@
 
 ### 锁绑定多个条件`Condition`
 * `synchronized`没有。
-* `ReentrantLock`用来实现分组唤醒需要唤醒的线程们，可以精确唤醒，而不是像`synchronized`那样随机唤醒或者唤醒全部线程。
+* `ReentrantLock`用来实现分组唤醒需要唤醒的线程们，**可以精确唤醒**，而不是像`synchronized`那样随机唤醒或者唤醒全部线程。
+  * 实现精确唤醒的示例代码：
+    ```java
+    /** 多线程之间按顺序执行，实现 T1 -> T2 -> T3 三个线程依次执行 */
+
+    class ShareResource {
+
+        private int       num  = 1; // T1:1  T2:2  T3:3
+        private Lock      lock = new ReentrantLock();
+        private Condition c1   = this.lock.newCondition();
+        private Condition c2   = this.lock.newCondition();
+        private Condition c3   = this.lock.newCondition();
+
+        public void printT1() {
+            this.lock.lock();
+            try {
+                while (this.num != 1) {
+                    this.c1.await();
+                }
+
+                for (int i = 1; i <= 2; i++) {
+                    System.out.println(Thread.currentThread().getName() + "\t" + i);
+                }
+
+                // 只通知唤醒T2线程
+                this.num = 2;
+                this.c2.signal();
+            }
+            catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            finally {
+                this.lock.unlock();
+            }
+        }
+
+        public void printT2() {
+            this.lock.lock();
+            try {
+                while (this.num != 2) {
+                    this.c2.await();
+                }
+
+                for (int i = 1; i <= 3; i++) {
+                    System.out.println(Thread.currentThread().getName() + "\t" + i);
+                }
+
+                // 只通知唤醒T3线程
+                this.num = 3;
+                this.c3.signal();
+            }
+            catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            finally {
+                this.lock.unlock();
+            }
+        }
+
+        public void printT3() {
+            this.lock.lock();
+            try {
+                while (this.num != 3) {
+                    this.c3.await();
+                }
+
+                for (int i = 1; i <= 4; i++) {
+                    System.out.println(Thread.currentThread().getName() + "\t" + i);
+                }
+
+                // 只通知唤醒T1线程
+                this.num = 1;
+                this.c1.signal();
+            }
+            catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            finally {
+                this.lock.unlock();
+            }
+        }
+    }
+
+    public class SynchronizedAndLockDemo {
+
+        public static void main(String[] args) {
+
+            ShareResource resource = new ShareResource();
+
+            new Thread(() -> {
+                for (int i = 1; i <= 3; i++) {
+                    resource.printT1();
+                }
+            }, "T1").start();
+
+            new Thread(() -> {
+                for (int i = 1; i <= 3; i++) {
+                    resource.printT2();
+                }
+            }, "T2").start();
+
+            new Thread(() -> {
+                for (int i = 1; i <= 3; i++) {
+                    resource.printT3();
+                }
+            }, "T3").start();
+        }
+
+    }
+    ```
+    ```
+    输出结果：
+    T1	1
+    T1	2
+    T2	1
+    T2	2
+    T2	3
+    T3	1
+    T3	2
+    T3	3
+    T3	4
+    T1	1
+    T1	2
+    T2	1
+    T2	2
+    T2	3
+    T3	1
+    T3	2
+    T3	3
+    T3	4
+    T1	1
+    T1	2
+    T2	1
+    T2	2
+    T2	3
+    T3	1
+    T3	2
+    T3	3
+    T3	4
+    ```
 
 ### 共同点
 * 都是用来协调多线程对共享对象、变量的访问。
