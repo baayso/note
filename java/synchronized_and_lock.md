@@ -66,7 +66,7 @@
 
 ### 加锁是否公平
 * `synchronized`是非公平锁。
-* `ReentrantLock`两者都可以，默认为公平锁。
+* `ReentrantLock`两者都可以，默认为非公平锁。
   ```java
   // 非公平锁
   Lock nonFairLock = new ReentrantLock();
