@@ -70,10 +70,10 @@
   ```java
   // 公平锁
   Lock nonFairLock = new ReentrantLock();
-  Lock nonFairLock = new ReentrantLock(false);
+  Lock fairLock = new ReentrantLock(true);
 
   // 非公平锁
-  Lock fairLock = new ReentrantLock(true);
+  Lock nonFairLock = new ReentrantLock(false);
   ```
 
 ### 锁绑定多个条件`Condition`
