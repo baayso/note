@@ -35,6 +35,59 @@
 * `DelayQueue<E extends Delayed>`：使用优先级队列实现的延迟无界阻塞队列。
 * **`SynchronousQueue<E>`：不存储元素的阻塞队列，即单个元素的阻塞队列。**
   * `SynchronousQueue<E>`没有容量，与其他阻塞队列不同，`SynchronousQueue<E>`是一个不存储元素的阻塞队列。每一个`put`操作必须要等待一个`take`操作，否则不能继续添加元素，反之依然。
+  * 示例代码：
+    ```java
+    public class SynchronousQueueDemo {
+
+        public static void main(String[] args) {
+
+            BlockingQueue<Integer> queue = new SynchronousQueue<>();
+
+            new Thread(() -> {
+                try {
+                    System.out.println(Thread.currentThread().getName() + "\tput: 1");
+                    queue.put(1);
+
+                    System.out.println(Thread.currentThread().getName() + "\tput: 2");
+                    queue.put(2);
+
+                    System.out.println(Thread.currentThread().getName() + "\tput: 3");
+                    queue.put(3);
+                }
+                catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }, "T1").start();
+
+            new Thread(() -> {
+                try {
+                    try { TimeUnit.SECONDS.sleep(3); } catch (InterruptedException e) { e.printStackTrace(); }
+                    System.out.println(Thread.currentThread().getName() + "\ttake: " + queue.take());
+
+                    try { TimeUnit.SECONDS.sleep(3); } catch (InterruptedException e) { e.printStackTrace(); }
+                    System.out.println(Thread.currentThread().getName() + "\ttake: " + queue.take());
+
+                    try { TimeUnit.SECONDS.sleep(3); } catch (InterruptedException e) { e.printStackTrace(); }
+                    System.out.println(Thread.currentThread().getName() + "\ttake: " + queue.take());
+                }
+                catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }, "T2").start();
+
+        }
+
+    }
+    ```
+    ```
+    输出结果
+    T1	put: 1
+    T2	take: 1
+    T1	put: 2
+    T2	take: 2
+    T1	put: 3
+    T2	take: 3
+    ```
 * `LinkedTransferQueue<E>`：由链表结构组成的无界阻塞队列。
 * `LinkedBlockingDeque<E>`：由链表结构组成的双向阻塞队列。
 
