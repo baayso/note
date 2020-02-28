@@ -1,4 +1,4 @@
-# `interface java.util.concurrent.BlockingQueue<E>`（阻塞队列）
+# [`interface java.util.concurrent.BlockingQueue<E>`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/BlockingQueue.java#L180)（阻塞队列）
 
 ### 什么是阻塞队列
 * 阻塞队列，顾名思义，首先它是一个队列，而一个阻塞队列在数据结构中所起的作用大致如下图所示：  
@@ -29,11 +29,11 @@
 
 ### 阻塞队列的种类及架构
 ![阻塞队列类图](https://github.com/baayso/note/blob/master/java/thread/blocking_queue/BlockingQueue.png)
-* **`ArrayBlockingQueue<E>`：由数组结构组成的有界阻塞队列。**
-* **`LinkedBlockingQueue<E>`：由链表结构组成的有界（但默认值是：`Integer.MAX_VALUE`）阻塞队列。**
-* `PriorityBlockingQueue<E>`：支持优先级排序的无界阻塞队列。
-* `DelayQueue<E extends Delayed>`：使用优先级队列实现的延迟无界阻塞队列。
-* **`SynchronousQueue<E>`：不存储元素的阻塞队列，即单个元素的阻塞队列。**
+* **[`ArrayBlockingQueue<E>`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/ArrayBlockingQueue.java#L238)：由数组结构组成的有界阻塞队列。**
+* **[`LinkedBlockingQueue<E>`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/LinkedBlockingQueue.java#L249)：由链表结构组成的有界（但[默认值](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/LinkedBlockingQueue.java#L249)是：`Integer.MAX_VALUE`）阻塞队列。**
+* [`PriorityBlockingQueue<E>`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/PriorityBlockingQueue.java#L110)：支持优先级排序的无界阻塞队列。
+* [`DelayQueue<E extends Delayed>`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/DelayQueue.java#L70)：使用优先级队列实现的延迟无界阻塞队列。
+* **[`SynchronousQueue<E>`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/SynchronousQueue.java#L854)：不存储元素的阻塞队列，即单个元素的阻塞队列。**
   * `SynchronousQueue<E>`没有容量，与其他阻塞队列不同，`SynchronousQueue<E>`是一个不存储元素的阻塞队列。每一个`put`操作必须要等待一个`take`操作，否则不能继续添加元素，反之依然。
   * 示例代码：
     ```java
@@ -88,8 +88,8 @@
     T1	put: 3
     T2	take: 3
     ```
-* `LinkedTransferQueue<E>`：由链表结构组成的无界阻塞队列。
-* `LinkedBlockingDeque<E>`：由链表结构组成的双向阻塞队列。
+* [`LinkedTransferQueue<E>`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/LinkedTransferQueue.java#L88)：由链表结构组成的无界阻塞队列。
+* [`LinkedBlockingDeque<E>`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/LinkedBlockingDeque.java#L77)：由链表结构组成的双向阻塞队列。
 
 ### 阻塞队列的使用场景
 * 线程池
