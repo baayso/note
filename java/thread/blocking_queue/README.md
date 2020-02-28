@@ -92,7 +92,7 @@
 * [`LinkedBlockingDeque<E>`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/LinkedBlockingDeque.java#L77)：由链表结构组成的双向阻塞队列。
 
 ### 阻塞队列的使用场景
-* 线程池
+* [线程池](https://github.com/baayso/note/blob/master/java/thread/README.md)
 
 * 消息中间件
 
