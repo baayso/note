@@ -173,7 +173,7 @@
 * **`int corePoolSize`**：线程池中的常驻核心线程数
   * 在创建了线程池后，当有请求任务来了之后，就会安排池中的线程去执行请求任务，近似理解为今日当值线程。
   * 当线程池中的线程数达到`corePoolSize`后，就会把到达的任务放到缓存队列当中。
-* **`int maximumPoolSize`**：线程池能够容纳同时执行的最大线程数，此值必须大于等于`1`
+* **`int maximumPoolSize`**：线程池能够容纳同时执行的最大线程数，此值必须大于等于`1`。
 * **`long keepAliveTime`**：多余的空闲线程的存活时间。当前线程池数量超过`corePoolSize`时，当空闲时间达到`keepAliveTime`值时，多余空闲线程会被销毁直到只剩下`corePoolSize`个线程为止。
   * 默认情况下，只有当线程池中的线程数**大于**`corePoolSize`时`keepAliveTime`才会起作用，直到线程池中的线程数**不大于**`corePoolSize`。
 * **`TimeUnit unit`**：`keepAliveTime`参数的单位。
