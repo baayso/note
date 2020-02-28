@@ -247,14 +247,14 @@
 
 ### 线程池的拒绝策略
 
-### 使用`Executors`创建线程池的问题（不允许使用`Executors`创建线程池）
+### 使用`Executors`创建线程池的问题
 > 以下内容摘自【阿里巴巴Java开发手册->编程规约->并发处理】：
-* 线程池不允许使用`Executors`创建，而是通过`ThreadPoolExecutor`的方式，这样的处理方式让写的同学更加明确线程池的运行规则，规避资源耗尽的风险。
+* **线程池不允许使用`Executors`创建，而是通过`ThreadPoolExecutor`的方式**，这样的处理方式让写的同学更加明确线程池的运行规则，规避资源耗尽的风险。
 * 说明：`Executors`创建的线程池对象的弊端如下：
   * `Executors.newFixedThreadPool(int nThreads)`和`Executors.newSingleThreadExecutor()`：
-    * 允许的请求队列长度为`Integer.MAX_VALUE`，可能会堆积大量的请求，从而导致`OOM`。
+    * 允许的**请求队列长度**为`Integer.MAX_VALUE`，可能会**堆积大量的请求**，从而导致`OOM`。
   * `Executors.newCachedThreadPool()`：
-    * 允许的创建线程数量为`Integer.MAX_VALUE`，可能会创建大量的线程，从而导致`OOM`。
+    * 允许的**创建线程数量**为`Integer.MAX_VALUE`，可能会**创建大量的线程**，从而导致`OOM`。
 
 ### 自定义线程池
 
