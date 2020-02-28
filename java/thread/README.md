@@ -169,6 +169,58 @@
     pool-1-thread-1	 办理业务
     ```
 
+### `ThreadPoolExecutor`构造函数参数说明
+* **`int corePoolSize`**：线程池中的常驻核心线程数
+  * 在创建了线程池后，当有请求任务来了之后，就会安排池中的线程去执行请求任务，近似理解为今日当值线程。
+  * 当线程池中的线程数达到`corePoolSize`后，就会把到达的任务放到缓存队列当中。
+* **`int maximumPoolSize`**：线程池能够容纳同时执行的最大线程数，此值必须大于等于`1`
+* **`long keepAliveTime`**：多余的空闲线程的存活时间。当前线程池数量超过`corePoolSize`时，当空闲时间达到`keepAliveTime`值时，多余空闲线程会被销毁直到只剩下`corePoolSize`个线程为止。
+  * 默认情况下，只有当线程池中的线程数**大于**`corePoolSize`时`keepAliveTime`才会起作用，直到线程池中的线程数**不大于**`corePoolSize`。
+* **`TimeUnit unit`**：`keepAliveTime`参数的单位。
+* **`BlockingQueue<Runnable> workQueue`**：任务队列，被提交但尚未被执行的任务。
+* **`ThreadFactory threadFactory`**：生成线程池中工作线程的线程工厂，用于创建线程**一般使用默认线程工厂即可**。
+* **`RejectedExecutionHandler handler`**：拒绝策略，表示当队列已满且工作线程大于等于线程池的最大线程数（`maximumPoolSize`）时如何来拒绝请求执行的`Runnable`的策略。
+```java
+    /**
+     * Creates a new {@code ThreadPoolExecutor} with the given initial
+     * parameters.
+     *
+     * @param corePoolSize the number of threads to keep in the pool, even
+     *        if they are idle, unless {@code allowCoreThreadTimeOut} is set
+     * @param maximumPoolSize the maximum number of threads to allow in the
+     *        pool
+     * @param keepAliveTime when the number of threads is greater than
+     *        the core, this is the maximum time that excess idle threads
+     *        will wait for new tasks before terminating.
+     * @param unit the time unit for the {@code keepAliveTime} argument
+     * @param workQueue the queue to use for holding tasks before they are
+     *        executed.  This queue will hold only the {@code Runnable}
+     *        tasks submitted by the {@code execute} method.
+     * @param threadFactory the factory to use when the executor
+     *        creates a new thread
+     * @param handler the handler to use when execution is blocked
+     *        because the thread bounds and queue capacities are reached
+     * @throws IllegalArgumentException if one of the following holds:<br>
+     *         {@code corePoolSize < 0}<br>
+     *         {@code keepAliveTime < 0}<br>
+     *         {@code maximumPoolSize <= 0}<br>
+     *         {@code maximumPoolSize < corePoolSize}
+     * @throws NullPointerException if {@code workQueue}
+     *         or {@code threadFactory} or {@code handler} is null
+     */
+    public ThreadPoolExecutor(int corePoolSize,
+                              int maximumPoolSize,
+                              long keepAliveTime,
+                              TimeUnit unit,
+                              BlockingQueue<Runnable> workQueue,
+                              ThreadFactory threadFactory,
+                              RejectedExecutionHandler handler) {
+        ...
+    }
+```
+
+### 线程程底层工作原理
+
 ### [`Callable<V>`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/Callable.java#L58) 与 [`FutureTask<V>`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/FutureTask.java#L132)
 
 ### 并发工具类
