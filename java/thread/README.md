@@ -16,79 +16,79 @@
   * [`Executors.newFixedThreadPool(int nThreads)`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/Executors.java#L88)：适用于执行长期任务，性能较好。
     * 创建一个**定长线程池**，可控制线程最大并发数，超出的线程会在队列中等待。
     * `corePoolSize`和`maximumPoolSize`是相等的，阻塞队列使用的是`new LinkedBlockingQueue<Runnable>()`。
-    ```java
-    /**
-     * Creates a thread pool that reuses a fixed number of threads
-     * operating off a shared unbounded queue.  At any point, at most
-     * {@code nThreads} threads will be active processing tasks.
-     * If additional tasks are submitted when all threads are active,
-     * they will wait in the queue until a thread is available.
-     * If any thread terminates due to a failure during execution
-     * prior to shutdown, a new one will take its place if needed to
-     * execute subsequent tasks.  The threads in the pool will exist
-     * until it is explicitly {@link ExecutorService#shutdown shutdown}.
-     *
-     * @param nThreads the number of threads in the pool
-     * @return the newly created thread pool
-     * @throws IllegalArgumentException if {@code nThreads <= 0}
-     */
-    public static ExecutorService newFixedThreadPool(int nThreads) {
-        return new ThreadPoolExecutor(nThreads, nThreads,
-                                      0L, TimeUnit.MILLISECONDS,
-                                      new LinkedBlockingQueue<Runnable>());
-    }
-    ```
+      ```java
+      /**
+       * Creates a thread pool that reuses a fixed number of threads
+       * operating off a shared unbounded queue.  At any point, at most
+       * {@code nThreads} threads will be active processing tasks.
+       * If additional tasks are submitted when all threads are active,
+       * they will wait in the queue until a thread is available.
+       * If any thread terminates due to a failure during execution
+       * prior to shutdown, a new one will take its place if needed to
+       * execute subsequent tasks.  The threads in the pool will exist
+       * until it is explicitly {@link ExecutorService#shutdown shutdown}.
+       *
+       * @param nThreads the number of threads in the pool
+       * @return the newly created thread pool
+       * @throws IllegalArgumentException if {@code nThreads <= 0}
+       */
+      public static ExecutorService newFixedThreadPool(int nThreads) {
+          return new ThreadPoolExecutor(nThreads, nThreads,
+                                        0L, TimeUnit.MILLISECONDS,
+                                        new LinkedBlockingQueue<Runnable>());
+      }
+      ```
   * [`Executors.newSingleThreadExecutor()`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/Executors.java#L170)：适用于任务需要依次执行。
     * 创建一个**只有一个线程**的线程池，它只会用唯一的工作线程来执行任务，保证所有的任务按照指定的顺序执行。
     * `corePoolSize`和`maximumPoolSize`都为`1`，阻塞队列使用的是`new LinkedBlockingQueue<Runnable>()`。
-    ```java
-    /**
-     * Creates an Executor that uses a single worker thread operating
-     * off an unbounded queue. (Note however that if this single
-     * thread terminates due to a failure during execution prior to
-     * shutdown, a new one will take its place if needed to execute
-     * subsequent tasks.)  Tasks are guaranteed to execute
-     * sequentially, and no more than one task will be active at any
-     * given time. Unlike the otherwise equivalent
-     * {@code newFixedThreadPool(1)} the returned executor is
-     * guaranteed not to be reconfigurable to use additional threads.
-     *
-     * @return the newly created single-threaded Executor
-     */
-    public static ExecutorService newSingleThreadExecutor() {
-        return new FinalizableDelegatedExecutorService
-            (new ThreadPoolExecutor(1, 1,
-                                    0L, TimeUnit.MILLISECONDS,
-                                    new LinkedBlockingQueue<Runnable>()));
-    }
-    ```
+      ```java
+      /**
+       * Creates an Executor that uses a single worker thread operating
+       * off an unbounded queue. (Note however that if this single
+       * thread terminates due to a failure during execution prior to
+       * shutdown, a new one will take its place if needed to execute
+       * subsequent tasks.)  Tasks are guaranteed to execute
+       * sequentially, and no more than one task will be active at any
+       * given time. Unlike the otherwise equivalent
+       * {@code newFixedThreadPool(1)} the returned executor is
+       * guaranteed not to be reconfigurable to use additional threads.
+       *
+       * @return the newly created single-threaded Executor
+       */
+      public static ExecutorService newSingleThreadExecutor() {
+          return new FinalizableDelegatedExecutorService
+              (new ThreadPoolExecutor(1, 1,
+                                      0L, TimeUnit.MILLISECONDS,
+                                      new LinkedBlockingQueue<Runnable>()));
+      }
+      ```
   * [`Executors.newCachedThreadPool()`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/Executors.java#L215)：适用于执行很多短期异步的小程序或者负载较轻的服务器。
     * 创建一个**可缓存线程池**，如果线程池长度超过处理需要，可灵活回收空间线程，若无可回收，则新建线程。
-    * `corePoolSize`初始为`0`，`maximumPoolSize`为`Integer.MAX_VALUE`，阻塞队列使用的是`new SynchronousQueue<Runnable>()`。
     * 任务来了就创建线程运行，当线程空闲超过`60秒`就会被销毁。
-    ```java
-    /**
-     * Creates a thread pool that creates new threads as needed, but
-     * will reuse previously constructed threads when they are
-     * available.  These pools will typically improve the performance
-     * of programs that execute many short-lived asynchronous tasks.
-     * Calls to {@code execute} will reuse previously constructed
-     * threads if available. If no existing thread is available, a new
-     * thread will be created and added to the pool. Threads that have
-     * not been used for sixty seconds are terminated and removed from
-     * the cache. Thus, a pool that remains idle for long enough will
-     * not consume any resources. Note that pools with similar
-     * properties but different details (for example, timeout parameters)
-     * may be created using {@link ThreadPoolExecutor} constructors.
-     *
-     * @return the newly created thread pool
-     */
-    public static ExecutorService newCachedThreadPool() {
-        return new ThreadPoolExecutor(0, Integer.MAX_VALUE,
-                                      60L, TimeUnit.SECONDS,
-                                      new SynchronousQueue<Runnable>());
-    }
-    ```
+    * `corePoolSize`初始为`0`，`maximumPoolSize`为`Integer.MAX_VALUE`，阻塞队列使用的是`new SynchronousQueue<Runnable>()`。
+      ```java
+      /**
+       * Creates a thread pool that creates new threads as needed, but
+       * will reuse previously constructed threads when they are
+       * available.  These pools will typically improve the performance
+       * of programs that execute many short-lived asynchronous tasks.
+       * Calls to {@code execute} will reuse previously constructed
+       * threads if available. If no existing thread is available, a new
+       * thread will be created and added to the pool. Threads that have
+       * not been used for sixty seconds are terminated and removed from
+       * the cache. Thus, a pool that remains idle for long enough will
+       * not consume any resources. Note that pools with similar
+       * properties but different details (for example, timeout parameters)
+       * may be created using {@link ThreadPoolExecutor} constructors.
+       *
+       * @return the newly created thread pool
+       */
+      public static ExecutorService newCachedThreadPool() {
+          return new ThreadPoolExecutor(0, Integer.MAX_VALUE,
+                                        60L, TimeUnit.SECONDS,
+                                        new SynchronousQueue<Runnable>());
+      }
+      ```
   * [`Executors.newScheduledThreadPool(int corePoolSize)`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/Executors.java#L284)
     ```java
     /**
