@@ -15,7 +15,7 @@
   ![Executor框架类图](https://github.com/baayso/note/blob/master/java/thread/Executor%E6%A1%86%E6%9E%B6%E7%B1%BB%E5%9B%BE.png)
   * [`Executors.newFixedThreadPool(int nThreads)`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/Executors.java#L88)：适用于执行长期任务，性能较好。
     * 创建一个**定长线程池**，可控制线程最大并发数，超出的线程会在队列中等待。
-    * `corePoolSize`和`maximumPoolSize`是相等的，阻塞队列使用的是`new LinkedBlockingQueue<Runnable>()`。
+    * `corePoolSize`和`maximumPoolSize`是相等的，阻塞队列使用的是[`new LinkedBlockingQueue<Runnable>()`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/LinkedBlockingQueue.java#L249)。
       ```java
       /**
        * Creates a thread pool that reuses a fixed number of threads
@@ -40,7 +40,7 @@
       ```
   * [`Executors.newSingleThreadExecutor()`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/Executors.java#L170)：适用于任务需要依次执行。
     * 创建一个**只有一个线程**的线程池，它只会用唯一的工作线程来执行任务，保证所有的任务按照指定的顺序执行。
-    * `corePoolSize`和`maximumPoolSize`都为`1`，阻塞队列使用的是`new LinkedBlockingQueue<Runnable>()`。
+    * `corePoolSize`和`maximumPoolSize`都为`1`，阻塞队列使用的是[`new LinkedBlockingQueue<Runnable>()`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/LinkedBlockingQueue.java#L249)。
       ```java
       /**
        * Creates an Executor that uses a single worker thread operating
@@ -65,7 +65,7 @@
   * [`Executors.newCachedThreadPool()`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/Executors.java#L215)：适用于执行很多短期异步的小程序或者负载较轻的服务器。
     * 创建一个**可缓存线程池**，如果线程池长度超过处理需要，可灵活回收空间线程，若无可回收，则新建线程。
     * 任务来了就创建线程运行，当线程空闲超过`60秒`就会被销毁。
-    * `corePoolSize`初始为`0`，`maximumPoolSize`为`Integer.MAX_VALUE`，阻塞队列使用的是`new SynchronousQueue<Runnable>()`。
+    * `corePoolSize`初始为`0`，`maximumPoolSize`为`Integer.MAX_VALUE`，阻塞队列使用的是[`new SynchronousQueue<Runnable>()`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/SynchronousQueue.java#L854)。
       ```java
       /**
        * Creates a thread pool that creates new threads as needed, but
@@ -169,7 +169,7 @@
     pool-1-thread-1	 办理业务
     ```
 
-### `ThreadPoolExecutor`构造函数参数说明
+### [`ThreadPoolExecutor`构造函数](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/ThreadPoolExecutor.java#L1303)参数说明
 * **`int corePoolSize`**：线程池中的常驻核心线程数
   * 在创建了线程池后，当有请求任务来了之后，就会安排池中的线程去执行请求任务，近似理解为今日当值线程。
   * 当线程池中的线程数达到`corePoolSize`后，就会把到达的任务放到缓存队列当中。
@@ -246,15 +246,22 @@
     * 所以线程池的所有任务完成后它**最终会收缩到`corePoolSize`的大小**。
 
 ### 线程池的拒绝策略
+* 线程池的拒绝策略是什么
+  * 当线程池中的线程达到了`maximumPoolSize`，无法继续创建新的线程，并且等待队列也已经装满，无法继续接收新任务进入队列。此时就需要拒绝策略机制合理的处理这个问题。
+* JDK内置的拒绝策略（均实现了[`RejectedExecutionHandler`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/RejectedExecutionHandler.java#L44)接口）
+  * [`AbortPolicy`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/ThreadPoolExecutor.java#L2047)：[**默认的拒绝策略**](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/ThreadPoolExecutor.java#L550)，直接抛出[`RejectedExecutionException`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/RejectedExecutionException.java)异常阻止系统正常运行。
+  * [`CallerRunsPolicy`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/ThreadPoolExecutor.java#L2023)：该策略不会抛弃任务，也不会抛出异常，而是将某些任务回退给调用者，从而降低新任务的流量。
+  * [`DiscardOldestPolicy`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/ThreadPoolExecutor.java#L2092)：抛弃队列中等待最久的任务，然后把当前任务加入队列中尝试再次提交当前任务。
+  * [`DiscardPolicy`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/ThreadPoolExecutor.java#L2071)：直接丢弃任务，不予任务处理也不抛出异常。如果允许任务丢失，这是最好的一种方案。
 
 ### 使用`Executors`创建线程池的问题
 > 以下内容摘自【阿里巴巴Java开发手册->编程规约->并发处理】：
 * **线程池不允许使用`Executors`创建，而是通过`ThreadPoolExecutor`的方式**，这样的处理方式让写的同学更加明确线程池的运行规则，规避资源耗尽的风险。
 * 说明：`Executors`创建的线程池对象的弊端如下：
-  * `Executors.newFixedThreadPool(int nThreads)`和`Executors.newSingleThreadExecutor()`：
-    * 允许的**请求队列长度**为`Integer.MAX_VALUE`，可能会**堆积大量的请求**，从而导致`OOM`。
-  * `Executors.newCachedThreadPool()`：
-    * 允许的**创建线程数量**为`Integer.MAX_VALUE`，可能会**创建大量的线程**，从而导致`OOM`。
+  * [`Executors.newFixedThreadPool(int nThreads)`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/Executors.java#L88)和[`Executors.newSingleThreadExecutor()`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/Executors.java#L170)：
+    * 允许的**请求队列长度**为[`Integer.MAX_VALUE`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/LinkedBlockingQueue.java#L250)，可能会**堆积大量的请求**，从而导致`OOM`。
+  * [`Executors.newCachedThreadPool()`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/Executors.java#L215)：
+    * 允许的**创建线程数量**为[`Integer.MAX_VALUE`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/Executors.java#L216)，可能会**创建大量的线程**，从而导致`OOM`。
 
 ### 自定义线程池
 
