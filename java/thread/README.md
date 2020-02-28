@@ -220,6 +220,30 @@
 ```
 
 ### 线程程底层工作原理
+* **当向线程池提交一个任务之后，线程池的主要处理流程：**  
+  ![线程池的主要处理流程](https://github.com/baayso/note/blob/master/java/thread/%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%9A%84%E4%B8%BB%E8%A6%81%E5%A4%84%E7%90%86%E6%B5%81%E7%A8%8B.png)
+  * 1）线程池判断核心线程池里的线程是否都在执行任务。如果不是，则创建一个新的工作线程来执行任务。如果核心线程池里的线程都在执行任务，则进入下个流程。
+  * 2）线程池判断工作队列是否已经满。如果工作队列没有满，则将新提交的任务存储在这个工作队列里。如果工作队列满了，则进入下个流程。
+  * 3）线程池判断线程池的线程是否都处于工作状态。如果没有，则创建一个新的工作线程来执行任务。如果已经满了，则交给饱和策略来处理这个任务。
+* **`ThreadPoolExecutor`执行`execute()`方法的示意图：**  
+  ![ThreadPoolExecutor执行示意图](https://github.com/baayso/note/blob/master/java/thread/ThreadPoolExecutor%E6%89%A7%E8%A1%8C%E7%A4%BA%E6%84%8F%E5%9B%BE.png)
+  * `ThreadPoolExecutor`执行`execute()`方法分下面4种情况：
+    * 1）如果当前运行的线程少于`corePoolSize`，则创建新线程来执行任务（注意，执行这一步骤需要获取全局锁）。
+    * 2）如果运行的线程等于或多于`corePoolSize`，则将任务加入`BlockingQueue`。
+    * 3）如果无法将任务加入`BlockingQueue`（队列已满），则创建新的线程来处理任务（注意，执行这一步骤需要获取全局锁）。
+    * 4）如果创建新线程将使当前运行的线程超出`maximumPoolSize`，任务将被拒绝，并调用`RejectedExecutionHandler.rejectedExecution()`方法。
+  * `ThreadPoolExecutor`采取上述步骤的总体设计思路，是为了在执行`execute()`方法时，尽可能地避免获取全局锁（那将会是一个严重的可伸缩瓶颈）。在`ThreadPoolExecutor`完成预热之后（当前运行的线程数大于等于`corePoolSize`），几乎所有的`execute()`方法调用都是执行步骤2，而步骤2不需要获取全局锁。
+* **线程程底层工作原理：**
+  * 1）在创建了线程地后，等待提交过来的任务请求。
+  * 2）当调用`execute()`方法添加一个请求任务时，线程池会做如下判断：
+    * 2.1 如果正在运行的线程数量小于`corePoolSize`，那么马上创建线程运行这个任务；
+    * 2.2 如果正在运行的线程数量大于或等于`corePoolSize`，那么将这个任务**放入队列**；
+    * 2.3 如果这时队列满了且正在运行的线程数量还小于`maximumPoolSize`，那么还是要创建非核心线程立刻运行这个任务；
+    * 2.4 如果队列满了且正在运行的线程数量大于或等于`maximumPoolSize`，那么线程池**会启动饱和拒绝策略来执行**。
+  * 3）当一个线程完成任务时，它会从队列中取下一个任务来执行。
+  * 4）当一个线程无事可做并超过一定的时间（`keepAliveTime`）时，线程池会判断：
+    * 如果当前运行的线程数大`corePoolSize`，那么这个线程就会被停掉。
+    * 所以线程池的所有任务完成后它**最终会收缩到`corePoolSize`的大小**。
 
 ### [`Callable<V>`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/Callable.java#L58) 与 [`FutureTask<V>`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/FutureTask.java#L132)
 
