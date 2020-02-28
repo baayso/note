@@ -245,6 +245,19 @@
     * 如果当前运行的线程数大`corePoolSize`，那么这个线程就会被停掉。
     * 所以线程池的所有任务完成后它**最终会收缩到`corePoolSize`的大小**。
 
+### 线程池的拒绝策略
+
+### 使用`Executors`创建线程池的问题（不允许使用`Executors`创建线程池）
+> 以下内容摘自【阿里巴巴Java开发手册->编程规约->并发处理】：
+* 线程池不允许使用`Executors`创建，而是通过`ThreadPoolExecutor`的方式，这样的处理方式让写的同学更加明确线程池的运行规则，规避资源耗尽的风险。
+* 说明：`Executors`创建的线程池对象的弊端如下：
+  * `Executors.newFixedThreadPool(int nThreads)`和`Executors.newSingleThreadExecutor()`：
+    * 允许的请求队列长度为`Integer.MAX_VALUE`，可能会堆积大量的请求，从而导致`OOM`。
+  * `Executors.newCachedThreadPool()`：
+    * 允许的创建线程数量为`Integer.MAX_VALUE`，可能会创建大量的线程，从而导致`OOM`。
+
+### 自定义线程池
+
 ### [`Callable<V>`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/Callable.java#L58) 与 [`FutureTask<V>`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/FutureTask.java#L132)
 
 ### 并发工具类
