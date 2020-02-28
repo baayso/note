@@ -11,7 +11,7 @@
   * 提高响应速度。当任务到达时，任务可以不需要等到线程创建就可以立即执行。
   * 提高线程的可管理性。线程是稀缺资源，如果无限制的创建，不仅会消耗系统资源，还会降低系统的稳定性，使用线程池可以进行统一的分配、调优和监控。
 * 如何使用线程池
-  * Java中的线程池是通过`Executor`框架实现的，该框架中用到了`Executor`、`Executors`、`ExecutorService`、`ThreadPoolExecutor`这几个类。  
+  * Java中的线程池是通过`Executor`框架实现的，该框架中用到了[`Executor`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/Executor.java#L128)、[`Executors`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/Executors.java#L71)、[`ExecutorService`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/ExecutorService.java#L137)、[`ThreadPoolExecutor`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/ThreadPoolExecutor.java#L323)这几个类。  
   ![Executor框架类图](https://github.com/baayso/note/blob/master/java/thread/Executor%E6%A1%86%E6%9E%B6%E7%B1%BB%E5%9B%BE.png)
   * [`Executors.newFixedThreadPool(int nThreads)`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/Executors.java#L88)：适用于执行长期任务，性能较好。
     * 创建一个**定长线程池**，可控制线程最大并发数，超出的线程会在队列中等待。
@@ -225,14 +225,14 @@
   * 1）线程池判断核心线程池里的线程是否都在执行任务。如果不是，则创建一个新的工作线程来执行任务。如果核心线程池里的线程都在执行任务，则进入下个流程。
   * 2）线程池判断工作队列是否已经满。如果工作队列没有满，则将新提交的任务存储在这个工作队列里。如果工作队列满了，则进入下个流程。
   * 3）线程池判断线程池的线程是否都处于工作状态。如果没有，则创建一个新的工作线程来执行任务。如果已经满了，则交给饱和策略来处理这个任务。
-* **`ThreadPoolExecutor`执行`execute()`方法的示意图：**  
+* **`ThreadPoolExecutor`执行[`execute(Runnable command)`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/ThreadPoolExecutor.java#L1342)方法的示意图：**  
   ![ThreadPoolExecutor执行示意图](https://github.com/baayso/note/blob/master/java/thread/ThreadPoolExecutor%E6%89%A7%E8%A1%8C%E7%A4%BA%E6%84%8F%E5%9B%BE.png)
-  * `ThreadPoolExecutor`执行`execute()`方法分下面4种情况：
+  * `ThreadPoolExecutor`执行`execute(Runnable command)`方法分下面4种情况：
     * 1）如果当前运行的线程少于`corePoolSize`，则创建新线程来执行任务（注意，执行这一步骤需要获取全局锁）。
     * 2）如果运行的线程等于或多于`corePoolSize`，则将任务加入`BlockingQueue`。
     * 3）如果无法将任务加入`BlockingQueue`（队列已满），则创建新的线程来处理任务（注意，执行这一步骤需要获取全局锁）。
     * 4）如果创建新线程将使当前运行的线程超出`maximumPoolSize`，任务将被拒绝，并调用`RejectedExecutionHandler.rejectedExecution()`方法。
-  * `ThreadPoolExecutor`采取上述步骤的总体设计思路，是为了在执行`execute()`方法时，尽可能地避免获取全局锁（那将会是一个严重的可伸缩瓶颈）。在`ThreadPoolExecutor`完成预热之后（当前运行的线程数大于等于`corePoolSize`），几乎所有的`execute()`方法调用都是执行步骤2，而步骤2不需要获取全局锁。
+  * `ThreadPoolExecutor`采取上述步骤的总体设计思路，是为了在执行`execute(Runnable command)`方法时，尽可能地避免获取全局锁（那将会是一个严重的可伸缩瓶颈）。在`ThreadPoolExecutor`完成预热之后（当前运行的线程数大于等于`corePoolSize`），几乎所有的`execute(Runnable command)`方法调用都是执行步骤2，而步骤2不需要获取全局锁。
 * **线程程底层工作原理：**
   * 1）在创建了线程地后，等待提交过来的任务请求。
   * 2）当调用`execute()`方法添加一个请求任务时，线程池会做如下判断：
