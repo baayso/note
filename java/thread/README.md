@@ -264,6 +264,16 @@
     * 允许的**创建线程数量**为[`Integer.MAX_VALUE`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/Executors.java#L216)，可能会**创建大量的线程**，从而导致`OOM`。
 
 ### 自定义线程池
+* 合理配置线程池参数
+  * CPU密集型
+    * CPU密集的意思是该任务需要大量的运算，而没有阻塞，CPU一直全速运行。
+    * CPU密集型任务只有在真正的多核CPU上才能得到加速（通过多线程）。而在单核CPU上，多线程任务不会得到加速，因为CPU总的运算能力就只有那些。
+    * CPU密集型任务配置尽可能少的线程数，计算线程数量的公式：`CPU核数 + 1`。
+  * IO密集型
+    * 即任务会有大量的IO操作，IO操作是比较慢的，所以会造成大量的阻塞。
+    * 在单线程上运行IO密集型的任务会导致大量的CPU运算能力浪费在等待上，所以在IO密集型任务中使用多线程可以大大的加速程序运行，即使是在单核CPU上。这种加速主要是利用了被浪费掉的阻塞时间。
+    * 1）由于IO密集型任务线程并不是一直在执行任务，则应配置尽可能多的线程。如：`CPU核数 * 2`。
+    * 2）IO密集型任务有大部分时间是被阻塞的，故需要多配置线程数。c参考公式：`CPU核数 / (1 - 阻塞系数)`（阻塞系数在 0.8 ~ 0.9之间），比如： `8 / (1 - 0.9) = 80个线程`。
 
 ### [`Callable<V>`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/Callable.java#L58) 与 [`FutureTask<V>`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/FutureTask.java#L132)
 
