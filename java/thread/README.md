@@ -330,7 +330,106 @@
   pool-1-thread-1	 办理业务
   ```
 
+### 死锁（DeakLock）
+* 死锁是指两个或两个以上的线程在执行过程中，因争夺资源而造成的一种互相等待的现象，若无外力干涉那它们都将无法推进下去，如果系统资源充足，线程的资源请求都能得到满足，死锁出现的可能性就比较低，否则就会因争夺有限的资源而陷入死锁。  
+![死锁](https://github.com/baayso/note/blob/master/java/thread/%E6%AD%BB%E9%94%81.png)
+* 产生死锁的主要原因
+  * 系统资源不足。
+  * 线程运行推进的顺序不合适。
+  * 资源分配不当。
+* 避免死锁的办法
+  * 避免一个线程同时获取多个锁。
+  * 避免一个线程在锁内同时占用多个资源，尽量保证每个锁只占用一个资源。
+  * 尝试使用定时锁，使用`lock.tryLock(long timeout, TimeUnit unit)`来代替使用内部锁机制。
+  * 对于数据库锁，加锁和解锁必须在一个数据库连接里，否则会出现解锁失败的情况。
+  * 计算资源的大小，计算出来后，永远按照从大到小的方式获得锁（注：所谓的资源“大小”，其实就是把这个资源变成一个数来比较，例如：可以用字符串的hashcode来比较）。
+* 死锁示例代码
+  ```java
+  class DeadLockThread implements Runnable {
+
+      private String lockA;
+      private String lockB;
+
+      public DeadLockThread(String lockA, String lockB) {
+          this.lockA = lockA;
+          this.lockB = lockB;
+      }
+
+      @Override
+      public void run() {
+          synchronized (this.lockA) {
+              System.out.println(Thread.currentThread().getName() + "\t自己持有：" + this.lockA + "，尝试获得：" + this.lockB);
+
+              try { TimeUnit.SECONDS.sleep(2); } catch (InterruptedException e) { e.printStackTrace(); }
+
+              synchronized (this.lockB) {
+                  System.out.println(Thread.currentThread().getName() + "\t自己持有：" + this.lockB + "，尝试获得：" + this.lockA);
+              }
+          }
+      }
+
+  }
+
+  public class DeadLockDemo {
+
+      public static void main(String[] args) {
+          String lockA = "lock_A";
+          String lockB = "lock_B";
+
+          new Thread(new DeadLockThread(lockA, lockB), "T1").start();
+          new Thread(new DeadLockThread(lockB, lockA), "T2").start();
+      }
+
+  }
+  ```
+  ```
+  输出结果：
+  T1	自己持有：lock_A，尝试获得：lock_B
+  T2	自己持有：lock_B，尝试获得：lock_A
+  // 程序不会结束
+  ```
+* Java中如何解决死锁
+  * `jps`命令定位线程编号
+    ```java
+    >jps
+    15520 GradleDaemon
+    18208 Jps
+    11160 RemoteMavenServer36
+    12220 DeadLockDemo
+    ```
+  * `jstack`命令找到死锁
+    ```java
+    >jstack 12220
+    
+    ...
+    
+    Found one Java-level deadlock:
+    =============================
+    "T2":
+      waiting to lock monitor 0x0000000002fa8c28 (object 0x000000076b22ef68, a java.lang.String),
+      which is held by "T1"
+    "T1":
+      waiting to lock monitor 0x0000000002fab568 (object 0x000000076b22efa0, a java.lang.String),
+      which is held by "T2"
+
+    Java stack information for the threads listed above:
+    ===================================================
+    "T2":
+            at DeadLockThread.run(DeadLockDemo.java:26)
+            - waiting to lock <0x000000076b22ef68> (a java.lang.String)  // Ctrl+F: 查找 0x000000076b22ef68
+            - locked <0x000000076b22efa0> (a java.lang.String)
+            at java.lang.Thread.run(Thread.java:748)
+    "T1":
+            at DeadLockThread.run(DeadLockDemo.java:26)
+            - waiting to lock <0x000000076b22efa0> (a java.lang.String)  // Ctrl+F: 查找 0x000000076b22efa0
+            - locked <0x000000076b22ef68> (a java.lang.String)
+            at java.lang.Thread.run(Thread.java:748)
+
+    Found 1 deadlock.
+    ```
+
 ### [`Callable<V>`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/Callable.java#L58) 与 [`FutureTask<V>`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/FutureTask.java#L132)
+* 待编写
 
 ### 并发工具类
 #### `CountDownLatch`
