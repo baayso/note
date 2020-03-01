@@ -274,6 +274,61 @@
     * 在单线程上运行IO密集型的任务会导致大量的CPU运算能力浪费在等待上，所以在IO密集型任务中使用多线程可以大大的加速程序运行，即使是在单核CPU上。这种加速主要是利用了被浪费掉的阻塞时间。
     * 1）由于IO密集型任务线程并不是一直在执行任务，则应配置尽可能多的线程。如：`CPU核数 * 2`。
     * 2）IO密集型任务有大部分时间是被阻塞的，故需要多配置线程数。c参考公式：`CPU核数 / (1 - 阻塞系数)`（阻塞系数在 0.8 ~ 0.9之间），比如： `8 / (1 - 0.9) = 80个线程`。
+* 示例代码
+  ```java
+  class CustomThreadPool {
+
+      public static final int availableProcessors = Runtime.getRuntime().availableProcessors();
+
+      public static ExecutorService newThreadPool() {
+          final int poolSize = availableProcessors + 1;
+          final int queueSize = availableProcessors;
+
+          return new ThreadPoolExecutor(
+                  poolSize,
+                  poolSize,
+                  0L,
+                  TimeUnit.MILLISECONDS,
+                  new LinkedBlockingQueue<Runnable>(queueSize),
+                  Executors.defaultThreadFactory(),
+                  new ThreadPoolExecutor.AbortPolicy());
+      }
+
+  }
+
+  public class CustomThreadPoolDemo {
+
+      private static ExecutorService threadPool = CustomThreadPool.newThreadPool();
+
+      public static void main(String[] args) {
+
+          try {
+              for (int i = 1; i <= 10; i++) {
+                  threadPool.execute(() -> {
+                      System.out.println(Thread.currentThread().getName() + "\t 办理业务");
+                  });
+              }
+          }
+          finally {
+              threadPool.shutdown();
+          }
+
+      }
+  }
+  ```
+  ```
+  输出结果：
+  pool-1-thread-1	 办理业务
+  pool-1-thread-4	 办理业务
+  pool-1-thread-3	 办理业务
+  pool-1-thread-3	 办理业务
+  pool-1-thread-2	 办理业务
+  pool-1-thread-6	 办理业务
+  pool-1-thread-5	 办理业务
+  pool-1-thread-7	 办理业务
+  pool-1-thread-4	 办理业务
+  pool-1-thread-1	 办理业务
+  ```
 
 ### [`Callable<V>`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/Callable.java#L58) 与 [`FutureTask<V>`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/FutureTask.java#L132)
 
