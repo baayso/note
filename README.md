@@ -48,6 +48,7 @@
   * [线程池的拒绝策略](https://github.com/baayso/note/blob/master/java/thread/README.md#%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%9A%84%E6%8B%92%E7%BB%9D%E7%AD%96%E7%95%A5)
   * [使用`Executors`创建线程池的问题](https://github.com/baayso/note/blob/master/java/thread/README.md#%E4%BD%BF%E7%94%A8executors%E5%88%9B%E5%BB%BA%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%9A%84%E9%97%AE%E9%A2%98)
   * [自定义线程池](https://github.com/baayso/note/blob/master/java/thread/README.md#%E8%87%AA%E5%AE%9A%E4%B9%89%E7%BA%BF%E7%A8%8B%E6%B1%A0)
+  * [死锁](https://github.com/baayso/note/blob/master/java/thread/README.md#%E6%AD%BB%E9%94%81deaklock)
   * [`Callable<V>`与`FutureTask<V>`](https://github.com/baayso/note/blob/master/java/thread/README.md#callablev-%E4%B8%8E-futuretaskv)
   * [`Thread#start()`](https://github.com/baayso/note/blob/master/java/thread/Thread#start().md)
   * [并发工具类](https://github.com/baayso/note/blob/master/java/thread/README.md#%E5%B9%B6%E5%8F%91%E5%B7%A5%E5%85%B7%E7%B1%BB)
