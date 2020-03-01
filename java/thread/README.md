@@ -247,7 +247,7 @@
 
 ### 线程池的拒绝策略
 * 线程池的拒绝策略是什么
-  * 当线程池中的线程达到了`maximumPoolSize`，无法继续创建新的线程，并且等待队列也已经装满，无法继续接收新任务进入队列。此时就需要拒绝策略机制合理的处理这个问题。
+  * 当任务等待队列已经装满，无法继续接收新任务进入队列，并且线程池中的线程也已经达到了`maximumPoolSize`，无法继续创建新的线程。此时就需要拒绝策略机制合理的处理这个问题。
 * JDK内置的拒绝策略（均实现了[`RejectedExecutionHandler`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/RejectedExecutionHandler.java#L44)接口）
   * [`AbortPolicy`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/ThreadPoolExecutor.java#L2047)：[**默认的拒绝策略**](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/ThreadPoolExecutor.java#L550)，直接抛出[`RejectedExecutionException`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/RejectedExecutionException.java)异常阻止系统正常运行。
   * [`CallerRunsPolicy`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/ThreadPoolExecutor.java#L2023)：该策略不会抛弃任务，也不会抛出异常，而是将某些任务回退给调用者，从而降低新任务的流量。
