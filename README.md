@@ -1,6 +1,11 @@
 # NOTE
 > 学习笔记
 
+## [Linux](https://github.com/baayso/note/tree/master/linux)
+  * [性能评估相关的命令](https://github.com/baayso/note/tree/master/linux#%E6%80%A7%E8%83%BD%E8%AF%84%E4%BC%B0%E7%9B%B8%E5%85%B3%E7%9A%84%E5%91%BD%E4%BB%A4)
+  * [生产环境分析及定位CPU占用过高的思路](https://github.com/baayso/note/tree/master/linux#%E7%94%9F%E4%BA%A7%E7%8E%AF%E5%A2%83%E5%88%86%E6%9E%90%E5%8F%8A%E5%AE%9A%E4%BD%8Dcpu%E5%8D%A0%E7%94%A8%E8%BF%87%E9%AB%98%E7%9A%84%E6%80%9D%E8%B7%AF)
+  * [JDK自带的JVM监控和性能分析工具](https://github.com/baayso/note/tree/master/linux#jdk%E8%87%AA%E5%B8%A6%E7%9A%84jvm%E7%9B%91%E6%8E%A7%E5%92%8C%E6%80%A7%E8%83%BD%E5%88%86%E6%9E%90%E5%B7%A5%E5%85%B7)
+
 ## [Java](https://github.com/baayso/note/tree/master/java)
 * [Java8新特性](https://github.com/baayso/note/blob/master/java/java8)
   * [Lambda](https://github.com/baayso/note/tree/master/java/java8#1-lambda)
