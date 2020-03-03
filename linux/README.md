@@ -67,8 +67,8 @@
       * wa：系统等待I/O的CPU时间百分比。
       * st：来自于一个虚拟机偷取CPU时间的百分比。
   * 安装`sysstat`工具
-    * CentOS: `sudo yum install sysstat`
-    * Ubuntu: `sudo apt-get install sysstat`
+    * CentOS：`sudo yum install sysstat`
+    * Ubuntu：`sudo apt-get install sysstat`
   * `mpstat -P ALL 2`：查看所有CPU核心信息（需先安装`sysstat`）
     ```
     $ mpstat -P ALL 2
@@ -96,7 +96,7 @@
     平均时间:    2    6.24    0.00   12.85    0.00    0.00    0.00    0.00    0.00    0.00   80.91
     平均时间:    3   17.27    0.00   26.87    0.00    0.00    0.00    0.00    0.00    0.00   55.85
     ```
-  * `pidstat -u 1 -p 进程编号`：每个进程使用CPU的用量分解信息（需先安装`sysstat`）
+  * `pidstat -u [采样间隔秒数] -p [进程编号]`：显示指定进程的CPU使用统计（需先安装`sysstat`）
      ```
      $ pidstat -u 1 -p 5240
      Linux 4.15.0-30deepin-generic (baayso-linux) 	03/03/2020 	_x86_64_	(4 CPU)
@@ -115,11 +115,79 @@
      平均时间:  1000      5240   20.98   36.51    0.00   57.49     -  java
      ```
 * **内存**
-  * `free`
+  * `free`：显示系统内存的使用情况，包括物理内存、交换内存（swap）和内核缓冲区内存
+    * `-m`：以MB为单位显示内存使用情况
+    * `-s <间隔秒数>`：持续观察内存使用状况
+    * `free -m`
+      ```
+      $ free -m
+                    total        used        free      shared  buff/cache   available
+      Mem:           3944        1186         334          26        2422        2473
+      Swap:          4095           0        4095
+      ```
+    * 经验值
+      * 可用内存/系统物理内存 > 70%，内存充足
+      * 可用内存/系统物理内存 < 20%，内存不足，需增加内存
+      * 20% < 可用内存/系统物理内存 < 70%，内存基本够用
+  * `pidstat -r [采样间隔秒数] -p [进程编号]`：显示指定进程的内存使用统计（需先安装`sysstat`）
+    ```
+    $ pidstat -r 1 -p 5479
+    Linux 4.15.0-30deepin-generic (baayso-linux) 	03/03/2020 	_x86_64_	(4 CPU)
+
+    12:35:00 PM   UID       PID  minflt/s  majflt/s     VSZ     RSS   %MEM  Command
+    12:35:01 PM  1000      5479      0.00      0.00 3356616  161316   3.99  java
+    12:35:02 PM  1000      5479      1.00      0.00 3356616  161316   3.99  java
+    12:35:03 PM  1000      5479      0.00      0.00 3356616  161316   3.99  java
+    12:35:04 PM  1000      5479      0.00      0.00 3356616  161316   3.99  java
+    12:35:05 PM  1000      5479      0.00      0.00 3356616  161316   3.99  java
+    12:35:06 PM  1000      5479      0.00      0.00 3356616  161316   3.99  java
+    12:35:07 PM  1000      5479      1.00      0.00 3356616  161316   3.99  java
+    ^C
+    平均时间:  1000      5479      0.29      0.00 3356616  161316   3.99  java
+    ```
 * **硬盘**
-  * `df`
+  * `df`：查看磁盘使用情况
+    * `-h`：`--human-readable`，使用人类可读的格式
+    * `df -h`
+      ```
+      $ df -h
+      FileSystem      Size  Used  Avail  Use%  Mounted on
+      /dev/sda1       98G   14G   80G    15%   /
+      ```
 * **硬盘IO**
-  * `iostat`
+  * `iostat`：磁盘I/O性能评估
+    * * `iostat [-xdk] [delay [count]]`
+    * `-x`：输出更详细的I/O设备统计信息。
+    * `-d`：单独输出Device结果，不包括CPU结果。
+    * `-k/-m`：输出结果以kB/mB为单位，而不是以扇区数为单位。
+    * `delay`：刷新时间间隔。如果不指定，只显示一条结果。
+    * `count`：刷新次数。如果不指定刷新次数，但指定了刷新时间间隔，这时刷新次数为无穷。
+    ```
+    $ iostat -xdk 2 3
+    Linux 4.15.0-30deepin-generic (baayso-linux) 	03/03/2020 	_x86_64_	(4 CPU)
+
+    Device:         rrqm/s   wrqm/s     r/s     w/s    rkB/s    wkB/s avgrq-sz avgqu-sz   await r_await w_await  svctm  %util
+    scd0              0.00     0.00    0.01    0.00     0.05     0.00     6.74     0.00    0.46    0.46    0.00   0.46   0.00
+    sda               4.44     2.77   18.87   63.64   626.93  1044.73    40.52     6.48   78.41   36.02   90.97   1.46  12.05
+
+    Device:         rrqm/s   wrqm/s     r/s     w/s    rkB/s    wkB/s avgrq-sz avgqu-sz   await r_await w_await  svctm  %util
+    scd0              0.00     0.00    0.00    0.00     0.00     0.00     0.00     0.00    0.00    0.00    0.00   0.00   0.00
+    sda               0.00     1.50    0.50    1.00     4.00    10.00    18.67     0.03   17.33   32.00   10.00  17.33   2.60
+
+    Device:         rrqm/s   wrqm/s     r/s     w/s    rkB/s    wkB/s avgrq-sz avgqu-sz   await r_await w_await  svctm  %util
+    scd0              0.00     0.00    0.00    0.00     0.00     0.00     0.00     0.00    0.00    0.00    0.00   0.00   0.00
+    sda               0.00     0.50    0.00    0.50     0.00     4.00    16.00     0.00    4.00    0.00    4.00   4.00   0.20
+    ```
+    * `rkB/s`：每秒读取数据量kB。
+    * `wkB/s`：每秒写入数据量kB。
+    * `svctm：I/O请求的平均服务时间，单位毫秒。
+    * `await：I/O请求的平均等待时间，单位毫秒；值越小，性能越好。
+    * **`util`：每秒有百分之几的时间用于I/O操作。接近100%时，表示磁盘带宽跑满，需要优化程序或者增加磁盘。**
+    * `rkB/s`、`wkB/s`根据系统应用的不同会有不同的值，但有规律遵循：长期、超大数据读写，肯定不正常，需要优化程序。
+    * `svctm`的值与`await`的值很接近，表示几乎没有I/O等待，磁盘性能好。如果`await`值远高于`svctm`的值，则表示I/O队列等待时间太长，需要优化程序或者更换性能更好的磁盘。
+  * `pidstat -d [采样间隔秒数] -p [进程编号]`
+    ```
+    ```
 * **网络IO**
   * `ifstat`
 
