@@ -2,7 +2,7 @@
 
 ### 性能评估相关的命令
 * 整机
-  * `top`（切换内存的显示单位：top运行时，顶部内存信息按E切换，下方进程信息按e切换）
+  * `top`（切换内存的显示单位：top运行时，顶部内存信息按`E`切换，下方进程信息按`e`切换）
     ```
     top - 10:14:03 up 34 min,  1 user,  load average: 2.27, 2.57, 2.18
     Tasks: 180 total,   2 running, 127 sleeping,   0 stopped,   0 zombie
@@ -11,9 +11,7 @@
     MiB Swap: 4095.996 total, 4095.996 free,    0.000 used. 2729.422 avail Mem 
 
      PID  USER      PR  NI    VIRT    RES    SHR S  %CPU %MEM     TIME+ COMMAND
-
-     5240 baayso    20   0 3277.9m  53.6m  15.8m S  67.8  1.4  12:24.83 java
-
+     5240 baayso    20   0 3277.9m  53.6m  15.8m S  67.8  1.4  12:24.83 java             // 注意
      4634 baayso    20   0  593.8m  41.5m  29.4m R  58.8  1.1  13:33.44 deepin-terminal
      5611 root      20   0    0.0m   0.0m   0.0m I  22.9  0.0   0:18.48 kworker/u8:2
      5306 root      20   0    0.0m   0.0m   0.0m I  13.3  0.0   1:32.48 kworker/u8:5
