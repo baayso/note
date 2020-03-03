@@ -4,6 +4,7 @@
 * 整机
   * `top`（切换内存的显示单位：top运行时，顶部内存信息按`E`切换，下方进程信息按`e`切换）
     ```
+    $ top
     top - 10:14:03 up 34 min,  1 user,  load average: 2.27, 2.57, 2.18
     Tasks: 180 total,   2 running, 127 sleeping,   0 stopped,   0 zombie
     %Cpu(s): 18.3 us, 28.5 sy,  0.0 ni, 53.0 id,  0.1 wa,  0.0 hi,  0.1 si,  0.0 st
@@ -36,6 +37,7 @@
     ```
   * `uptime`：精简版系统性能命令
     ```
+    $ uptime
     10:25:43 up 46 min,  1 user,  load average: 2.29, 2.64, 2.49
     ```
 * CPU
