@@ -234,16 +234,92 @@
 
 ### 生产环境分析及定位CPU占用过高的思路
 > 结合Linux和JDK相关工具
+* 示例代码：
+  ```java
+  // 编译后运行下面这段代码
+  // javac EndlessLoopDemo.java
+  // java EndlessLoopDemo
+
+  1 public class EndlessLoopDemo {
+  2     public static void main(String[] args) {
+  3         while (true) {
+  4             System.out.println(new java.util.Random().nextInt(99999999));
+  5         }
+  6     }
+  7 }
+  ```
 * 1）先用`top`命令找出CPU占用比最高的进程
 * 2）`ps -ef | grep java`或者`jps`进一步定位有异常的进程
 * **3）定位到具体线程或者代码**
-  * `ps -mp 进程 -0 THREAD,tid,time`
+  * `ps -mp <进程ID> -o THREAD,tid,time`
     * `-m`：显示所有的线程
     * `-p pid`：进程使用CPU的时间
     * `-o`：该参数后面为用户自定义格式
-* 4）将需要的`线程ID`转换为16进制格式（小写英文格式）
-  * `printf "%x\n" 线程ID`
-* 5）`jstack 进程ID | grep tid(16进制小写英文格式的线程ID) -A60`
+    ```
+    $ ps -mp 6091 -o THREAD,tid,time
+    USER     %CPU PRI SCNT WCHAN  USER SYSTEM   TID     TIME
+    baayso   77.9   -    - -         -      -     - 00:15:28
+    baayso    0.0  19    - futex_    -      -  6091 00:00:00
+    baayso   76.8  19    - -         -      -  6092 00:15:23    // 此线程占用CPU过高，线程ID为6092
+    baayso    0.2  19    - futex_    -      -  6093 00:00:01
+    baayso    0.1  19    - futex_    -      -  6094 00:00:01
+    baayso    0.1  19    - futex_    -      -  6095 00:00:00
+    baayso    0.3  19    - futex_    -      -  6096 00:00:01
+    baayso    0.0  19    - futex_    -      -  6097 00:00:00
+    baayso    0.0  19    - futex_    -      -  6098 00:00:00
+    baayso    0.0  19    - futex_    -      -  6099 00:00:00
+    baayso    0.0  19    - futex_    -      -  6100 00:00:00
+    baayso    0.0  19    - futex_    -      -  6101 00:00:00
+    baayso    0.0  19    - futex_    -      -  6102 00:00:00
+    baayso    0.0  19    - futex_    -      -  6103 00:00:00
+    baayso    0.0  19    - futex_    -      -  6104 00:00:00
+    baayso    0.0  19    - futex_    -      -  6105 00:00:00
+    baayso    0.0  19    - skb_wa    -      -  6387 00:00:00
+    ```
+* 4）将需要的`线程ID`转换为十六进制格式（小写英文格式）
+  * `printf "%x\n" <线程ID>`
+    ```
+    $ printf "%x\n" 6092
+    17cc
+    ```
+* 5）`jstack <进程ID> | grep <十六进制小写英文格式的线程ID> -A60`
+  ```
+  $ jstack 6091 | grep 17cc -A60
+  "main" #1 prio=5 os_prio=0 tid=0x00007f92b400a800 nid=0x17cc runnable [0x00007f92bca48000]
+     java.lang.Thread.State: RUNNABLE
+   at java.io.FileOutputStream.writeBytes(Native Method)
+   at java.io.FileOutputStream.write(FileOutputStream.java:326)
+   at java.io.BufferedOutputStream.flushBuffer(BufferedOutputStream.java:82)
+   at java.io.BufferedOutputStream.flush(BufferedOutputStream.java:140)
+   - locked <0x00000000c2416e10> (a java.io.BufferedOutputStream)
+   at java.io.PrintStream.write(PrintStream.java:482)
+   - locked <0x00000000c24053a0> (a java.io.PrintStream)
+   at sun.nio.cs.StreamEncoder.writeBytes(StreamEncoder.java:221)
+   at sun.nio.cs.StreamEncoder.implFlushBuffer(StreamEncoder.java:291)
+   at sun.nio.cs.StreamEncoder.flushBuffer(StreamEncoder.java:104)
+   - locked <0x00000000c2405358> (a java.io.OutputStreamWriter)
+   at java.io.OutputStreamWriter.flushBuffer(OutputStreamWriter.java:185)
+   at java.io.PrintStream.write(PrintStream.java:527)
+   - eliminated <0x00000000c24053a0> (a java.io.PrintStream)
+   at java.io.PrintStream.print(PrintStream.java:597)
+   at java.io.PrintStream.println(PrintStream.java:736)
+   - locked <0x00000000c24053a0> (a java.io.PrintStream)
+   at EndlessLoopDemo.main(EndlessLoopDemo.java:4)                  // 有问题的代码的具体位置
+
+  "VM Thread" os_prio=0 tid=0x00007f92b4078800 nid=0x17d1 runnable 
+
+  "GC task thread#0 (ParallelGC)" os_prio=0 tid=0x00007f92b401f800 nid=0x17cd runnable 
+
+  "GC task thread#1 (ParallelGC)" os_prio=0 tid=0x00007f92b4021800 nid=0x17ce runnable 
+
+  "GC task thread#2 (ParallelGC)" os_prio=0 tid=0x00007f92b4023000 nid=0x17cf runnable 
+
+  "GC task thread#3 (ParallelGC)" os_prio=0 tid=0x00007f92b4025000 nid=0x17d0 runnable 
+
+  "VM Periodic Task Thread" os_prio=0 tid=0x00007f92b40cb800 nid=0x17d9 waiting on condition 
+
+  JNI global references: 5
+  ```
 
 ### [JDK自带的JVM监控和性能分析工具](https://docs.oracle.com/javase/8/docs/technotes/tools/)
 * `jps`：虚拟机进程状况工具
