@@ -154,7 +154,7 @@
       FileSystem      Size  Used  Avail  Use%  Mounted on
       /dev/sda1       98G   14G   80G    15%   /
       ```
-* **硬盘IO**
+* **硬盘I/O**
   * `iostat`：磁盘I/O性能评估
     * * `iostat [-xdk] [delay [count]]`
     * `-x`：输出更详细的I/O设备统计信息。
@@ -187,9 +187,49 @@
     * `svctm`的值与`await`的值很接近，表示几乎没有I/O等待，磁盘性能好。如果`await`值远高于`svctm`的值，则表示I/O队列等待时间太长，需要优化程序或者更换性能更好的磁盘。
   * `pidstat -d [采样间隔秒数] -p [进程编号]`
     ```
+    pidstat -d 2 -p 2833
+    Linux 4.15.0-30deepin-generic (baayso-linux) 	03/03/2020 	_x86_64_	(4 CPU)
+
+    01:52:07 PM   UID       PID   kB_rd/s   kB_wr/s kB_ccwr/s iodelay  Command
+    01:52:09 PM  1000      2833      0.00      3.98      0.00       0  java
+    01:52:11 PM  1000      2833      0.00      0.00      0.00       0  java
+    01:52:13 PM  1000      2833      0.00      0.00      0.00       0  java
+    01:52:15 PM  1000      2833      0.00      0.00      0.00       0  java
+    01:52:17 PM  1000      2833      0.00      0.00      0.00       0  java
+    01:52:19 PM  1000      2833      0.00      0.00      0.00       0  java
+    01:52:21 PM  1000      2833      0.00      0.00      0.00       0  java
+    01:52:23 PM  1000      2833      0.00      0.00      0.00       0  java
+    ^C
+    平均时间:  1000      2833      0.00      0.47      0.00       0  java
     ```
-* **网络IO**
-  * `ifstat`
+* **网络I/O**
+  * `ifstat`：网络流量实时监控
+    * 安装
+      ```
+      wget http://distfiles.macports.org/ifstat/ifstat-1.1.tar.gz
+      tar xzvf ifstat-1.1.tar.gz
+      cd ifstat-1.1
+      ./configure
+      make
+      make install
+      ```
+    * `ifstat -tT [delay [count]]`
+      * `-t`：在每一行的开头加一个时间戳。
+      * `-T`：报告所有监测接口的全部带宽（最后一列有个total，显示所有的接口的in流量和所有接口的out流量，简单的把所有接口的in流量相加，out流量相加）。
+      * `delay`：刷新时间间隔。如果不指定，只显示一条结果。
+      * `count`：刷新次数。如果不指定刷新次数，但指定了刷新时间间隔，这时刷新次数为无穷。
+      ```
+      $ ifstat -t 1
+        Time          enp0s3      
+      HH:MM:SS   KB/s in  KB/s out
+      14:36:37      0.00      0.00
+      14:36:38     13.97      0.74
+      14:36:39     53.03      0.70
+      14:36:40      3.22      0.22
+      14:36:41      0.00      0.00
+      14:36:42      0.00      0.00
+      14:36:43      0.00      0.00
+      ```
 
 ### 生产环境分析及定位CPU占用过高的思路
 > 结合Linux和JDK相关工具
