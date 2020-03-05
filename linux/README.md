@@ -323,12 +323,64 @@
 
 ### [JDK自带的JVM监控和性能分析工具](https://docs.oracle.com/javase/8/docs/technotes/tools/)
 * `jps`：虚拟机进程状况工具
+  * `jps -l`：输出应用程序main class的完整package名或者应用程序的JAR文件完整路径名
 * `jinfo`：Java配置信息工具
+  * `jinfo -flags <进程ID>`：输出JVM全部参数
+  * `jinfo -flag name <进程ID>`：输出对应名称的参数
+     ```
+     $ jinfo -flag InitialHeapSize 25152
+     -XX:InitialHeapSize=268435456
+
+    $ jinfo -flag PrintFlagsFinal 25152
+    -XX:-PrintFlagsFinal
+     ```
+  * `jinfo -flag [+|-]name <进程ID>`：开启或者关闭对应名称的参数
+     ```
+     $ jinfo -flag PrintGCDetails 25152
+     -XX:-PrintGCDetails
+
+     $ jinfo -flag +PrintGCDetails 25152
+     （无任务输出表示设置成功）
+
+     $ jinfo -flag PrintGCDetails 25152
+     -XX:+PrintGCDetails
+     ```
+  * `jinfo -flag name=value <进程ID>`：设定对应名称的参数
 * `jmap`：内存映像工具
   * `jmap -heap 进程ID`：映射堆快照
-  * 抓取堆内存
-    * 生成hprof文件并下载到本地
-    * [MAT分析插件工具](https://www.eclipse.org/mat/downloads.php)
+  * `jmap -dump:format=b,file=[dumpFileName] <进程ID>`：抓取堆内存，生成指定进程的hprof文件并保存到指定位置
+    ```
+    $ jmap -dump:format=b,file=/tmp/heap_dump.hprof 25152
+    Dumping heap to /tmp/heap_dump.hprof ...
+    Heap dump file created
+    ```
+* 堆内存溢出时，保存内存快照
+  > 在[`JAVA_OPTIONS`变量](https://github.com/baayso/ieasy-server/blob/master/bin/start.sh)中增加以下参数
+  * `-XX:+HeapDumpOnOutOfMemoryError`：配置该参数表示当JVM发生OOM时，自动生成DUMP文件。也可以通过`-XX:HeapDumpPath=${保存路径}`来显示指定保存路径
+    ```
+    -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp/heap_dump.hprof
+    ```
+  * `-XX:OnOutOfMemoryError`参数允许用户指定当出现OOM时，指定某个脚本来完成一些动作。
+    ```
+    -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp/heap_dump.hprof -XX:OnOutOfMemoryError="sh ~/oom_test.sh"
+    ```
+* 使用`jconsole`选项通过`HotSpotDiagnosticMXBean`从运行时获得堆转储（生成hprof文件）。
+* JVM堆内存分析
+  * `jhat`：Java Heap Analysis Tool，是一个用来分析JVM堆情况的命令。
+    ```
+    $ jhat -port 8082 /tmp/heap_dump.hprof
+    jhat -port 8082 /tmp/heap_dump.hprof
+    Reading from /tmp/heap_dump.hprof...
+    Dump file created Thu Mar 05 12:56:48 CST 2020
+    Snapshot read, resolving...
+    Resolving 440396 objects...
+    Chasing references, expect 88 dots.................................................................
+    Eliminating duplicate references.................................................................
+    Snapshot resolved.
+    Started HTTP server on port 8082
+    Server is ready.
+    ```
+  * [MAT分析插件工具](https://www.eclipse.org/mat/downloads.php)：MAT是Memory Analyzer的简称，是一款功能强大的JVM堆内存分析器。
 * `jstat`：统计信息监视工具
   * `jstat`命令可以查看堆内存各部分的使用量，以及加载类的信息
   * `jstat [-命令选项][vm进程ID] 间隔时间(单位毫秒) 查询次数`
