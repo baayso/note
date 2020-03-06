@@ -55,7 +55,7 @@
   * [自定义线程池](https://github.com/baayso/note/blob/master/java/thread/README.md#%E8%87%AA%E5%AE%9A%E4%B9%89%E7%BA%BF%E7%A8%8B%E6%B1%A0)
   * [死锁](https://github.com/baayso/note/blob/master/java/thread/README.md#%E6%AD%BB%E9%94%81deaklock)
   * [`Callable<V>`与`FutureTask<V>`](https://github.com/baayso/note/blob/master/java/thread/README.md#callablev-%E4%B8%8E-futuretaskv)
-  * [`Thread#start()`](https://github.com/baayso/note/blob/master/java/thread/Thread#start().md)
+  * [`Thread#start()`](https://github.com/baayso/note/blob/master/java/thread/Thread.start().md)
   * [并发工具类](https://github.com/baayso/note/blob/master/java/thread/README.md#%E5%B9%B6%E5%8F%91%E5%B7%A5%E5%85%B7%E7%B1%BB)
     * [`CountDownLatch`](https://github.com/baayso/note/blob/master/java/thread/README.md#countdownlatch)
     * [`CyclicBarrier`](https://github.com/baayso/note/blob/master/java/thread/README.md#cyclicbarrier)
