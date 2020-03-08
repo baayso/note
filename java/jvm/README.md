@@ -1,8 +1,11 @@
 # JVM（Java Virtual Machine，Java虚拟机）
 
 ### JVM内存结构
+* 请阅读[精美图文带你掌握 JVM 内存布局](https://juejin.im/post/5e0708baf265da33c34e495b)
 
 ### GC作用区域
+* 堆区
+* 方法区
 
 ### 判断对象是否可回收
 * 引用计数法
@@ -26,7 +29,79 @@
     * 方法区中常量引用的对象
     * 本地方法栈中JNI（Native方法）引用的对象
 
-### 
+### JVM调优和参数配置，查看JVM参数默认值
+* JVM的参数类型
+  * 标配参数
+    * `-version`
+    * `-help`
+    * `-showversion`：输出产品版本并继续
+  * X参数（了解）
+    * `-Xint`：解释执行
+      ```
+      $ java -Xint -version
+      java version "1.8.0_202"
+      Java(TM) SE Runtime Environment (build 1.8.0_202-b08)
+      Java HotSpot(TM) 64-Bit Server VM (build 25.202-b08, interpreted mode)
+      ```
+    * `-Xcomp`：第一次使用就编译成本地代码
+      ```
+      $ java -Xcomp -version
+      java version "1.8.0_202"
+      Java(TM) SE Runtime Environment (build 1.8.0_202-b08)
+      Java HotSpot(TM) 64-Bit Server VM (build 25.202-b08, compiled mode)
+      ```
+    * `-Xmixed`：混合模式（默认）
+      ```
+      $ java -version
+      java version "1.8.0_202"
+      Java(TM) SE Runtime Environment (build 1.8.0_202-b08)
+      Java HotSpot(TM) 64-Bit Server VM (build 25.202-b08, mixed mode)
+      ```
+  * XX参数（重点）
+    * Boolean类型
+      > `-XX:+[属性]`表示开启某个属性，`-XX:-<属性>`表示关闭某个属性
+      * 是否打印GC收集细节
+        * `-XX:+PrintGCDetails`
+        * `-XX:-PrintGCDetails`
+      * 是否使用串行垃圾回收器
+        * `-XX:+UseSerialGC`
+        * `-XX:-UseSerialGC`
+    * KV键值类型
+      > `-XX:[属性键]=[属性值]`
+      * `-XX:MetaspaceSize=128m`
+      * `-XX:MaxTenuringThreshold=15`
+    * 使用`jinfo`查看当前运行程序的配置
+      * jinfo -flags <进程ID>：输出JVM全部参数
+      * jinfo -flag name <进程ID>：输出对应名称的参数
+        ```
+        $ jinfo -flag InitialHeapSize 25152
+        -XX:InitialHeapSize=268435456
+
+        $ jinfo -flag PrintFlagsFinal 25152
+        -XX:-PrintFlagsFinal
+        ```
+    * 其他
+      * **`-Xms`：等价于`-XX:InitialHeapSize`**
+      * **`-Xmx`：等价于`-XX:MaxHeapSize`**
+* 查看JVM参数默认值
+  * 查看初始默认值
+    * `java -XX:+PrintFlagsInitial`
+  * 查看修改更新
+    * `java -XX:+PrintFlagsFinal -version`
+  * `=`与`:=`
+    > `=`为默认值，`:=`为修改过的值
+    ```
+      uintx MaxMetaspaceSize          = 4294901760          {product}
+      uintx MaxNewSize               := 1424490496          {product}
+    ```
+  * 打印命令行参数
+    ```
+    $ java -XX:+PrintCommandLineFlags -version
+    -XX:InitialHeapSize=267109312 -XX:MaxHeapSize=4273748992 -XX:+PrintCommandLineFlags -XX:+UseCompressedClassPointers -XX:+UseCompressedOops -XX:-UseLargePagesIndividualAllocation -XX:+UseParallelGC
+    java version "1.8.0_202"
+    Java(TM) SE Runtime Environment (build 1.8.0_202-b08)
+    Java HotSpot(TM) 64-Bit Server VM (build 25.202-b08, mixed mode)
+    ```
 
 ### GC（Garbage Collection，垃圾回收）算法
 * 引用计数
