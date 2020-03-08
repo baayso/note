@@ -2,6 +2,11 @@
 
 ### JVM内存结构
 * 请阅读[精美图文带你掌握 JVM 内存布局](https://juejin.im/post/5e0708baf265da33c34e495b)
+* Java8之后，永久代已经被移除，使用元空间取代。元空间的本质与永久代类似。
+* 元空间与永久代之间最大的区别：
+  * 永久代使用JVM的堆内存
+  * 元空间使用本机物理内存，不在JVM堆内存中。
+  * 默认情况下，元空间的大小受本机物理内存限制。类的元数据放入 native memory，字符串池和类的静态变量放入JVM堆中，这样可以加载多少类的元数据就不再由`MaxPermSize`控制，而是由系统的实际可用空间来控制。
 
 ### GC作用区域
 * 堆区
@@ -103,10 +108,77 @@
     Java HotSpot(TM) 64-Bit Server VM (build 25.202-b08, mixed mode)
     ```
 
+### 常用的基本配置参数
+* `-Xms`：等价于`-XX:InitialHeapSize`
+  * 初始内存大小，默认为物理内存的1/64
+* `-Xmx`：等价于`-XX:MaxHeapSize`
+  * 最大分配内存，默认为物理内存的1/4
+* `-Xss`：等价于`-XX:ThreadStackSize`
+  * 单个线程的内存大小，一般默认为512K~1024K
+  ```
+  -Xss size
+  Sets the thread stack size (in bytes).
+  Append the letter k or K to indicate KB, m or M to indicate MB, g or G to indicate GB.
+  The default value depends on the platform:
+
+  Linux/ARM (32-bit): 320 KB
+  Linux/i386 (32-bit): 320 KB
+  Linux/x64 (64-bit): 1024 KB
+  OS X (64-bit): 1024 KB
+  Oracle Solaris/i386 (32-bit): 320 KB
+  Oracle Solaris/x64 (64-bit): 1024 KB
+  Windows: The default value depends on virtual memory
+
+  The following examples set the thread stack size to 1024 KB in different units:
+
+  -Xss1m
+  -Xss1024k
+  -Xss1048576
+
+  This option is equivalent to -XX:ThreadStackSize.
+  ```
+* `-Xmn`
+  * 设置年轻代大小
+* `-XX:MetaspaceSize`
+  * 设置元空间的大小
+  * 元空间的本质和永久代类似，都是对JVM规范中的方法区的实现。不过元空间与永久代之间最大的区别在于：元空间并不使用虚拟机堆空间，而是使用本地内存。因此，默认情况下，元空间大小受本地内存限制。
+  * `-Xms10m -Xmx10m -XX:MetaspaceSize=1024m -XX:+PrintFlagsFinal`
+* `-XX:PrintGCDetails`
+  * 输出详细GC收集日志信息
+  * GC
+  * FullGC
+* `-XX:SurvivorRatio`
+  * 设置新生代中`Eden`和`S0/S1`空间的比例
+  * 默认：`-XX:SurvivorRatio=8`，Eden:S0:S1=8:1:1
+  * 例如：`-XX:SurvivorRatio=4`，Eden:S0:S1=4:1:1
+  * `-XX:SurvivorRatio`值就是设置`Eden`区的比例点多少，`S0/S1`比例相同
+* `-XX:NewRatio`
+  * 设置新生代（年轻代）与老年代在堆内存的占比
+  * 默认：`-XX:NewRatio=2`，新生代占1，老年代占2，新生代占整个堆内存的1/3
+  * 例如：`-XX:NewRatio=4`，新生代占1，老年代占4，新生代占整个堆内存的1/5
+  * `-XX:NewRatio`值就是设置老年代的占比，剩下的1给新生代（年轻代）
+* `-XX:MaxTenuringThreshold`
+  * 该参数主要是控制新生代需要经历多少次GC晋升到老年代中的最大阈值。
+  * 在JVM中用4个bit存储（放在对象头中），所以其最大值是15。
+  * 但并非意味着对象必须要经历15次YGC才会晋升到老年代中。例如，当Survivor区空间不够时，便会提前进入到老年代中，但这个次数一定不大于设置的最大阈值。
+  * 如果设置为0，则新生代对象不经过Survivor区，直接进入老年代。对于老年代空间大的应用，可以提高效率。如果将此值设置为一个较大值，则新生代对象会在Survivor区进行多次复制，这样可以增加对象在新生代的存活时间，增加在新生代被回收的概率。
+* 案例
+
+### 强引用、软引用、弱引用、虚引用
+
+### OOM
+
 ### GC（Garbage Collection，垃圾回收）算法
 * 引用计数
 * 复制
 * 标记-清除
 * 标记-清除-整理
 
-###
+### 垃圾回收器
+
+### 生产环境上配置垃圾回收器
+
+### G1垃圾回收器
+
+### 生产环境诊断和评估性能
+
