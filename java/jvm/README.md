@@ -145,8 +145,73 @@
   * `-Xms10m -Xmx10m -XX:MetaspaceSize=1024m -XX:+PrintFlagsFinal`
 * `-XX:PrintGCDetails`
   * 输出详细GC收集日志信息
-  * GC
-  * FullGC
+    ```
+    -Xms10m -Xmx10m -XX:+PrintCommandLineFlags -XX:+PrintGCDetails -XX:+UseParallelGC
+    ```
+    ```
+    [GC (Allocation Failure) [PSYoungGen: 1966K->503K(2560K)] 1966K->997K(9728K), 0.0008437 secs] [Times: user=0.00 sys=0.00, real=0.00 secs] 
+    [GC (Allocation Failure) [PSYoungGen: 2551K->488K(2560K)] 3045K->1379K(9728K), 0.0008770 secs] [Times: user=0.00 sys=0.00, real=0.00 secs] 
+    [GC (Allocation Failure) [PSYoungGen: 2536K->504K(2560K)] 3427K->1677K(9728K), 0.0006665 secs] [Times: user=0.00 sys=0.00, real=0.00 secs] 
+    [GC (Allocation Failure) [PSYoungGen: 1012K->504K(2560K)] 2185K->1758K(9728K), 0.0011944 secs] [Times: user=0.00 sys=0.00, real=0.00 secs] 
+    [GC (Allocation Failure) [PSYoungGen: 504K->504K(2560K)] 1758K->1774K(9728K), 0.0005198 secs] [Times: user=0.00 sys=0.00, real=0.00 secs] 
+    [Full GC (Allocation Failure) [PSYoungGen: 504K->0K(2560K)] [ParOldGen: 1270K->1471K(7168K)] 1774K->1471K(9728K), [Metaspace: 3390K->3390K(1056768K)], 0.0073477 secs] [Times: user=0.06 sys=0.00, real=0.01 secs] 
+    [GC (Allocation Failure) [PSYoungGen: 0K->0K(1536K)] 1471K->1471K(8704K), 0.0002993 secs] [Times: user=0.00 sys=0.00, real=0.00 secs] 
+    [Full GC (Allocation Failure) [PSYoungGen: 0K->0K(1536K)] [ParOldGen: 1471K->1455K(7168K)] 1471K->1455K(8704K), [Metaspace: 3390K->3390K(1056768K)], 0.0082870 secs] [Times: user=0.00 sys=0.00, real=0.01 secs] 
+    Disconnected from the target VM, address: '127.0.0.1:59205', transport: 'socket'
+    Exception in thread "main" java.lang.OutOfMemoryError: Java heap space
+    Heap
+     at GCDetailsDemo.main(GCDetailsDemo.java:10)
+     PSYoungGen      total 1536K, used 82K [0x00000000ffd00000, 0x0000000100000000, 0x0000000100000000)
+      eden space 1024K, 8% used [0x00000000ffd00000,0x00000000ffd14890,0x00000000ffe00000)
+      from space 512K, 0% used [0x00000000fff80000,0x00000000fff80000,0x0000000100000000)
+      to   space 1024K, 0% used [0x00000000ffe00000,0x00000000ffe00000,0x00000000fff00000)
+     ParOldGen       total 7168K, used 1455K [0x00000000ff600000, 0x00000000ffd00000, 0x00000000ffd00000)
+      object space 7168K, 20% used [0x00000000ff600000,0x00000000ff76bca8,0x00000000ffd00000)
+     Metaspace       used 3428K, capacity 4568K, committed 4864K, reserved 1056768K
+      class space    used 369K, capacity 392K, committed 512K, reserved 1048576K
+    ```
+  * 解读GC日志
+    ```
+    [GC (Allocation Failure) [PSYoungGen: 1966K->509K(2560K)] 1966K->1015K(9728K), 0.0123801 secs] [Times: user=0.03 sys=0.02, real=0.01 secs]
+    ```
+    * 规律：[`名称:` `GC前内存占用`->`GC后内存占用`(`该区域内存总大小`)]
+    * `GC (Allocation Failure)`：GC类型
+    * `PSYoungGen:`：新生代（Young区）
+    * `1966K`：GC前新生代内存占用
+    * `509K`：GC后新生代内存占用
+    * `(2560K)`：新生代总大小
+    * `1966K`：GC前JVM堆内存占用
+    * `1015K`：GC后JVM堆内存占用
+    * `(9728K)`：JVM堆总大小
+    * `0.0123801 secs`：GC耗时
+    * `Times: user=0.03`：GC用户耗时
+    * `sys=0.02`：GC系统耗时
+    * `real=0.01 secs`：GC实际耗时
+  * 解读FullGC日志
+    ```
+    [Full GC (Allocation Failure) [PSYoungGen: 510K->0K(2560K)] [ParOldGen: 1229K->1230K(7168K)] 1739K->1230K(9728K), [Metaspace: 3393K->3393K(1056768K)], 0.0084324 secs] [Times: user=0.00 sys=0.00, real=0.01 secs]
+    ```
+    * 规律：[`名称:` `GC前内存占用`->`GC后内存占用`(`该区域内存总大小`)]
+    * `Full GC (Allocation Failure)`：GC类型
+    * `PSYoungGen:`：新生代（Young区）
+    * `510K`：GC前新生代内存占用
+    * `0K`：GC后新生代内存占用
+    * `(2560K)`：新生代总大小
+    * `ParOldGen:`：老年代（Old区）
+    * `1229K`：GC前老年代内存占用
+    * `1230K`：GC后老年代内存占用
+    * `(7168K)`：老年代总大小
+    * `1739K`：GC前JVM堆内存占用
+    * `1230K`：GC后JVM堆内存占用
+    * `(9728K)`：JVM堆总大小
+    * `Metaspace:`：元空间
+    * `3393K`：GC前元空间内存占用
+    * `3393K`：GC后元空间内存占用
+    * `(1056768K)`：元空间总大小
+    * `0.0084324 secs`：GC耗时
+    * `Times: user=0.00`：GC用户耗时
+    * `sys=0.00`：GC系统耗时
+    * `real=0.01 secs`：GC实际耗时
 * `-XX:SurvivorRatio`
   * 设置新生代中`Eden`和`S0/S1`空间的比例
   * 默认：`-XX:SurvivorRatio=8`，Eden:S0:S1=8:1:1
