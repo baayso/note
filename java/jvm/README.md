@@ -146,6 +146,9 @@
 * `-XX:PrintGCDetails`
   * 输出详细GC收集日志信息
     ```
+    jinfo -flag PrintGCDetails <进程编号>
+
+    VM options:
     -Xms10m -Xmx10m -XX:+PrintCommandLineFlags -XX:+PrintGCDetails -XX:+UseParallelGC
     ```
     ```
@@ -227,6 +230,11 @@
   * 在JVM中用4个bit存储（放在对象头中），所以其最大值是15。
   * 但并非意味着对象必须要经历15次YGC才会晋升到老年代中。例如，当Survivor区空间不够时，便会提前进入到老年代中，但这个次数一定不大于设置的最大阈值。
   * 如果设置为0，则新生代对象不经过Survivor区，直接进入老年代。对于老年代空间大的应用，可以提高效率。如果将此值设置为一个较大值，则新生代对象会在Survivor区进行多次复制，这样可以增加对象在新生代的存活时间，增加在新生代被回收的概率。
+  * `jinfo -flag MaxTenuringThreshold <进程编号>`
+    ```
+    $ jinfo -flag MaxTenuringThreshold 22192
+    -XX:MaxTenuringThreshold=15
+    ```
 * 案例
 
 ### 强引用、软引用、弱引用、虚引用
