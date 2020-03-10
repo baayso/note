@@ -337,6 +337,84 @@
     null
     null    // 当系统内存不足时会被回收
     ```
+* **弱引用**
+  * 弱引用需要使用`java.lang.ref.WeakReference<T>`类来实现，它比软引用的生存期更短；
+  * 对于只有弱引用的对象来说，只要垃圾回收一运行，不管JVM的内存空间是否足够，都会回收该对象占用的内存。
+  ```java
+  public class WeakReferenceDemo {
+
+      public static void main(String[] args) {
+          Object o1 = new Object();
+          WeakReference<Object> ref = new WeakReference<>(o1);
+
+          System.out.println(o1);
+          System.out.println(ref.get());
+
+          o1 = null;
+          System.gc();
+
+          System.out.println("==============================");
+
+          System.out.println(o1);
+          System.out.println(ref.get());
+      }
+
+  }
+  ```
+  ```
+  输出结果：
+  java.lang.Object@15db9742
+  java.lang.Object@15db9742
+  ==============================
+  null
+  null
+  ```
+* **软引用和弱引用的适用场景**
+  * 假如有一个应用需要读取大量的本地图片：
+    * 如果每次读取图片都从硬盘读取则会严重影响性能；
+    * 如果一次性全部加载到内存中又可能造成内存溢出。
+  * 使用软引用可以解决上面的问题：
+    * 设计思路：用一个`HashMap`来保存图片的路径和相应图片对象关联的软引用之间的映射关系，在内存不足时，JVM会自动回收这些缓存图片对象所占用的空间，从而有效的避免了OOM的风险。
+      ```java
+      Map<String, SoftReference<Image>> imageCache = new HashMap<>();
+      ```
+* `java.util.WeakHashMap<K, V>`
+  ```java
+  public class WeakHashMapDemo {
+
+      public static void main(String[] args) {
+          Map<Integer, String> map = new WeakHashMap<>();
+
+          Integer key = new Integer(3);
+          String value = "WeakHashMap";
+
+          map.put(key, value);
+          System.out.println(map);
+
+          System.out.println("=========================");
+
+          key = null;
+          System.out.println(map);
+
+          System.out.println("=========================");
+
+          System.gc();
+
+          System.out.println(map);
+          System.out.println("map size = " + map.size());
+      }
+
+  }
+  ```
+  ```
+  输出结果：
+  {3=WeakHashMap}
+  =========================
+  {3=WeakHashMap}
+  =========================
+  {}
+  map size = 0
+  ```
 
 ### OOM
 
