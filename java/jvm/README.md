@@ -238,6 +238,105 @@
 * 案例
 
 ### 强引用、软引用、弱引用、虚引用
+* **强引用**
+  * 当内存不足，JVM开始垃圾回收，对于强引用的对象，就算是出现了OOM也不会对该对象进行回收，死都不收。
+  * 强引用是我们最常见的普通对象引用，只要还有强引用指问一个对象， 就能表明对象还“活着”，垃圾收集器不会回收这种对象。在Java中最常见的就是强引用，把一个对象赋给一个引用变量，这个引用变量就是一个强引用。当一个对象被强引用变量引用时，它处于可达状态，它是不可能被垃圾回收机制回收的，即使该对象以后水远都不会被用到，JVM也不会回收。因此强引用是造成Java内存泄漏的主要原因之一。
+  * 对于一个普通的对象，如果没有其他的引用关系，只要超过了引用的作用域或者显式地将相应(强)引用赋值为null，一般认为就是可以被垃圾回收（当然具体回收时机还是要看垃圾收集策略）。
+  ```java
+  public class StrongReferenceDemo {
+
+      public static void main(String[] args) {
+          Object obj1 = new Object(); // 强引用
+          Object obj2 = obj1;
+          obj1 = null;
+
+          System.gc();
+
+          System.out.println(obj2);
+      }
+
+  }
+  ```
+  ```
+  输出结果：
+  java.lang.Object@1b701da1
+  ```
+* **软引用**
+  * 软引用是一种相对强引用弱化了一些的引用，需要使用`java.lang.ref.SoftReference<T>`类来实现，可以让对象豁免一些垃圾回收。
+  * 对于只有软引用的对象来说：
+    * 当系统**内存充足**时它**不会**被回收；
+    * 当系统**内存不足**时它**会**被回收。
+  * 软引用通常用在对内存敏感的程序中，比如高速缓存就有用到软引用，内存够用时就保留，不够用时就回收！
+  * 内存足够时：
+    ```java
+    public class SoftReferenceDemo {
+
+        public static void main(String[] args) {
+            Object o1 = new Object();
+            SoftReference<Object> sr = new SoftReference<>(o1);
+
+            System.out.println(o1);
+            System.out.println(sr.get());
+
+            o1 = null;
+            System.gc();
+
+            System.out.println(o1);
+            System.out.println(sr.get());
+        }
+
+    }
+    ```
+    ```
+    输出结果：
+    java.lang.Object@15db9742
+    java.lang.Object@15db9742
+    null
+    java.lang.Object@15db9742    // 当系统内存充足时不会被回收
+    ```
+  * 内存不够时：
+    ```
+    VM options: 
+    -Xms10m -Xmx10m
+    ```
+    ```java
+    import java.lang.ref.SoftReference;
+
+    public class SoftReferenceDemo {
+
+        public static void main(String[] args) {
+            Object o1 = new Object();
+            SoftReference<Object> sr = new SoftReference<>(o1);
+
+            System.out.println(o1);
+            System.out.println(sr.get());
+
+            o1 = null;
+
+            try {
+                byte[] bytes = new byte[50 * 1024 * 1024];
+            }
+            catch (Throwable e) {
+                e.printStackTrace();
+            }
+            finally {
+                System.out.println(o1);
+                System.out.println(sr.get());
+            }
+
+        }
+
+    }
+    ```
+    ```
+    输出结果：
+    java.lang.Object@15db9742
+    java.lang.Object@15db9742
+    java.lang.OutOfMemoryError: Java heap space
+     at SoftReferenceDemo.main(SoftReferenceDemo.java:15)
+    null
+    null    // 当系统内存不足时会被回收
+    ```
 
 ### OOM
 
