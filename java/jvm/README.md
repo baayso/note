@@ -460,6 +460,12 @@
   ```
 
 ### OOM
+* `java.lang.StackOverflowError`
+* `java.lang.OutOfMemoryError: Java heap space`
+* `java.lang.OutOfMemoryError: GC overhead limit exceeded`
+* `java.lang.OutOfMemoryError: Direct buffer memory`
+* `java.lang.OutOfMemoryError: unable to create new native thread`
+* `java.lang.OutOfMemoryError: Metaspace`
 
 ### GC（Garbage Collection，垃圾回收）算法
 * 引用计数
