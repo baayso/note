@@ -510,6 +510,17 @@
   * G1垃圾回收器
     * 将堆内存分割成不同的区域然后并发的对其进行垃圾回收。
   * ZGC垃圾回收器
+
+### 生产环境上配置垃圾回收器
+* 查看默认的垃圾回收器
+  ```
+  $java -XX:+PrintCommandLineFlags -version
+  -XX:InitialHeapSize=267109312 -XX:MaxHeapSize=4273748992 -XX:+PrintCommandLineFlags -XX:+UseCompressedClassPointers 
+  -XX:+UseCompressedOops -XX:-UseLargePagesIndividualAllocation -XX:+UseParallelGC
+  java version "1.8.0_202"
+  Java(TM) SE Runtime Environment (build 1.8.0_202-b08)
+  Java HotSpot(TM) 64-Bit Server VM (build 25.202-b08, mixed mode)
+  ```
 * Java中垃圾回收器有以下几种：
   * `UseSerialGC`
   * `UseParallelGC`
@@ -517,10 +528,48 @@
   * `UseParNewGC`
   * `UseParallelOldGC`
   * `UseG1GC`
-
-### 生产环境上配置垃圾回收器
+* 名词解释：
+  * `DefNew`: Default New Generation
+  * `Tenured`: Old
+  * `ParNew`: Parallel New Generation
+  * `PSYoungGen`: Parallel Scavenge
+  * `ParOldGen`: Parallel Old Generation
+* 新生代（年轻代）
+  * 串行GC (Serial)/(Serial Copying)
+  * 并行GC (ParNew)
+  * 并行回收GC (Parallel)/(Parallel Scavenge)
+* 老年代
+  * 串行GC (Serial Old)/(Serial MSC)
+  * 并行GC (Parallel Old)/(Parallel MSC)
+  * 标记清除GC (CMS)
 
 ### G1垃圾回收器
-
-### 生产环境诊断和评估性能
-
+* 以前的垃圾回收器的特点：
+  * 年轻代和老年代是各自独立且连续的内存块；
+  * 年轻代收集使用单Eden+S0+S1进行复制算法；
+  * 老年代收集必须扫描整个老年代区域；
+  * 都是以尽可能少而快速的执行GC为设计原则。
+* G1是什么：
+  * G1（Garbage First）回收器，是一款面向服务端应用的垃圾回收器；
+  * 应用在多处理器和大容量内存环境中；
+  * 在实现高吞吐量的同时，尽可能的满足垃圾回收暂停时间的要求；
+  * 和CMS回收器一样，可以与应用线程并发执行；
+  * 整理空闲空间更快；
+  * 需要更多的时间来预测GC停顿时间；
+  * 不希望牺牲大量的吞吐性能；
+  * 不需要更大的Java Heap；
+  * G1收集器的设计目标是取代CMS收集器，它与CMS相比，在以下方面表现更出色：
+    * G1是一个有整理内存过程的垃圾回收器，不会产生很多的内存碎片；
+    * G1的Stop The World（STW）更可控，G1在停顿时间上添加了预测机制，用户可以指定期望停顿时间。
+  * 主要改变是Eden，Survivor和Tenured等内存区域不再是连续的了，而是变成一个个大小一样的region，每个region从1M到32M不等。一个region有可能属于Eden，Survivor或者Tenured内存区域。
+* G1回收器的特点：
+  * G1能充分自用多CPU、多核环境的硬件优势，尽量缩短STW；
+  * G1整体上采用标记-整理算法，局部是通过复制算法，不会产生内存碎片；
+  * 宏观上看G1之中不再区分年轻代和老年代。**把内存分成多个独立的子区域（region）**，可以近似理解为一个围棋的棋盘；
+  * G1回收器里面将整个的内存区域都混合在一起，**但其本身依然在小范围内要进行年轻代和老年代的区分**，保留了新生代和老年代，但它们不再是物理隔离的，而是一部分Region的集合且不需要Region是连续的，也就是依然会采用不同的GC方式来处理不同的区域；
+  * G1虽然也是分代收集器，但整个内存分区**不存在物理上的年轻代和老年代的区分**，也不需要完全独立的Survivor(to space)堆做复制准备。**G1只有逻辑上的分代概念**，或者说每个分区都可能随G1的运行在不同代之间前后切换。
+* 底层原理
+* 案例
+* 常用配置参数（了解）
+* 和CMS相比的优势
+* 总结
