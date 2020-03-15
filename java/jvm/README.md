@@ -461,11 +461,34 @@
 
 ### OOM
 * `java.lang.StackOverflowError`
+  * Java虚拟机栈溢出，Java虚拟机栈中每个元素是一个栈帧，一个栈帧对应一个方法。
+  * 通常是因为递归调用深度超出Java虚拟机栈大小导致。
 * `java.lang.OutOfMemoryError: Java heap space`
+  * 最常见的OOM，堆内存空间溢出
 * `java.lang.OutOfMemoryError: GC overhead limit exceeded`
+  * GC回收时间过长，过长的定义是：超过98%的时间用来做GC并且回收不到2%的堆内存，连续多次GC都只回收了不到2%的极端情况下会抛出此Error。
+  * 这个Error属于JVM的保护机制：如果不抛出此Error，那么GC清理的一点儿内存很快就会被再次填满，迫使GC再次运行，造成了恶性循环，CPU使用率一直是100%，而GC后却没有任何成果。
 * `java.lang.OutOfMemoryError: Direct buffer memory`
+  * 不断使用`ByteBuffer.allocateDirect(int capacity)`分配本地内存导致。
+    ```
+    VM参数：
+    -XX:MaxDirectMemorySize=5m
+    ```
 * `java.lang.OutOfMemoryError: unable to create new native thread`
+  * 导致原因：
+    * 创建了太多的线程，一个应用进程创建多个线程，超过系统承载极限。
+    * 服务器不允许你的应用程序创建这么多线程，Linux系统默认允许单个进程可以创建的线程数为1024个。
 * `java.lang.OutOfMemoryError: Metaspace`
+  * Metaspace空间溢出
+    ```
+    VM参数：
+    -XX:MetaspaceSize=8m -XX:MaxMetaspaceSize=8m
+    ```
+  * Metaspace存放了以下信息：
+    * 虚拟机加载的类信息
+    * 常量池
+    * 静态变量
+    * 即时编译后的代码
 
 ### GC（Garbage Collection，垃圾回收）算法
 > GC算法是内存回收的方法论，垃圾回收器是这些算法的落地实现。
