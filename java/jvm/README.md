@@ -540,6 +540,10 @@
   * 并行回收GC (Parallel)/(Parallel Scavenge)
 * 老年代
   * 串行GC (Serial Old)/(Serial MSC)
+    * Serial Old是Serial垃圾回收器的老年代版本，它同样是个单线程的收集器，使用标记-整理算法，这个收集器也主要是运行在Client的Java虚拟机默认的老年代垃圾回收器。
+    * 在Server模式下，主要有两个用途：
+      * 在JDK1.5之前版本中与新生代的Parallel Scavenge回收器搭配使用（Parallel Scavenge + Serial Old）。
+      * 作为老年代使用CMS回收器的后备垃圾回收器。
   * 并行GC (Parallel Old)/(Parallel MSC)
   * 并发标记清除GC (CMS)
     * 4步过程：
@@ -550,7 +554,7 @@
     * 优点：
       * 并发回收低停顿。由于并发进行，CMS在回收与应用线程会同时会增加对堆内存的占用，也就是说，CMS必须要在老年代堆内存用尽之前完成垃圾回收，否则CMS回收失败时，将触发担保机制，串行老年代回收器将会以STW的方式进行一次GC，从而造成较大停顿时间。
     * 缺点：
-      * 并发执行，对CPU资源压力大
+      * 并发执行，对CPU资源压力大。
       * 采用的标记清除算法会导致大量内存碎片：标记清除算法无法整理内存碎片，老年代空间会随着应用时长被逐步耗尽，最后将不得不通过担保机制对堆内存进行压缩。CMS也提供了参数`-XX:CMSFullGCsBeForeCompaction`（默认是0，即每次都进行内存整理）来指定多少次CMS收集之后，进行一次压缩的Full GC。
 
 ### G1垃圾回收器
