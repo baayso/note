@@ -74,6 +74,9 @@
     * [`CyclicBarrier`](https://github.com/baayso/note/blob/master/java/thread/README.md#cyclicbarrier)
     * [`Semaphore`](https://github.com/baayso/note/blob/master/java/thread/README.md#semaphore)
 * [JVM](https://github.com/baayso/note/blob/master/java/jvm)
+  * [常用的基本配置参数](https://github.com/baayso/note/blob/master/java/jvm/README.md#%E5%B8%B8%E7%94%A8%E7%9A%84%E5%9F%BA%E6%9C%AC%E9%85%8D%E7%BD%AE%E5%8F%82%E6%95%B0)
+  * [强引用、软引用、弱引用、虚引用](https://github.com/baayso/note/blob/master/java/jvm/README.md#%E5%BC%BA%E5%BC%95%E7%94%A8%E8%BD%AF%E5%BC%95%E7%94%A8%E5%BC%B1%E5%BC%95%E7%94%A8%E8%99%9A%E5%BC%95%E7%94%A8)
+  * [OOM](https://github.com/baayso/note/blob/master/java/jvm/README.md#oom)
 * 杂项
   * [`Runtime.getRuntime().availableProcessors();`](https://github.com/baayso/note/blob/master/java/java_other.md#1-runtimegetruntimeavailableprocessors)
 
