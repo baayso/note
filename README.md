@@ -28,7 +28,6 @@
   * [Selector](https://github.com/baayso/note/blob/master/java/nio/nio.md#6-selector)
 * [Netty](https://github.com/baayso/note/tree/master/java/netty)
   * [Reactor模型](https://github.com/baayso/note/blob/master/java/reactor/reactor.md)
-  * [Netty源码解析](https://github.com/baayso/note/blob/master/java/netty/netty.md)
   * [为什么Netty只基于NIO而抛弃AIO](https://github.com/baayso/note/blob/master/java/netty/netty-nio-aio.md)
   * [ByteBuf](https://github.com/baayso/note/blob/master/java/netty/README.md#6-netty-bytebuf%E6%89%80%E6%8F%90%E4%BE%9B%E7%9A%843%E7%A7%8D%E7%BC%93%E5%86%B2%E5%8C%BA%E7%B1%BB%E5%9E%8B)
   * [Handler](https://github.com/baayso/note/blob/master/java/netty/README.md#8-netty-%E5%A4%84%E7%90%86%E5%99%A8handler)
@@ -74,6 +73,7 @@
     * [`CountDownLatch`](https://github.com/baayso/note/blob/master/java/thread/README.md#countdownlatch)
     * [`CyclicBarrier`](https://github.com/baayso/note/blob/master/java/thread/README.md#cyclicbarrier)
     * [`Semaphore`](https://github.com/baayso/note/blob/master/java/thread/README.md#semaphore)
+* [JVM](https://github.com/baayso/note/blob/master/java/jvm)
 * 杂项
   * [`Runtime.getRuntime().availableProcessors();`](https://github.com/baayso/note/blob/master/java/java_other.md#1-runtimegetruntimeavailableprocessors)
 
