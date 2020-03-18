@@ -1,7 +1,7 @@
-# CAS（Compare And Swap，比较并交换）
+# CAS（Compare And Swap/Set，比较并交换）
 
 ### 什么是CAS：
-* Compare And Swap，比较并交换
+* Compare And Swap，或者 Compare And Set，比较并交换
 * 比较当前线程工作内存中的值和主内存中的值，如果相同则执行规定操作，否则放弃执行规定操作。
 
 ### CAS的底层原理：
