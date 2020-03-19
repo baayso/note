@@ -1,5 +1,5 @@
 # NOTE
-> 学习笔记
+> 个人博客（学习笔记）
 
 ## [Linux](https://github.com/baayso/note/tree/master/linux)
   * [性能评估相关的命令](https://github.com/baayso/note/tree/master/linux#%E6%80%A7%E8%83%BD%E8%AF%84%E4%BC%B0%E7%9B%B8%E5%85%B3%E7%9A%84%E5%91%BD%E4%BB%A4)
