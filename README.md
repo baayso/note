@@ -88,6 +88,7 @@
   * [...](https://github.com/baayso/note/blob/master/git.md)
 
 ## 推荐阅读：
+* https://github.com/RedSpider1/concurrent
 * https://github.com/Snailclimb/JavaGuide
 * https://github.com/crossoverJie/JCSprout
 * https://github.com/doocs/advanced-java
