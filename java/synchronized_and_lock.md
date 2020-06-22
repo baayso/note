@@ -4,12 +4,12 @@
 * 当使用`synchronized`关键字来`修饰代码块`时，字节码层面上是通过`monitorenter`与`monitorexit`指令来实现的锁的获取与释放动作。当线程进入到`monitorenter`指令后，线程将会持有`Monitor对象`，退出`monitorenter`指令后，线程将会释放`Monitor对象`。
 * 对于`synchronized`关键字`修饰方法`来说，并没有出现`monitorenter`与`monitorexit`指令，而是出现了一个`ACC_SYNCHRONIZED`标志。
 * JVM使用了`ACC_SYNCHRONIZED`访问标志来区分一个方法是否为同步方法；当方法被调用时，调用指令会检查该方法是否拥有`ACC_SYNCHRONIZED`标志，如果有，那么执行线程将会先持有方法所在对象的`Monitor对象`，然后再去执行方法体；在该方法执行期间，其他任何线程均无法再获取到这个`Monitor对象`，当线程执行完该方法后，它会释放掉这个`Monitor对象`。
-* JVM中的同步是基于进入与退出监视器对象（管程对象）（Monitor）来实现的，每个对象实例都会有一个Monitor对象，Monitor对象会和Java对象一同创建并销毁。Monitor对象是由C++来实现的。
+* JVM中的同步是基于进入与退出监视器对象（管程对象）（Monitor）来实现的，每个对象实例都会有一个Monitor对象，[`Monitor对象`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/hotspot/src/share/vm/runtime/objectMonitor.hpp#L74)会和Java对象一同创建并销毁。Monitor对象是由C++来实现的。
 * 当多个线程同时访问一段同步代码时，这些线程会被放到一个`EntryList`集合中，处于阻塞状态的线程都会被放到该列表当中。接下来，当线程获取到对象的Monitor时，Monitor是依赖于底层操作系统的`mutex lock`来实现互斥的，线程获取mutex成功，则会持有该mutex，这时其他线程就无法再获取到该mutex。
 * 如果线程调用了`wait()`方法，那么该线程就会释放掉所持有的mutex，并且该线程会进入到`WaitSet`集合（等待集合）中，等待下一次被其他线程调用`notify()/notifyAll()`唤醒。如果当前线程顺利执行完毕方法，那么它也会释放掉所持有的mutex。
 * 总结：同步锁在这种实现方式当中，因为Monitor是依赖于底层的操作系统实现，这样就存在用户态与内核态之间的切换，所以会增加性能开销。
 * 通过对象互斥锁的概念来保证共享数据操作的完整性。每个对象都对应于一个可称为『互斥锁』的标记，这个标记用于保证在任何时刻，只能有一个线程访问该对象。
-* 那些处于`[EntryList](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/hotspot/src/share/vm/runtime/objectMonitor.hpp#L150)`与`[WaitSet](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/hotspot/src/share/vm/runtime/objectMonitor.hpp#L144)`中的线程均处于阻塞状态，阻塞操作是由操作系统来完成的，在linux下是通过`pthread_mutex_lock`函数实现的。线程被阻塞后便会进入到内核调度状态，这会导致系统在用户态与内核态之间来回切换，严重影响锁的性能。
+* 那些处于[`EntryList`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/hotspot/src/share/vm/runtime/objectMonitor.hpp#L150)与[`WaitSet`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/hotspot/src/share/vm/runtime/objectMonitor.hpp#L144)中的线程均处于阻塞状态，阻塞操作是由操作系统来完成的，在linux下是通过`pthread_mutex_lock`函数实现的。线程被阻塞后便会进入到内核调度状态，这会导致系统在用户态与内核态之间来回切换，严重影响锁的性能。
 * 解决上述问题的办法便是自旋（Spin）。其原理是：当发生对Monitor的争用时，若Owner能够在很短的时间内释放掉锁，则那些正在争用的线程就可以稍微等待一下（即所谓的自旋），在Owner线程释放锁之后，争用线程可能会立刻获取到锁，从而避免了系统阻塞。不过，当Owner运行的时间超过了临界值后，争用线程自旋一段时间后依然无法获取到锁，这时争用线程则会停止自旋而进入到阻塞状态。所以总体的思想是：先自旋，不成功再进行阻塞，尽量降低阻塞的可能性，这对那些执行时间很短的代码块来说有极大的性能提升。显然，自旋在多处理器（多核心）上才有意义。
 * 互斥锁的属性：
   1. `PTHREAD_MUTEX_TIMED_NP`：这是缺省值，也就是普通锁。当一个线程加锁以后，其余请求锁的线程将会形成一个等待队列，并且在解锁后按照优先级获取到锁。这种策略可以确保资源分配的公平性。
