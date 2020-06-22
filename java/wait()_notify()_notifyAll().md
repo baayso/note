@@ -4,7 +4,7 @@
 * 在调用`wait()`方法时，线程必须要持有被调用对象的锁，当调用`wait()`方法后，线程就会释放掉该对象的`锁（monitor）`。
 * 在调用`Thread`类的`sleep()`方法时，线程是不会释放掉对象的锁的。
 
-### 关于`wait()`、`notify()`和`notifyAll()`方法的总结：
+### 关于[`wait()`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/hotspot/src/share/vm/runtime/objectMonitor.cpp#L1471)、[`notify()`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/hotspot/src/share/vm/runtime/objectMonitor.cpp#L1706)和[`notifyAll()`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/hotspot/src/share/vm/runtime/objectMonitor.cpp#L1825)方法的总结：
 1. 当调用`wait()`时，首先需要确保调用了`wait()`方法的线程已经持有了对象的锁。
 2. 当调用`wait()`后，该线程就会释放掉这个对象的锁，然后进入到`等待状态（wait set）`。
 3. 当线程调用了`wait()`后进入到等待状态时，它就可以等待其他线程调用相同对象的`notify()`或`notifyAll()`方法来使得自己被唤醒。
