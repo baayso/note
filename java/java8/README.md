@@ -1,6 +1,89 @@
 # Java8新特性
 > 在Java8中，接口中可以声明抽象方法，可以定义 ```default```方法 以及 ```static```方法。
 
+## 0. 接口中的```default```方法
+* 实现多个接口时，接口中具有同名的```default```方法
+  ```java
+  // 编译错误：DefaultMethodDemo inherits unrelated defaults for method() from types InterfaceOne and InterfaceTwo
+  // 编译错误：DefaultMethodDemo 从 InterfaceOne 和 InterfaceTwo 类型继承了 method() 的不相关默认值
+  public class DefaultMethodDemo implements InterfaceOne, InterfaceTwo {
+      public static void main(String[] args) {
+          DefaultMethodDemo demo = new DefaultMethodDemo();
+          String str = demo.method();
+          System.out.println(str);
+      }
+  }
+
+  interface InterfaceOne {
+      default String method() {
+          return "hello";
+      }
+  }
+
+  interface InterfaceTwo {
+      default String method() {
+          return "world";
+      }
+  }
+  ```
+  ```java
+  public class DefaultMethodDemo implements InterfaceOne, InterfaceTwo {
+      // 必须重写InterfaceOne和InterfaceTwo同名的default方法
+      @Override
+      public String method() {
+          return InterfaceTwo.super.method();
+      }
+
+      public static void main(String[] args) {
+          DefaultMethodDemo demo = new DefaultMethodDemo();
+          String str = demo.method();
+          System.out.println(str);
+      }
+  }
+
+  interface InterfaceOne {
+      default String method() {
+          return "hello";
+      }
+  }
+
+  interface InterfaceTwo {
+      default String method() {
+          return "world";
+      }
+  }
+  ```
+* 当多个接口中具有同名的```default```方法，自定义类继承了接口一实现类并实现了接口二，此时自定义类会继承接口一实现类的方法。因为实现类的优先级高于接口，类中的方法是具体的实现，更贴近需求，接口中的方法是一种契约，一种约定。
+  ```java
+  public class DefaultMethodDemo extends InterfaceOneImpl implements InterfaceTwo {
+      public static void main(String[] args) {
+          DefaultMethodDemo demo = new DefaultMethodDemo();
+          String str = demo.method();
+          System.out.println(str);
+      }
+  }
+
+  interface InterfaceOne {
+      default String method() {
+          return "hello";
+      }
+  }
+
+  interface InterfaceTwo {
+      default String method() {
+          return "world";
+      }
+  }
+
+  class InterfaceOneImpl implements InterfaceOne {
+      // 如果这里不重写method()方法会导致编译失败
+      @Override
+      public String method() {
+          return "InterfaceOneImpl";
+      }
+  }
+  ```
+
 ## 1. Lambda
 > 高阶函数：如果一个函数接收一个函数作为参数，或者返回一个函数作为返回值，那么该函数就叫做高阶函数。
 * Java Lambda表达式是一种匿名函数；它是没有声明的方法，即没有访问修饰符、返回值声明和名字。
