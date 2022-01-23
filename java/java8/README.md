@@ -376,6 +376,7 @@
   Lsit<Roles> roles = optional.map(u -> u.getRoles()).orElse(Collections.emptyList());
   ```
 ## 3. 方法引用（method reference）
+* 当Lambda表达式只有一行代码且这一行代码使用了已经存在的方法，并且这个方法的签名符合函数式方法的签名。则可以使用方法引用替换Lambda表达式。
 * 方法引用是Lambda表达式的一种语法糖。
 * 可以将方法引用看作是一个【函数指针，function pointer】
 * 共分为4类：
