@@ -91,6 +91,31 @@
        return (T t, U u) -> after.apply(apply(t, u));
    }
   ```
+* ```@FunctionalInterface public interface BinaryOperator<T> extends BiFunction<T,T,T>```使用示例代码
+  > 表示对两个相同类型的操作数的操作，产生与操作数相同类型的结果。这是```BiFunction<T, U, R>```在操作数和结果都是相同类型的情况下的特殊化。 
+  ```java
+  public class BinaryOperatorDemo {
+      public static void main(String[] args) {
+          // world
+          System.out.println(BinaryOperatorDemo.getShortString("hello 123", "world", (a, b) -> a.length() - b.length()));
+          // hello 123
+          System.out.println(BinaryOperatorDemo.getShortString("hello 123", "world", (a, b) -> a.charAt(0) - b.charAt(0)));
+
+          // hello 123
+          System.out.println(BinaryOperatorDemo.getLongString("hello 123", "world", (a, b) -> a.length() - b.length()));
+          // world
+          System.out.println(BinaryOperatorDemo.getLongString("hello 123", "world", (a, b) -> a.charAt(0) - b.charAt(0)));
+      }
+
+      public static String getShortString(String a, String b, Comparator<String> comparator) {
+          return BinaryOperator.minBy(comparator).apply(a, b);
+      }
+
+      public static String getLongString(String a, String b, Comparator<String> comparator) {
+          return BinaryOperator.maxBy(comparator).apply(a, b);
+      }
+  }
+  ```
 
 ### 1.4 ```java.util.function.Predicate<T>``` 接口
 * 这个函数式接口表示一个参数的predicate（boolean-valued function）。
