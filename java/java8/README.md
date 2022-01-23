@@ -197,6 +197,33 @@
       T get();
   }
   ```
+* 示例代码
+  ```java
+  public class SupplierDemo {
+      public static void main(String[] args) {
+          Supplier<User> supplier = () -> new User("李四", 20);
+          System.out.println(supplier.get().getName());
+
+          Supplier<User> supplier2 = User::new;
+          System.out.println(supplier2.get().getName());
+      }
+  }
+
+  class User {
+      private String name = "张三";
+      private int    age  = 18;
+
+      public User() {
+      }
+
+      public User(String name, int age) {
+          this.name = name;
+          this.age = age;
+      }
+      
+      // getter and setter ...
+  }
+  ```
 
 ### 1.6 ```java.util.function.Consumer<T>``` 接口
 * 这个函数式接口表示接受单个输入参数但不返回结果的操作。与大多数其他函数式接口不同，Consumer需要通过```side-effects（函数“附”作用）```进行操作。
