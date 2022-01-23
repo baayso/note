@@ -115,6 +115,59 @@
       return (t) -> test(t) || other.test(t);
   }
   ```
+* 示例代码
+  ```java
+  public class PredicateTest {
+      public static void main(String[] args) {
+          List<Integer> numbers = IntStream.rangeClosed(1, 10).boxed().collect(Collectors.toList());
+          // 2 4 6 8 10
+          PredicateTest.conditionFilter(numbers, num -> num % 2 == 0).forEach(n -> System.out.print(n + " "));
+          System.out.println();
+          // 6 7 8 9 10
+          PredicateTest.conditionFilter(numbers, num -> num > 5).forEach(n -> System.out.print(n + " "));
+          System.out.println();
+          // 1 2 3 4 5 6 7 8 9 10
+          PredicateTest.conditionFilter(numbers, num -> true).forEach(n -> System.out.print(n + " "));
+          System.out.println();
+          // 2 4
+          PredicateTest.conditionFilter(numbers, num -> num % 2 == 0, num -> num <= 5).forEach(n -> System.out.print(n + " "));
+          System.out.println();
+          // 1 3 5 6 7 8 9 10
+          PredicateTest.conditionFilterNegate(numbers, num -> num % 2 == 0, num -> num <= 5).forEach(n -> System.out.print(n + " "));
+          System.out.println();
+      }
+
+      public static List<Integer> conditionFilter(List<Integer> numbers, Predicate<Integer> predicate) {
+          List<Integer> result = new ArrayList<>();
+          for (Integer number : numbers) {
+              if (predicate.test(number)) {
+                  result.add(number);
+              }
+          }
+          return result;
+      }
+
+      public static List<Integer> conditionFilter(List<Integer> numbers, Predicate<Integer> predicate, Predicate<Integer> predicate2) {
+          List<Integer> result = new ArrayList<>();
+          for (Integer number : numbers) {
+              if (predicate.and(predicate2).test(number)) {
+                  result.add(number);
+              }
+          }
+          return result;
+      }
+
+      public static List<Integer> conditionFilterNegate(List<Integer> numbers, Predicate<Integer> predicate, Predicate<Integer> predicate2) {
+          List<Integer> result = new ArrayList<>();
+          for (Integer number : numbers) {
+              if (predicate.and(predicate2).negate().test(number)) {
+                  result.add(number);
+              }
+          }
+          return result;
+      }
+  }
+  ```
  
 ### 1.5 ```java.util.function.Supplier<T>``` 接口
 * Supplier使用场景：没有输入参数的工厂。
