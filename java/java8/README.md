@@ -76,7 +76,7 @@
   }
 
   class InterfaceOneImpl implements InterfaceOne {
-      // 如果这里不重写method()方法会导致编译失败
+      // 如果这里不重写method()方法会导致编译错误
       @Override
       public String method() {
           return "InterfaceOneImpl";
