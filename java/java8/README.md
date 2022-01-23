@@ -267,11 +267,17 @@
 * 是一个容器对象，可能包含也可能不包含```非null值```。如果值存在则```isPresent()```方法会返回```true```，调用```get()```方法会返回该对象。
 * 可以保存类型```T```的值，或者仅仅保存```null```。```Optional```类提供很多有用的方法，这样我们就不用显式进行空值检测。
 * 可以很好的解决```NPE(NullPointerException, 空指针异常)```。
-* ```Optional```类通常只做为方法的返回值，不要定义```接收Optional类型参数的方法```和```Optional类型的成员变量```。因为```Optional```类并没有实现```Serializable```接口。
+* **```Optional```类通常只做为方法的返回值，不要定义```接收Optional类型参数的方法```和```Optional类型的成员变量```。因为```Optional```类并没有实现```Serializable```接口**。
 * 推荐用法：
   ```java
-  Optional<String> optional = Optional.ofNullable(...);
-  optional.isPresent(str -> System.out.println(str));
+  // String str = null;
+  String str = "hello";
+  Optional<String> optional = Optional.ofNullable(str);
+
+  optional.ifPresent(v -> System.out.println(v));
+
+  System.out.println(optional.orElse("world"));
+  System.out.println(optional.orElseGet(() -> "hello world"));
   ```
   ```java
   class User {
