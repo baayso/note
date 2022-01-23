@@ -292,12 +292,138 @@
   Optional<User> optional = Optional.ofNullable(user);
   Lsit<Roles> roles = optional.map(u -> u.getRoles()).orElse(Collections.emptyList());
   ```
-## 3. 方法引用
+## 3. 方法引用（method reference）
+* 方法引用是Lambda表达式的一种语法糖。
+* 可以将方法引用看作是一个【函数指针，function pointer】
 * 共分为4类：
   1) 类名::静态方法名
+     ```java
+     public class MethodReferenceDemo {
+         public static void main(String[] args) {
+             Student student_1 = new Student("zhangsan", 55);
+             Student student_2 = new Student("lisi", 90);
+             Student student_3 = new Student("wangwu", 85);
+             Student student_4 = new Student("zhaoliu", 70);
+
+             List<Student> studentList = Arrays.asList(student_1, student_2, student_3, student_4);
+
+             // studentList.sort((studentOne, studentTwo) -> Student.compareStudentByScore(studentOne, studentTwo));
+             studentList.sort(Student::compareStudentByScore);
+
+             studentList.forEach(System.out::println);
+         }
+     }
+
+     class Student {
+         private String name;
+         private int    score;
+
+         public Student(String name, int score) {
+             this.name = name;
+             this.score = score;
+         }
+
+         // getter and setter...
+
+         public static int compareStudentByScore(Student studentOne, Student studentTwo) {
+             return studentOne.getScore() - studentTwo.getScore();
+         }
+
+         public static int compareStudentByName(Student studentOne, Student studentTwo) {
+             return studentOne.getName().compareToIgnoreCase(studentTwo.getName());
+         }
+
+        @Override
+        public String toString() {
+            return "Student{" +
+                    "name='" + name + '\'' +
+                    ", score=" + score +
+                    '}';
+        }
+     }
+     ```
   2) 实例名::实例方法名
+     ```java
+     StudentComparator studentComparator = new StudentComparator();
+     // studentList.sort((studentOne, studentTwo) -> studentComparator.compareStudentByName(studentOne, studentTwo));
+     studentList.sort(studentComparator::compareStudentByName);
+
+     class StudentComparator {
+         public int compareStudentByScore(Student studentOne, Student studentTwo) {
+             return studentOne.getScore() - studentTwo.getScore();
+         }
+
+         public int compareStudentByName(Student studentOne, Student studentTwo) {
+             return studentOne.getName().compareToIgnoreCase(studentTwo.getName());
+         }
+     }
+     ```
   3) 类名::实例方法名，第一个Lambda参数做为调用**实例方法**的对象，第二个及后面的Lambda参数做为**实例方法**的参数。
+     ```java
+     List<String> cityList = Arrays.asList("beijing", "nanjing", "chengdu", "guangzhou", "tianjin");
+
+     // Collections.sort(cityList, (cityOne, cityTwo) -> cityOne.compareToIgnoreCase(cityTwo));
+     // Collections.sort(cityList, String::compareToIgnoreCase);
+
+     // cityList.sort((cityOne, cityTwo) -> cityOne.compareToIgnoreCase(cityTwo));
+     cityList.sort(String::compareToIgnoreCase);
+
+     cityList.forEach(System.out::println);
+     ```
+     ```java
+     // studentList.sort((studentOne, studentTwo) -> studentOne.compareByScore(studentTwo));
+     studentList.sort(Student::compareByScore);
+
+     class Student {
+         private String name;
+         private int    score;
+
+         public Student(String name, int score) {
+             this.name = name;
+             this.score = score;
+         }
+
+        // getter and setter...
+
+         public int compareByScore(Student student) {
+             return this.getScore() - student.getScore();
+         }
+
+         public int compareByName(Student student) {
+             return this.getName().compareToIgnoreCase(student.getName());
+         }
+
+         @Override
+         public String toString() {
+             return "Student{" +
+                     "name='" + name + '\'' +
+                     ", score=" + score +
+                     '}';
+         }
+     }
+     ```
   4) 类名::new（构造方法引用）
+     ```java
+     public class MethodReferenceDemo {
+         public static void main(String[] args) {
+             // System.out.println(MethodReferenceDemo.getString(() -> ""));
+             // System.out.println(MethodReferenceDemo.getString(() -> new String()));
+             System.out.println(MethodReferenceDemo.getString(String::new));
+
+             // System.out.println(MethodReferenceDemo.getString("hello", str -> str));
+             // System.out.println(MethodReferenceDemo.getString("hello", str -> new String(str)));
+             System.out.println(MethodReferenceDemo.getString("hello", String::new));
+         }
+
+         public static String getString(Supplier<String> supplier) {
+             return supplier.get() + ";";
+         }
+
+         public static String getString(String str, Function<String, String> function) {
+             return function.apply(str) + ";";
+         }
+     }
+     ```
 
 ## 4. Stream（流）
 > 流不存储值，通过管道的方式获取值，对流的操作会生成一个结果，不过并不会修改底层的数据源。
