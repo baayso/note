@@ -1,8 +1,23 @@
 # Java8新特性
-> 在Java8中，接口中可以声明抽象方法，可以定义 ```default```方法 以及 ```static```方法。
+> 在Java8中，接口中可以声明抽象(```abstract```)方法，可以定义默认( ```default```)方法 以及 静态(```static```)方法。
 
-## 0. 接口中的```default```方法
-* 实现多个接口时，接口中具有同名的```default```方法
+## 0. 接口中的```default```方法和```static```方法
+> 接口中的变量都会被```public static final```修饰，成为常量  
+> 接口中的方法都会被```public```修饰，如果方法没有方法体则会被```public abstract```修饰，即抽象方法  
+* 接口中的```static```方法
+  * 不能被子接口继承
+  * 不能被实现该接口的类继承
+  * 调用形式：```接口名.静态方法名()```
+* 接口中的```default```方法
+  * 可以被子接口继承
+  * 可以被实现该接口的类继承
+  * 子接口中如有同名默认方法，父接口中的默认方法会被覆盖
+  * 不能通过接口名调用，需要通过接口实现类的实例进行调用
+  * 调用形式：```对象名.默认方法名()```
+  * 在接口中增加default方法的语法机制是为了兼容已有的接口实现类的代码（不用修改实现类的代码）。
+  * 对于在已有的接口中增加一个新的抽象方法，那么势必需要对所有实现了该接口的类进行修改（实现新增加的抽象方法）。
+  * 比如```java.util.List<E>```接口中新增加的```default void sort(Comparator<? super E> c) {...}```方法，如果这个方法不是一个default方法，而是一个抽象方法，那么就需要对List接口的所有实现类进行修改以增加对sort()方法的实现。但是如果List接口中增加的sort()方法是一个default方法，它拥有默认的实现，那么List接口的所有实现类将自动继承sort()方法，如此则不需要大规模修改List接口的所有实现类。
+* 实现多个接口时，接口中都具有同名的```default```方法
   ```java
   // 编译错误：DefaultMethodDemo inherits unrelated defaults for method() from types InterfaceOne and InterfaceTwo
   // 编译错误：DefaultMethodDemo 从 InterfaceOne 和 InterfaceTwo 类型继承了 method() 的不相关默认值
@@ -53,7 +68,7 @@
       }
   }
   ```
-* 当多个接口中具有同名的```default```方法，自定义类继承了接口一实现类并实现了接口二，此时自定义类会继承接口一实现类的方法。因为实现类的优先级高于接口，类中的方法是具体的实现，更贴近需求，接口中的方法是一种契约，一种约定。
+* 当多个接口中都具有同名的```default```方法，自定义类继承了接口一实现类并实现了接口二，此时自定义类会继承接口一实现类的方法。因为实现类的优先级高于接口，类中的方法是具体的实现，更贴近需求，接口中的方法是一种契约，一种约定。
   ```java
   public class DefaultMethodDemo extends InterfaceOneImpl implements InterfaceTwo {
       public static void main(String[] args) {
