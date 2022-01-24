@@ -8,7 +8,7 @@
 
 ## [Java](https://github.com/baayso/note/tree/master/java)
 * [Java8新特性](https://github.com/baayso/note/blob/master/java/java8)
-  * [接口中的default方法](https://github.com/baayso/note/tree/master/java/java8#0-%E6%8E%A5%E5%8F%A3%E4%B8%AD%E7%9A%84default%E6%96%B9%E6%B3%95)
+  * [接口中的default方法和static方法](https://github.com/baayso/note/tree/master/java/java8#0-%E6%8E%A5%E5%8F%A3%E4%B8%AD%E7%9A%84default%E6%96%B9%E6%B3%95%E5%92%8Cstatic%E6%96%B9%E6%B3%95)
   * [Lambda](https://github.com/baayso/note/tree/master/java/java8#1-lambda)
     * [函数式接口](https://github.com/baayso/note/tree/master/java/java8#11-%E5%87%BD%E6%95%B0%E5%BC%8F%E6%8E%A5%E5%8F%A3)
     * [```java.util.function.Function<T, R>``` 接口](https://github.com/baayso/note/tree/master/java/java8#12-javautilfunctionfunctiont-r-%E6%8E%A5%E5%8F%A3)
