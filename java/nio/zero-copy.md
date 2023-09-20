@@ -20,7 +20,7 @@
 * 第七步：操作系统将内核空间中`socket`缓冲区的数据写入硬件。**第四次数据拷贝**。
 * 第八步：硬件通知操作系统完成数据写入。
 * 第九步：`write()`系统调用完成并返回结果，***由内核空间切换到用户空间***。
-![传统IO底层操作机制](https://github.com/baayso/note/blob/master/java/nio/zero-copy_1.png)
+![传统IO底层操作机制](zero-copy_1.png)
 
 ## 2. 零拷贝底层操作机制
 > 数据不会在从内核空间拷贝到用户空间中，**所有的操作都在内核空间中完成**。
@@ -31,8 +31,8 @@
 * 第五步：操作系统将内核空间中`socket`缓冲区的数据写入硬件。**第三次数据拷贝**
 * 第六步：硬件通知操作系统完成数据写入。
 * 第七步：`sendfile()`系统调用完成并返回结果，***由内核空间切换到用户空间***。
-![零拷贝底层操作机制-1](https://github.com/baayso/note/blob/master/java/nio/zero-copy_2.png)
-![零拷贝底层操作机制-2](https://github.com/baayso/note/blob/master/java/nio/zero-copy_5.png)
+![零拷贝底层操作机制-1](zero-copy_2.png)
+![零拷贝底层操作机制-2](zero-copy_5.png)
 
 ## 3. 改进的(底层使用了Gather)零拷贝底层操作机制
 * 第一步：JVM向操作系统发起`sendfile()`系统调用，***由用户空间切换到内核空间***。
@@ -44,11 +44,11 @@
     * 2) 内核缓冲区数据的长度(即需要读多少数据)
 * 第五步：协议引擎根据`socket`缓冲区存储的*描述符*信息从内核空间缓冲区中读取数据(Gather)，然后写入对端。
 * 第六步：`sendfile()`系统调用完成并返回结果，***由内核空间切换到用户空间***。
-![改进的零拷贝底层操作机制-1](https://github.com/baayso/note/blob/master/java/nio/zero-copy_6.jpg)
-![改进的零拷贝底层操作机制-2](https://github.com/baayso/note/blob/master/java/nio/zero-copy_3.png)
+![改进的零拷贝底层操作机制-1](zero-copy_6.jpg)
+![改进的零拷贝底层操作机制-2](zero-copy_3.png)
 
 ## 4. 使用内存映射文件来解决需要修改数据的问题
-![使用内存映射文件来解决需要修改数据的问题](https://github.com/baayso/note/blob/master/java/nio/zero-copy_4.png)
+![使用内存映射文件来解决需要修改数据的问题](zero-copy_4.png)
 
 ## 5. Java中使用零拷贝的代码示例：
 * Java中通过`java.nio.channels.FileChannel`中的`transferTo()`方法来支持零拷贝，内部实现就是使用操作系统底层的`sendfile()`系统调用。

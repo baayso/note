@@ -12,7 +12,7 @@
   * 提高线程的可管理性。线程是稀缺资源，如果无限制的创建，不仅会消耗系统资源，还会降低系统的稳定性，使用线程池可以进行统一的分配、调优和监控。
 * 如何使用线程池
   * Java中的线程池是通过`Executor`框架实现的，该框架中用到了[`Executor`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/Executor.java#L128)、[`Executors`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/Executors.java#L71)、[`ExecutorService`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/ExecutorService.java#L137)、[`ThreadPoolExecutor`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/ThreadPoolExecutor.java#L323)这几个类。  
-  ![Executor框架类图](https://github.com/baayso/note/blob/master/java/thread/Executor%E6%A1%86%E6%9E%B6%E7%B1%BB%E5%9B%BE.png)
+  ![Executor框架类图](Executor框架类图.png)
   * [`Executors.newFixedThreadPool(int nThreads)`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/Executors.java#L88)：适用于执行长期任务，性能较好。
     * 创建一个**定长线程池**，可控制线程最大并发数，超出的线程会在队列中等待。
     * `corePoolSize`和`maximumPoolSize`是相等的，阻塞队列使用的是[`new LinkedBlockingQueue<Runnable>()`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/LinkedBlockingQueue.java#L249)。
@@ -221,12 +221,12 @@
 
 ### 线程程底层工作原理
 * **当向线程池提交一个任务之后，线程池的主要处理流程：**  
-  ![线程池的主要处理流程](https://github.com/baayso/note/blob/master/java/thread/%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%9A%84%E4%B8%BB%E8%A6%81%E5%A4%84%E7%90%86%E6%B5%81%E7%A8%8B.png)
+  ![线程池的主要处理流程](线程池的主要处理流程.png)
   * 1）线程池判断核心线程池里的线程是否都在执行任务。如果不是，则创建一个新的工作线程来执行任务。如果核心线程池里的线程都在执行任务，则进入下个流程。
   * 2）线程池判断工作队列是否已经满。如果工作队列没有满，则将新提交的任务存储在这个工作队列里。如果工作队列满了，则进入下个流程。
   * 3）线程池判断线程池的线程是否都处于工作状态。如果没有，则创建一个新的工作线程来执行任务。如果已经满了，则交给饱和策略来处理这个任务。
 * **`ThreadPoolExecutor`执行[`execute(Runnable command)`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/ThreadPoolExecutor.java#L1342)方法的示意图：**  
-  ![ThreadPoolExecutor执行示意图](https://github.com/baayso/note/blob/master/java/thread/ThreadPoolExecutor%E6%89%A7%E8%A1%8C%E7%A4%BA%E6%84%8F%E5%9B%BE.png)
+  ![ThreadPoolExecutor执行示意图](ThreadPoolExecutor执行示意图.png)
   * `ThreadPoolExecutor`执行`execute(Runnable command)`方法分下面4种情况：
     * 1）如果当前运行的线程少于`corePoolSize`，则创建新线程来执行任务（注意，执行这一步骤需要获取全局锁）。
     * 2）如果运行的线程等于或多于`corePoolSize`，则将任务加入`BlockingQueue`。
@@ -332,7 +332,7 @@
 
 ### 死锁（DeakLock）
 * 死锁是指两个或两个以上的线程在执行过程中，因争夺资源而造成的一种互相等待的现象，若无外力干涉那它们都将无法推进下去，如果系统资源充足，线程的资源请求都能得到满足，死锁出现的可能性就比较低，否则就会因争夺有限的资源而陷入死锁。  
-![死锁](https://github.com/baayso/note/blob/master/java/thread/%E6%AD%BB%E9%94%81.png)
+![死锁](死锁.png)
 * 产生死锁的主要原因
   * 系统资源不足。
   * 线程运行推进的顺序不合适。

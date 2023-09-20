@@ -2,7 +2,7 @@
 
 ### 什么是阻塞队列
 * 阻塞队列，顾名思义，首先它是一个队列，而一个阻塞队列在数据结构中所起的作用大致如下图所示：  
-  ![阻塞队列](https://github.com/baayso/note/blob/master/java/thread/blocking_queue/blocking_queue.png)
+  ![阻塞队列](blocking_queue.png)
 * 当阻塞队列为空时，从队列中**获取**元素的操作将会被阻塞。
 * 当阻塞队列已满时，往队列里**添加**元素的操作将会被阻塞。
 * 试图从空的阻塞队列中获取元素的线程将会被阻塞，直到其他的线程往空的队列插入新的元素。
@@ -28,7 +28,7 @@
 超时退出 | 当阻塞队列已满时，队列会阻塞生产者线程一定时间，超过限时后生产者线程则会退出。 |
 
 ### 阻塞队列的种类及架构
-![阻塞队列类图](https://github.com/baayso/note/blob/master/java/thread/blocking_queue/BlockingQueue.png)
+![阻塞队列类图](BlockingQueue.png)
 * **[`ArrayBlockingQueue<E>`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/ArrayBlockingQueue.java#L238)：由数组结构组成的有界阻塞队列。**
 * **[`LinkedBlockingQueue<E>`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/LinkedBlockingQueue.java#L249)：由链表结构组成的有界（但[默认值](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/LinkedBlockingQueue.java#L249)是：`Integer.MAX_VALUE`）阻塞队列。**
 * [`PriorityBlockingQueue<E>`](https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/util/concurrent/PriorityBlockingQueue.java#L110)：支持优先级排序的无界阻塞队列。

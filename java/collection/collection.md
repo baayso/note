@@ -1,5 +1,5 @@
 # Collection
-  ![Java集合框架结构图](https://github.com/baayso/note/blob/master/java/collection/Java%E9%9B%86%E5%90%88%E6%A1%86%E6%9E%B6%E7%BB%93%E6%9E%84%E5%9B%BE.gif)
+  ![Java集合框架结构图](Java集合框架结构图.gif)
 * `Set`与`List`的最大区别就是`Set`中的元素不可重复（这个重复指的是`equals()`方法的返回值是否相等）。
 
 ## 1. ArrayList
@@ -91,7 +91,7 @@
 * 当向`HashMap`中`put`一对键值时，它会根据`key`的`hashCode`值计算出一个位置，该位置就是此对象 准备往数组中存放的位置。
 * 如果该位置没有对象存在，就将此对象直接放进数组当中；如果该位置已经有对象存在了，则顺着此存在的对象的链开始寻找（`Entry`类有一个`Entry`类型的`next`成员变量，指向了该对象的下一个对象），如果此链上有对象的话，再去使用`equals()`方法进行比较，如果对此链上的某个对象的`equals()`方法比较为`false`，则将该对象放到数组当中，然后将数组中该位置以前存在的那个对象链接到此对象的后面。
 * HashMap存储结构图：
-  ![HashMap存储结构图](https://github.com/baayso/note/blob/master/java/collection/HashMap%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84%E5%9B%BE.png)
+  ![HashMap存储结构图](HashMap存储结构图.png)
 * 元素查找：使用`hashCode`定位元素，若有哈希冲突，则遍历对比。
 
 ## 8. Hashtable
